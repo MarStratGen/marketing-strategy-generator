@@ -274,10 +274,10 @@ function BusinessCard({ card, groupColor }) {
 
       {/* Card Content Preview */}
       <div className="p-6">
-        <div className={`${isExpanded ? '' : 'max-h-32 overflow-hidden'} relative`}>
-          {renderCardContent(card.data)}
+        <div className={`${isExpanded ? '' : 'max-h-40 overflow-hidden'} relative`}>
+          {renderCardContent(card.data, 0, isExpanded)}
           {!isExpanded && (
-            <div className="absolute bottom-0 left-0 right-0 h-8 bg-gradient-to-t from-white to-transparent"></div>
+            <div className="absolute bottom-0 left-0 right-0 h-12 bg-gradient-to-t from-white to-transparent"></div>
           )}
         </div>
         
@@ -294,41 +294,49 @@ function BusinessCard({ card, groupColor }) {
 }
 
 /* Enhanced content renderer for business cards */
-function renderCardContent(data, depth = 0) {
+function renderCardContent(data, depth = 0, isExpanded = false) {
   if (!data) return <p className="text-gray-500 italic">No data available</p>;
   
   if (Array.isArray(data)) {
+    // Show more items when expanded, fewer when collapsed
+    const itemsToShow = isExpanded ? data.length : (depth === 0 ? 3 : 2);
     return (
       <ul className="space-y-2">
-        {data.slice(0, depth === 0 ? 5 : 3).map((item, index) => (
+        {data.slice(0, itemsToShow).map((item, index) => (
           <li key={index} className="flex items-start gap-2">
             <span className="text-blue-500 mt-1 text-sm">•</span>
-            <span className="text-gray-700 text-sm">{typeof item === 'object' ? renderCardContent(item, depth + 1) : item}</span>
+            <span className="text-gray-700 text-sm">
+              {typeof item === 'object' ? renderCardContent(item, depth + 1, isExpanded) : item}
+            </span>
           </li>
         ))}
-        {data.length > (depth === 0 ? 5 : 3) && (
-          <li className="text-gray-400 text-sm italic">...and {data.length - (depth === 0 ? 5 : 3)} more items</li>
+        {!isExpanded && data.length > itemsToShow && (
+          <li className="text-gray-400 text-sm italic">...and {data.length - itemsToShow} more items</li>
         )}
       </ul>
     );
   }
   
   if (typeof data === 'object') {
+    // Show more sections when expanded
+    const entriesToShow = isExpanded ? Object.entries(data).length : (depth === 0 ? 3 : 2);
+    const entries = Object.entries(data);
+    
     return (
       <div className="space-y-4">
-        {Object.entries(data).slice(0, depth === 0 ? 4 : 2).map(([key, value]) => (
+        {entries.slice(0, entriesToShow).map(([key, value]) => (
           <div key={key}>
             <h5 className="font-semibold text-gray-800 text-sm mb-2 flex items-center gap-2">
               <span className="w-1.5 h-1.5 bg-blue-400 rounded-full"></span>
               {key.replace(/([A-Z_])/g, ' $1').trim()}
             </h5>
             <div className="ml-4 text-gray-600">
-              {renderCardContent(value, depth + 1)}
+              {renderCardContent(value, depth + 1, isExpanded)}
             </div>
           </div>
         ))}
-        {Object.keys(data).length > (depth === 0 ? 4 : 2) && (
-          <p className="text-gray-400 text-sm italic">...and {Object.keys(data).length - (depth === 0 ? 4 : 2)} more sections</p>
+        {!isExpanded && entries.length > entriesToShow && (
+          <p className="text-gray-400 text-sm italic">...and {entries.length - entriesToShow} more sections</p>
         )}
       </div>
     );
