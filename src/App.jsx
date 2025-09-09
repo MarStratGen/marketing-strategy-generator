@@ -315,7 +315,7 @@ export default function App() {
       </div>
       
       {/* Report breaks out of form container for full width */}
-      <Report plan={result} />
+      <Report plan={result} loading={loading} />
     </div>
   );
 }

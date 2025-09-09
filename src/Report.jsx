@@ -1,4 +1,9 @@
-export default function Report({ plan }) {
+export default function Report({ plan, loading }) {
+  // Show skeleton loading animation while generating
+  if (loading) {
+    return <SkeletonTimeline />;
+  }
+  
   if (!plan) return null; // form visible
 
   /* Error handling */
@@ -137,6 +142,96 @@ export default function Report({ plan }) {
         >
           🖨️ Print Plan
         </button>
+      </div>
+    </div>
+  );
+}
+
+/* Skeleton Loading Animation */
+function SkeletonTimeline() {
+  const skeletonPhases = [
+    { color: "blue", duration: "Week 1-2" },
+    { color: "purple", duration: "Week 3-4" },
+    { color: "green", duration: "Week 4-5" },
+    { color: "orange", duration: "Week 6+" },
+    { color: "indigo", duration: "Ongoing" }
+  ];
+
+  return (
+    <div className="mt-8 w-full max-w-6xl mx-auto px-4">
+      {/* Header skeleton */}
+      <div className="text-center mb-12">
+        <div className="h-10 bg-gray-200 rounded-lg w-3/4 mx-auto mb-4 animate-pulse"></div>
+        <div className="h-6 bg-gray-200 rounded w-1/2 mx-auto animate-pulse"></div>
+      </div>
+      
+      {/* Timeline skeleton */}
+      <div className="relative">
+        {/* Timeline line */}
+        <div className="absolute left-8 top-0 bottom-0 w-0.5 bg-gradient-to-b from-gray-300 via-gray-300 to-gray-300 animate-pulse"></div>
+        
+        {/* Skeleton phases */}
+        <div className="space-y-12">
+          {skeletonPhases.map((phase, index) => (
+            <SkeletonStep key={index} phase={phase} />
+          ))}
+        </div>
+      </div>
+      
+      {/* Action bar skeleton */}
+      <div className="mt-8 flex flex-wrap gap-3 justify-center bg-gray-50 p-4 rounded-lg">
+        <div className="h-10 bg-gray-200 rounded-lg w-32 animate-pulse"></div>
+        <div className="h-10 bg-gray-200 rounded-lg w-24 animate-pulse"></div>
+      </div>
+    </div>
+  );
+}
+
+function SkeletonStep({ phase }) {
+  const dotColors = {
+    blue: "bg-blue-300",
+    purple: "bg-purple-300", 
+    green: "bg-green-300",
+    orange: "bg-orange-300",
+    indigo: "bg-indigo-300"
+  };
+
+  return (
+    <div className="relative">
+      {/* Timeline dot */}
+      <div className={`absolute left-6 w-4 h-4 ${dotColors[phase.color]} rounded-full border-4 border-white shadow-lg z-10 animate-pulse`}></div>
+      
+      {/* Content */}
+      <div className="ml-20">
+        {/* Phase header skeleton */}
+        <div className="flex items-center gap-3 mb-3">
+          <div className="w-12 h-12 bg-gray-200 rounded animate-pulse"></div>
+          <div className="flex-1">
+            <div className="flex items-center gap-3">
+              <div className="h-4 bg-gray-200 rounded w-32 animate-pulse"></div>
+              <div className="h-6 bg-gray-200 rounded-full w-20 animate-pulse"></div>
+            </div>
+            <div className="h-8 bg-gray-200 rounded w-80 mt-2 animate-pulse"></div>
+            <div className="h-5 bg-gray-200 rounded w-96 mt-2 animate-pulse"></div>
+          </div>
+        </div>
+        
+        {/* Content card skeleton */}
+        <div className="bg-white border-l-4 border-gray-300 rounded-r-lg shadow-sm p-6 mb-4">
+          <div className="space-y-4">
+            <div className="h-6 bg-gray-200 rounded w-3/4 animate-pulse"></div>
+            <div className="space-y-2">
+              <div className="h-4 bg-gray-200 rounded w-full animate-pulse"></div>
+              <div className="h-4 bg-gray-200 rounded w-5/6 animate-pulse"></div>
+              <div className="h-4 bg-gray-200 rounded w-4/5 animate-pulse"></div>
+            </div>
+            <div className="h-6 bg-gray-200 rounded w-2/3 animate-pulse"></div>
+            <div className="space-y-2">
+              <div className="h-4 bg-gray-200 rounded w-full animate-pulse"></div>
+              <div className="h-4 bg-gray-200 rounded w-3/4 animate-pulse"></div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );
