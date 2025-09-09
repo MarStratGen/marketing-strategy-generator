@@ -36,9 +36,9 @@ export default function Report({ plan, loading }) {
   }
 
   /* Success → render beautiful timeline marketing plan */
-  const marketingPlan = plan.GoToMarketPlan || plan;
+  const marketingPlan = plan.GoToMarketPlan || plan.GTM_Plan || plan;
   
-  // Define timeline phases with the marketing plan data
+  // Define timeline phases matching the actual API response structure
   const timelinePhases = [
     {
       id: 1,
@@ -47,7 +47,7 @@ export default function Report({ plan, loading }) {
       color: "blue",
       title: "Market Analysis & Strategy",
       description: "Understanding your market position and strategic foundation",
-      data: marketingPlan.MarketAnalysis || marketingPlan.MarketAnalysisAndPositioning,
+      data: marketingPlan.Market_Analysis_Positioning || marketingPlan.MarketAnalysis || marketingPlan.MarketAnalysisAndPositioning,
       duration: "Week 1-2"
     },
     {
@@ -57,7 +57,7 @@ export default function Report({ plan, loading }) {
       color: "purple",
       title: "Marketing Mix Development",
       description: "Building your comprehensive marketing framework",
-      data: marketingPlan.MarketingMix,
+      data: marketingPlan.Marketing_Mix || marketingPlan.MarketingMix,
       duration: "Week 3-4"
     },
     {
@@ -67,7 +67,7 @@ export default function Report({ plan, loading }) {
       color: "green",
       title: "Budget Planning & Allocation",
       description: "Strategic investment and resource allocation",
-      data: marketingPlan.Budget || marketingPlan.BudgetAllocation,
+      data: marketingPlan.Budget_Allocation || marketingPlan.Budget || marketingPlan.BudgetAllocation,
       duration: "Week 4-5"
     },
     {
@@ -77,7 +77,7 @@ export default function Report({ plan, loading }) {
       color: "orange", 
       title: "Campaign Timeline",
       description: "Marketing calendar and campaign scheduling",
-      data: marketingPlan.MarketingCalendar || marketingPlan.Timeline,
+      data: marketingPlan.Marketing_Calendar || marketingPlan.MarketingCalendar || marketingPlan.Timeline,
       duration: "Week 6+"
     },
     {
@@ -87,7 +87,7 @@ export default function Report({ plan, loading }) {
       color: "indigo",
       title: "KPIs & Success Tracking", 
       description: "Performance measurement and optimization",
-      data: marketingPlan.KPIs || marketingPlan.SuccessMetrics,
+      data: marketingPlan.KPIs_Success_Metrics || marketingPlan.KPIs || marketingPlan.SuccessMetrics,
       duration: "Ongoing"
     }
   ].filter(phase => phase.data);
