@@ -97,39 +97,15 @@ export default function Report({ plan, loading }) {
   ].filter(phase => phase.data);
 
   return (
-    <div className="mt-8 w-full max-w-6xl mx-auto px-4">
+    <div className="mt-8 w-full max-w-7xl mx-auto px-4">
       {/* Header */}
       <div className="text-center mb-8">
-        <h2 className="text-4xl font-bold text-gray-900 mb-4">🚀 Your Strategic Marketing Roadmap</h2>
-        <p className="text-lg text-gray-600 max-w-2xl mx-auto mb-6">A step-by-step journey to marketing success, designed specifically for your business</p>
-        
-        {/* View Mode Selector */}
-        <div className="flex justify-center gap-2 mb-8">
-          <button 
-            onClick={() => setViewMode('stepper')}
-            className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${viewMode === 'stepper' ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'}`}
-          >
-            📱 Stepper Interface
-          </button>
-          <button 
-            onClick={() => setViewMode('summary')}
-            className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${viewMode === 'summary' ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'}`}
-          >
-            📋 Summary + Drill-down
-          </button>
-          <button 
-            onClick={() => setViewMode('interactive')}
-            className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${viewMode === 'interactive' ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'}`}
-          >
-            🔄 Interactive Phases
-          </button>
-        </div>
+        <h2 className="text-4xl font-bold text-gray-900 mb-4">🚀 Your Marketing Plan</h2>
+        <p className="text-lg text-gray-600 max-w-2xl mx-auto mb-6">A comprehensive strategy organized into actionable card groups</p>
       </div>
       
-      {/* Render based on view mode */}
-      {viewMode === 'stepper' && <StepperView phases={timelinePhases} />}
-      {viewMode === 'summary' && <SummaryView phases={timelinePhases} />}
-      {viewMode === 'interactive' && <InteractiveView phases={timelinePhases} />}
+      {/* Card Groups Layout */}
+      <CardGroupsView data={marketingPlan} />
       
       {/* Action Bar */}
       <div className="flex flex-wrap gap-3 justify-center bg-gray-50 p-4 rounded-lg">
@@ -158,6 +134,207 @@ export default function Report({ plan, loading }) {
       </div>
     </div>
   );
+}
+
+/* Card Groups View - Organized, scannable card layout */
+function CardGroupsView({ data }) {
+  const cardGroups = [
+    {
+      title: "🎯 Market Foundation",
+      description: "Understanding your market and strategic positioning",
+      color: "blue",
+      cards: [
+        {
+          title: "Market Analysis",
+          icon: "📊",
+          data: data.Market_Analysis_and_Positioning || data.MarketAnalysisAndPositioning || data.Market_Analysis_Positioning,
+          priority: "high"
+        }
+      ]
+    },
+    {
+      title: "🔧 Strategy Framework", 
+      description: "Core marketing mix and tactical approach",
+      color: "purple",
+      cards: [
+        {
+          title: "Marketing Mix (7 Ps)",
+          icon: "⚡",
+          data: data.Marketing_Mix || data.MarketingMix,
+          priority: "high"
+        }
+      ]
+    },
+    {
+      title: "💰 Investment & Execution",
+      description: "Budget allocation and implementation timeline",
+      color: "green", 
+      cards: [
+        {
+          title: "Budget Allocation",
+          icon: "💸",
+          data: data.Budget_Allocation || data.Budget || data.BudgetAllocation,
+          priority: "medium"
+        },
+        {
+          title: "Marketing Calendar",
+          icon: "📅",
+          data: data.Marketing_Calendar || data.MarketingCalendar || data.Timeline,
+          priority: "medium"
+        }
+      ]
+    },
+    {
+      title: "📈 Performance & Measurement",
+      description: "KPIs and success tracking metrics",
+      color: "indigo",
+      cards: [
+        {
+          title: "Success Metrics",
+          icon: "🎯",
+          data: data.KPIs_Success_Metrics || data.KPIs || data.SuccessMetrics,
+          priority: "high"
+        }
+      ]
+    }
+  ].filter(group => group.cards.some(card => card.data));
+
+  return (
+    <div className="space-y-12">
+      {cardGroups.map((group, groupIndex) => (
+        <CardGroup key={groupIndex} group={group} />
+      ))}
+    </div>
+  );
+}
+
+/* Card Group Component */
+function CardGroup({ group }) {
+  return (
+    <div className="space-y-6">
+      {/* Group Header */}
+      <div className="text-center">
+        <h3 className="text-2xl font-bold text-gray-900 mb-2">{group.title}</h3>
+        <p className="text-gray-600 max-w-lg mx-auto">{group.description}</p>
+      </div>
+      
+      {/* Cards Grid */}
+      <div className={`grid gap-6 ${group.cards.length === 1 ? 'grid-cols-1 max-w-4xl mx-auto' : 'grid-cols-1 md:grid-cols-2'}`}>
+        {group.cards.filter(card => card.data).map((card, cardIndex) => (
+          <BusinessCard key={cardIndex} card={card} groupColor={group.color} />
+        ))}
+      </div>
+    </div>
+  );
+}
+
+/* Business Card Component */
+function BusinessCard({ card, groupColor }) {
+  const [isExpanded, setIsExpanded] = useState(false);
+  
+  const colorClasses = {
+    blue: {
+      header: "bg-gradient-to-r from-blue-500 to-blue-600",
+      border: "border-blue-200",
+      accent: "text-blue-600"
+    },
+    purple: {
+      header: "bg-gradient-to-r from-purple-500 to-purple-600", 
+      border: "border-purple-200",
+      accent: "text-purple-600"
+    },
+    green: {
+      header: "bg-gradient-to-r from-green-500 to-green-600",
+      border: "border-green-200", 
+      accent: "text-green-600"
+    },
+    indigo: {
+      header: "bg-gradient-to-r from-indigo-500 to-indigo-600",
+      border: "border-indigo-200",
+      accent: "text-indigo-600"
+    }
+  };
+
+  const colors = colorClasses[groupColor] || colorClasses.blue;
+
+  return (
+    <div className={`bg-white rounded-xl border-2 ${colors.border} shadow-sm hover:shadow-md transition-all duration-200 overflow-hidden`}>
+      {/* Card Header */}
+      <div className={`${colors.header} text-white p-6`}>
+        <div className="flex items-center gap-4">
+          <div className="text-3xl">{card.icon}</div>
+          <div>
+            <h4 className="text-xl font-bold">{card.title}</h4>
+            {card.priority === 'high' && (
+              <span className="text-xs bg-white bg-opacity-20 px-2 py-1 rounded-full">High Priority</span>
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* Card Content Preview */}
+      <div className="p-6">
+        <div className={`${isExpanded ? '' : 'max-h-32 overflow-hidden'} relative`}>
+          {renderCardContent(card.data)}
+          {!isExpanded && (
+            <div className="absolute bottom-0 left-0 right-0 h-8 bg-gradient-to-t from-white to-transparent"></div>
+          )}
+        </div>
+        
+        {/* Expand/Collapse Button */}
+        <button
+          onClick={() => setIsExpanded(!isExpanded)}
+          className={`mt-4 w-full ${colors.accent} hover:bg-gray-50 border border-gray-200 px-4 py-2 rounded-lg font-medium transition-colors text-sm`}
+        >
+          {isExpanded ? '👆 Show Less' : '👇 Show More'}
+        </button>
+      </div>
+    </div>
+  );
+}
+
+/* Enhanced content renderer for business cards */
+function renderCardContent(data, depth = 0) {
+  if (!data) return <p className="text-gray-500 italic">No data available</p>;
+  
+  if (Array.isArray(data)) {
+    return (
+      <ul className="space-y-2">
+        {data.slice(0, depth === 0 ? 5 : 3).map((item, index) => (
+          <li key={index} className="flex items-start gap-2">
+            <span className="text-blue-500 mt-1 text-sm">•</span>
+            <span className="text-gray-700 text-sm">{typeof item === 'object' ? renderCardContent(item, depth + 1) : item}</span>
+          </li>
+        ))}
+        {data.length > (depth === 0 ? 5 : 3) && (
+          <li className="text-gray-400 text-sm italic">...and {data.length - (depth === 0 ? 5 : 3)} more items</li>
+        )}
+      </ul>
+    );
+  }
+  
+  if (typeof data === 'object') {
+    return (
+      <div className="space-y-4">
+        {Object.entries(data).slice(0, depth === 0 ? 4 : 2).map(([key, value]) => (
+          <div key={key}>
+            <h5 className="font-semibold text-gray-800 text-sm mb-2 flex items-center gap-2">
+              <span className="w-1.5 h-1.5 bg-blue-400 rounded-full"></span>
+              {key.replace(/([A-Z_])/g, ' $1').trim()}
+            </h5>
+            <div className="ml-4 text-gray-600">
+              {renderCardContent(value, depth + 1)}
+            </div>
+          </div>
+        ))}
+        {Object.keys(data).length > (depth === 0 ? 4 : 2) && (
+          <p className="text-gray-400 text-sm italic">...and {Object.keys(data).length - (depth === 0 ? 4 : 2)} more sections</p>
+        )}
+      </div>
+    );
+  }
+  
+  return <p className="text-gray-700 text-sm leading-relaxed">{String(data)}</p>;
 }
 
 /* 1. Stepper Interface - Navigate through phases one by one */
