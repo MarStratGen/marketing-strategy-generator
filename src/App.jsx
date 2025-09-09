@@ -152,21 +152,20 @@ export default function App() {
   };
 
   return (
-    <div
-      className="
-      w-full max-w-md bg-white/90 backdrop-blur-sm rounded-xl shadow-2xl p-8"
-    >
-      <h1 className="text-3xl font-bold mb-6 text-gray-800 tracking-wide">
-        Tiny Marketing-Plan Generator
-      </h1>
+    <div className="w-full min-h-screen">
+      {/* Form Container */}
+      <div className="w-full max-w-md mx-auto bg-white/90 backdrop-blur-sm rounded-xl shadow-2xl p-8 mb-8">
+        <h1 className="text-3xl font-bold mb-6 text-gray-800 tracking-wide">
+          Tiny Marketing-Plan Generator
+        </h1>
 
-      {error && (
-        <div className="bg-red-200 text-red-800 px-4 py-2 rounded mb-4">
-          {error}
-        </div>
-      )}
+        {error && (
+          <div className="bg-red-200 text-red-800 px-4 py-2 rounded mb-4">
+            {error}
+          </div>
+        )}
 
-      <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-4">
         {/* Country */}
         <Field label="Country">
           <select
@@ -313,7 +312,9 @@ export default function App() {
           {loading ? "Thinking…" : "Generate Plan"}
         </button>
       </form>
-
+      </div>
+      
+      {/* Report breaks out of form container for full width */}
       <Report plan={result} />
     </div>
   );
