@@ -1,4 +1,8 @@
+import { useState } from 'react';
+
 export default function Report({ plan, loading }) {
+  const [viewMode, setViewMode] = useState('stepper'); // stepper, summary, interactive
+  
   // Show skeleton loading animation while generating
   if (loading) {
     return <SkeletonTimeline />;
@@ -95,28 +99,37 @@ export default function Report({ plan, loading }) {
   return (
     <div className="mt-8 w-full max-w-6xl mx-auto px-4">
       {/* Header */}
-      <div className="text-center mb-12">
+      <div className="text-center mb-8">
         <h2 className="text-4xl font-bold text-gray-900 mb-4">🚀 Your Strategic Marketing Roadmap</h2>
-        <p className="text-lg text-gray-600 max-w-2xl mx-auto">A step-by-step journey to marketing success, designed specifically for your business</p>
-      </div>
-      
-      {/* Timeline */}
-      <div className="relative">
-        {/* Timeline line */}
-        <div className="absolute left-8 top-0 bottom-0 w-0.5 bg-gradient-to-b from-blue-500 via-purple-500 via-green-500 via-orange-500 to-indigo-500"></div>
+        <p className="text-lg text-gray-600 max-w-2xl mx-auto mb-6">A step-by-step journey to marketing success, designed specifically for your business</p>
         
-        {/* Timeline phases */}
-        <div className="space-y-12">
-          {timelinePhases.map((phase, index) => (
-            <TimelineStep 
-              key={phase.id}
-              phase={phase}
-              index={index}
-              isLast={index === timelinePhases.length - 1}
-            />
-          ))}
+        {/* View Mode Selector */}
+        <div className="flex justify-center gap-2 mb-8">
+          <button 
+            onClick={() => setViewMode('stepper')}
+            className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${viewMode === 'stepper' ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'}`}
+          >
+            📱 Stepper Interface
+          </button>
+          <button 
+            onClick={() => setViewMode('summary')}
+            className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${viewMode === 'summary' ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'}`}
+          >
+            📋 Summary + Drill-down
+          </button>
+          <button 
+            onClick={() => setViewMode('interactive')}
+            className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${viewMode === 'interactive' ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'}`}
+          >
+            🔄 Interactive Phases
+          </button>
         </div>
       </div>
+      
+      {/* Render based on view mode */}
+      {viewMode === 'stepper' && <StepperView phases={timelinePhases} />}
+      {viewMode === 'summary' && <SummaryView phases={timelinePhases} />}
+      {viewMode === 'interactive' && <InteractiveView phases={timelinePhases} />}
       
       {/* Action Bar */}
       <div className="flex flex-wrap gap-3 justify-center bg-gray-50 p-4 rounded-lg">
@@ -145,6 +158,207 @@ export default function Report({ plan, loading }) {
       </div>
     </div>
   );
+}
+
+/* 1. Stepper Interface - Navigate through phases one by one */
+function StepperView({ phases }) {
+  const [currentStep, setCurrentStep] = useState(0);
+  const phase = phases[currentStep];
+
+  if (!phase) return <div className="text-center text-gray-500">No data available</div>;
+
+  return (
+    <div className="max-w-4xl mx-auto">
+      {/* Progress bar */}
+      <div className="mb-8">
+        <div className="flex justify-between items-center mb-2">
+          <span className="text-sm font-medium text-gray-700">Progress</span>
+          <span className="text-sm text-gray-500">{currentStep + 1} of {phases.length}</span>
+        </div>
+        <div className="w-full bg-gray-200 rounded-full h-2">
+          <div 
+            className="bg-blue-600 h-2 rounded-full transition-all duration-300"
+            style={{ width: `${((currentStep + 1) / phases.length) * 100}%` }}
+          ></div>
+        </div>
+      </div>
+
+      {/* Current phase content */}
+      <div className="bg-white rounded-xl shadow-lg p-8 mb-6">
+        <div className="flex items-center gap-4 mb-6">
+          <div className={`w-16 h-16 rounded-full flex items-center justify-center text-2xl ${getPhaseColor(phase.color)}`}>
+            {phase.icon}
+          </div>
+          <div>
+            <div className="text-sm font-semibold text-gray-500 uppercase tracking-wide">
+              Phase {phase.id}: {phase.phase}
+            </div>
+            <h3 className="text-2xl font-bold text-gray-900">{phase.title}</h3>
+            <p className="text-gray-600">{phase.description}</p>
+          </div>
+        </div>
+        
+        <div className="prose max-w-none">
+          {renderTimelineData(phase.data)}
+        </div>
+      </div>
+
+      {/* Navigation */}
+      <div className="flex justify-between items-center">
+        <button
+          onClick={() => setCurrentStep(Math.max(0, currentStep - 1))}
+          disabled={currentStep === 0}
+          className="flex items-center gap-2 px-4 py-2 bg-gray-100 text-gray-700 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-200 transition-colors"
+        >
+          ← Previous
+        </button>
+
+        <div className="flex gap-2">
+          {phases.map((_, index) => (
+            <button
+              key={index}
+              onClick={() => setCurrentStep(index)}
+              className={`w-3 h-3 rounded-full transition-colors ${index === currentStep ? 'bg-blue-600' : 'bg-gray-300'}`}
+            />
+          ))}
+        </div>
+
+        <button
+          onClick={() => setCurrentStep(Math.min(phases.length - 1, currentStep + 1))}
+          disabled={currentStep === phases.length - 1}
+          className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-blue-700 transition-colors"
+        >
+          Next →
+        </button>
+      </div>
+    </div>
+  );
+}
+
+/* 4. Summary + Drill-down - Overview cards that expand for details */
+function SummaryView({ phases }) {
+  const [expandedPhase, setExpandedPhase] = useState(null);
+
+  return (
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      {phases.map((phase) => (
+        <div key={phase.id} className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden hover:shadow-md transition-shadow">
+          {/* Summary card */}
+          <div className={`p-4 ${getPhaseColor(phase.color)} bg-opacity-10`}>
+            <div className="flex items-center gap-3 mb-3">
+              <span className="text-2xl">{phase.icon}</span>
+              <div>
+                <div className="text-xs font-semibold text-gray-500 uppercase tracking-wide">
+                  Phase {phase.id}
+                </div>
+                <h3 className="font-bold text-gray-900">{phase.title}</h3>
+              </div>
+            </div>
+            <p className="text-sm text-gray-600 mb-4">{phase.description}</p>
+            <button
+              onClick={() => setExpandedPhase(expandedPhase === phase.id ? null : phase.id)}
+              className="w-full bg-white bg-opacity-50 hover:bg-opacity-75 text-gray-700 px-3 py-2 rounded text-sm font-medium transition-colors"
+            >
+              {expandedPhase === phase.id ? 'Hide Details' : 'View Details'}
+            </button>
+          </div>
+          
+          {/* Expanded content */}
+          {expandedPhase === phase.id && (
+            <div className="p-4 border-t border-gray-100 bg-gray-50">
+              <div className="text-sm">
+                {renderTimelineData(phase.data)}
+              </div>
+            </div>
+          )}
+        </div>
+      ))}
+    </div>
+  );
+}
+
+/* 5. Interactive Phases - Click through with smooth transitions */
+function InteractiveView({ phases }) {
+  const [selectedPhase, setSelectedPhase] = useState(phases[0]?.id || 1);
+  const currentPhase = phases.find(p => p.id === selectedPhase) || phases[0];
+
+  return (
+    <div className="flex gap-8">
+      {/* Phase navigation sidebar */}
+      <div className="w-80 bg-gray-50 rounded-xl p-6">
+        <h3 className="font-bold text-gray-900 mb-4">Strategy Phases</h3>
+        <div className="space-y-3">
+          {phases.map((phase) => (
+            <button
+              key={phase.id}
+              onClick={() => setSelectedPhase(phase.id)}
+              className={`w-full text-left p-3 rounded-lg transition-all ${
+                selectedPhase === phase.id 
+                  ? `${getPhaseColor(phase.color)} bg-opacity-20 border-l-4 ${getBorderColor(phase.color)}` 
+                  : 'hover:bg-gray-100'
+              }`}
+            >
+              <div className="flex items-center gap-3">
+                <span className="text-lg">{phase.icon}</span>
+                <div>
+                  <div className="text-xs font-semibold text-gray-500 uppercase tracking-wide">
+                    Phase {phase.id}
+                  </div>
+                  <div className="font-medium text-gray-900">{phase.title}</div>
+                  <div className="text-xs text-gray-600">{phase.duration}</div>
+                </div>
+              </div>
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Main content area */}
+      <div className="flex-1">
+        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-8">
+          <div className="flex items-center gap-4 mb-6">
+            <div className={`w-12 h-12 rounded-full flex items-center justify-center text-xl ${getPhaseColor(currentPhase.color)}`}>
+              {currentPhase.icon}
+            </div>
+            <div>
+              <div className="text-sm font-semibold text-gray-500 uppercase tracking-wide">
+                Phase {currentPhase.id}: {currentPhase.phase}
+              </div>
+              <h2 className="text-2xl font-bold text-gray-900">{currentPhase.title}</h2>
+              <p className="text-gray-600">{currentPhase.description}</p>
+            </div>
+          </div>
+          
+          <div className="prose max-w-none">
+            {renderTimelineData(currentPhase.data)}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* Helper functions */
+function getPhaseColor(color) {
+  const colors = {
+    blue: "bg-blue-100 text-blue-800",
+    purple: "bg-purple-100 text-purple-800",
+    green: "bg-green-100 text-green-800",
+    orange: "bg-orange-100 text-orange-800",
+    indigo: "bg-indigo-100 text-indigo-800"
+  };
+  return colors[color] || colors.blue;
+}
+
+function getBorderColor(color) {
+  const colors = {
+    blue: "border-blue-500",
+    purple: "border-purple-500",
+    green: "border-green-500",
+    orange: "border-orange-500",
+    indigo: "border-indigo-500"
+  };
+  return colors[color] || colors.blue;
 }
 
 /* Skeleton Loading Animation */
