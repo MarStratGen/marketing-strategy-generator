@@ -1,27 +1,20 @@
-import { useState } from 'react';
+import { useState } from "react";
 
 export default function Report({ plan, loading }) {
-  const [viewMode, setViewMode] = useState('stepper'); // stepper, summary, interactive
-  
-  // Show skeleton loading animation while generating
-  if (loading) {
-    return <SkeletonTimeline />;
-  }
-  
-  if (!plan) return null; // form visible
+  const [viewMode] = useState("cards"); // simple view
 
-  /* Error handling */
+  if (loading) return <SkeletonTimeline />;
+  if (!plan) return null;
+
+  // Error handling
   if (plan.error) {
-    const errorMessage = typeof plan === 'object' ? JSON.stringify(plan, null, 2) : String(plan);
-    
-    // Extract user-friendly error message
+    const errorMessage =
+      typeof plan === "object" ? JSON.stringify(plan, null, 2) : String(plan);
     let userMessage = "An error occurred while generating your marketing plan.";
-    if (plan.detail?.error?.message) {
+    if (plan.detail?.error?.message)
       userMessage = `API Error: ${plan.detail.error.message}`;
-    } else if (plan.error) {
-      userMessage = `Error: ${plan.error}`;
-    }
-    
+    else if (plan.error) userMessage = `Error: ${plan.error}`;
+
     return (
       <div className="mt-6">
         <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
@@ -39,83 +32,34 @@ export default function Report({ plan, loading }) {
     );
   }
 
-  /* Success → render beautiful timeline marketing plan */
-  const marketingPlan = plan.GoToMarketPlan || plan.GTM_Plan || plan;
-  
-  // Define timeline phases matching the actual API response structure
-  const timelinePhases = [
-    {
-      id: 1,
-      phase: "Foundation",
-      icon: "🎯",
-      color: "blue",
-      title: "Market Analysis & Strategy",
-      description: "Understanding your market position and strategic foundation",
-      data: marketingPlan.Market_Analysis_Positioning || marketingPlan.MarketAnalysis || marketingPlan.MarketAnalysisAndPositioning,
-      duration: "Week 1-2"
-    },
-    {
-      id: 2, 
-      phase: "Framework",
-      icon: "🔧",
-      color: "purple",
-      title: "Marketing Mix Development",
-      description: "Building your comprehensive marketing framework",
-      data: marketingPlan.Marketing_Mix || marketingPlan.MarketingMix,
-      duration: "Week 3-4"
-    },
-    {
-      id: 3,
-      phase: "Investment",
-      icon: "💰", 
-      color: "green",
-      title: "Budget Planning & Allocation",
-      description: "Strategic investment and resource allocation",
-      data: marketingPlan.Budget_Allocation || marketingPlan.Budget || marketingPlan.BudgetAllocation,
-      duration: "Week 4-5"
-    },
-    {
-      id: 4,
-      phase: "Execution",
-      icon: "📅",
-      color: "orange", 
-      title: "Campaign Timeline",
-      description: "Marketing calendar and campaign scheduling",
-      data: marketingPlan.Marketing_Calendar || marketingPlan.MarketingCalendar || marketingPlan.Timeline,
-      duration: "Week 6+"
-    },
-    {
-      id: 5,
-      phase: "Measurement",
-      icon: "📈",
-      color: "indigo",
-      title: "KPIs & Success Tracking", 
-      description: "Performance measurement and optimization",
-      data: marketingPlan.KPIs_Success_Metrics || marketingPlan.KPIs || marketingPlan.SuccessMetrics,
-      duration: "Ongoing"
-    }
-  ].filter(phase => phase.data);
+  const data = plan.GoToMarketPlan || plan.GTM_Plan || plan;
 
   return (
     <div className="mt-8 w-full max-w-7xl mx-auto px-4">
       {/* Header */}
       <div className="text-center mb-8">
-        <h2 className="text-4xl font-bold text-gray-900 mb-4">🚀 Your Marketing Plan</h2>
-        <p className="text-lg text-gray-600 max-w-2xl mx-auto mb-6">A comprehensive strategy organized into actionable card groups</p>
+        <h2 className="text-4xl font-bold text-gray-900 mb-4">
+          🚀 Your Marketing Plan
+        </h2>
+        <p className="text-lg text-gray-600 max-w-2xl mx-auto mb-6">
+          Organised into clear, scannable sections
+        </p>
       </div>
-      
-      {/* Card Groups Layout */}
-      <CardGroupsView data={marketingPlan} />
-      
+
+      {/* Card Groups */}
+      <CardGroups data={data} />
+
       {/* Action Bar */}
       <div className="flex flex-wrap gap-3 justify-center bg-gray-50 p-4 rounded-lg">
-        <button 
+        <button
           onClick={() => {
-            const blob = new Blob([JSON.stringify(plan, null, 2)], { type: 'application/json' });
+            const blob = new Blob([JSON.stringify(plan, null, 2)], {
+              type: "application/json",
+            });
             const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
+            const a = document.createElement("a");
             a.href = url;
-            a.download = 'marketing-plan.json';
+            a.download = "marketing-plan.json";
             document.body.appendChild(a);
             a.click();
             document.body.removeChild(a);
@@ -125,7 +69,7 @@ export default function Report({ plan, loading }) {
         >
           📄 Download JSON
         </button>
-        <button 
+        <button
           onClick={() => window.print()}
           className="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors flex items-center gap-2"
         >
@@ -136,695 +80,217 @@ export default function Report({ plan, loading }) {
   );
 }
 
-/* Card Groups View - Organized, scannable card layout */
-function CardGroupsView({ data }) {
-  const cardGroups = [
+function CardGroups({ data }) {
+  const groups = [
     {
-      title: "🎯 Market Foundation",
-      description: "Understanding your market and strategic positioning",
+      title: "🎯 Positioning",
+      description: "Focus, targets, promise, proof",
       color: "blue",
-      cards: [
+      items: [
         {
-          title: "Market Analysis",
-          icon: "📊",
-          data: data.Market_Analysis_and_Positioning || data.MarketAnalysisAndPositioning || data.Market_Analysis_Positioning,
-          priority: "high"
-        }
-      ]
+          title: "Positioning",
+          icon: "📌",
+          data:
+            data.positioning ||
+            data.Market_Analysis_and_Positioning ||
+            data.MarketAnalysisAndPositioning,
+        },
+      ],
     },
     {
-      title: "🔧 Strategy Framework", 
-      description: "Core marketing mix and tactical approach",
+      title: "🔧 Strategy Framework",
+      description: "Marketing mix and channels",
       color: "purple",
-      cards: [
+      items: [
         {
           title: "Marketing Mix (7 Ps)",
           icon: "⚡",
-          data: data.Marketing_Mix || data.MarketingMix,
-          priority: "high"
-        }
-      ]
-    },
-    {
-      title: "💰 Investment & Execution",
-      description: "Budget allocation and implementation timeline",
-      color: "green", 
-      cards: [
-        {
-          title: "Budget Allocation",
-          icon: "💸",
-          data: data.Budget_Allocation || data.Budget || data.BudgetAllocation,
-          priority: "medium"
+          data: data.mix_7ps || data.Marketing_Mix || data.MarketingMix,
         },
         {
-          title: "Marketing Calendar",
-          icon: "📅",
-          data: data.Marketing_Calendar || data.MarketingCalendar || data.Timeline,
-          priority: "medium"
-        }
-      ]
+          title: "Channels and intent",
+          icon: "🧭",
+          data: data.channel_intent_map,
+        },
+      ],
     },
     {
-      title: "📈 Performance & Measurement",
-      description: "KPIs and success tracking metrics",
+      title: "💰 Investment and Timeline",
+      description: "Budget split and 90 day plan",
+      color: "green",
+      items: [
+        { title: "Budget", icon: "💸", data: data.budget },
+        { title: "90 day calendar", icon: "📅", data: data.calendar_90d },
+      ],
+    },
+    {
+      title: "📈 Measurement and Tests",
+      description: "KPIs, experiments and evidence",
       color: "indigo",
-      cards: [
-        {
-          title: "Success Metrics",
-          icon: "🎯",
-          data: data.KPIs_Success_Metrics || data.KPIs || data.SuccessMetrics,
-          priority: "high"
-        }
-      ]
-    }
-  ].filter(group => group.cards.some(card => card.data));
+      items: [
+        { title: "KPIs", icon: "🎯", data: data.kpis },
+        { title: "Experiments", icon: "🧪", data: data.experiments },
+        { title: "Evidence ledger", icon: "📂", data: data.evidence_ledger },
+        { title: "Funnel maths", icon: "🧮", data: data.funnel_math },
+      ],
+    },
+  ];
 
   return (
     <div className="space-y-12">
-      {cardGroups.map((group, groupIndex) => (
-        <CardGroup key={groupIndex} group={group} />
+      {groups.map((g, i) => (
+        <CardGroup key={i} group={g} />
       ))}
     </div>
   );
 }
 
-/* Card Group Component */
 function CardGroup({ group }) {
+  const colors = {
+    blue: "from-blue-500 to-blue-600 border-blue-200",
+    purple: "from-purple-500 to-purple-600 border-purple-200",
+    green: "from-green-500 to-green-600 border-green-200",
+    indigo: "from-indigo-500 to-indigo-600 border-indigo-200",
+  };
+
   return (
     <div className="space-y-6">
-      {/* Group Header */}
       <div className="text-center">
         <h3 className="text-2xl font-bold text-gray-900 mb-2">{group.title}</h3>
         <p className="text-gray-600 max-w-lg mx-auto">{group.description}</p>
       </div>
-      
-      {/* Cards Grid */}
-      <div className={`grid gap-6 ${group.cards.length === 1 ? 'grid-cols-1 max-w-4xl mx-auto' : 'grid-cols-1 md:grid-cols-2'}`}>
-        {group.cards.filter(card => card.data).map((card, cardIndex) => (
-          <BusinessCard key={cardIndex} card={card} groupColor={group.color} />
-        ))}
+
+      <div
+        className={`grid gap-6 ${group.items.length === 1 ? "grid-cols-1 max-w-4xl mx-auto" : "grid-cols-1 md:grid-cols-2"}`}
+      >
+        {group.items
+          .filter((it) => it.data)
+          .map((it, idx) => (
+            <BusinessCard
+              key={idx}
+              title={it.title}
+              icon={it.icon}
+              color={colors[group.color]}
+              data={it.data}
+            />
+          ))}
       </div>
     </div>
   );
 }
 
-/* Business Card Component */
-function BusinessCard({ card, groupColor }) {
-  const [isExpanded, setIsExpanded] = useState(false);
-  
-  const colorClasses = {
-    blue: {
-      header: "bg-gradient-to-r from-blue-500 to-blue-600",
-      border: "border-blue-200",
-      accent: "text-blue-600"
-    },
-    purple: {
-      header: "bg-gradient-to-r from-purple-500 to-purple-600", 
-      border: "border-purple-200",
-      accent: "text-purple-600"
-    },
-    green: {
-      header: "bg-gradient-to-r from-green-500 to-green-600",
-      border: "border-green-200", 
-      accent: "text-green-600"
-    },
-    indigo: {
-      header: "bg-gradient-to-r from-indigo-500 to-indigo-600",
-      border: "border-indigo-200",
-      accent: "text-indigo-600"
-    }
-  };
-
-  const colors = colorClasses[groupColor] || colorClasses.blue;
-
+function BusinessCard({ title, icon, color, data }) {
   return (
-    <div className={`bg-white rounded-xl border-2 ${colors.border} shadow-sm hover:shadow-md transition-all duration-200 overflow-hidden`}>
-      {/* Card Header */}
-      <div className={`${colors.header} text-white p-6`}>
-        <div className="flex items-center gap-4">
-          <div className="text-3xl">{card.icon}</div>
-          <div>
-            <h4 className="text-xl font-bold">{card.title}</h4>
-            {card.priority === 'high' && (
-              <span className="text-xs bg-white bg-opacity-20 px-2 py-1 rounded-full">High Priority</span>
-            )}
-          </div>
+    <div
+      className={`bg-white rounded-xl border border-gray-200 shadow-sm hover:shadow-md transition duration-200 overflow-hidden`}
+    >
+      <div className={`bg-gradient-to-r ${color} text-white p-4`}>
+        <div className="flex items-center gap-3">
+          <span className="text-2xl">{icon}</span>
+          <h4 className="text-lg font-semibold">{title}</h4>
         </div>
       </div>
-
-      {/* Card Content Preview */}
-      <div className="p-6">
-        <div className={`${isExpanded ? '' : 'max-h-40 overflow-hidden'} relative`}>
-          {renderCardContent(card.data, 0, isExpanded)}
-          {!isExpanded && (
-            <div className="absolute bottom-0 left-0 right-0 h-12 bg-gradient-to-t from-white to-transparent"></div>
-          )}
-        </div>
-        
-        {/* Expand/Collapse Button */}
-        <button
-          onClick={() => setIsExpanded(!isExpanded)}
-          className={`mt-4 w-full ${colors.accent} hover:bg-gray-50 border border-gray-200 px-4 py-2 rounded-lg font-medium transition-colors text-sm`}
-        >
-          {isExpanded ? '👆 Show Less' : '👇 Show More'}
-        </button>
-      </div>
+      <div className="p-4">{renderData(data)}</div>
     </div>
   );
 }
 
-/* Enhanced content renderer for business cards */
-function renderCardContent(data, depth = 0, isExpanded = false) {
-  if (!data) return <p className="text-gray-500 italic">No data available</p>;
-  
+function renderData(data, depth = 0) {
+  if (!data) return <p className="text-gray-500 italic">No data</p>;
+
   if (Array.isArray(data)) {
-    // Show more items when expanded, fewer when collapsed
-    const itemsToShow = isExpanded ? data.length : (depth === 0 ? 3 : 2);
     return (
       <ul className="space-y-2">
-        {data.slice(0, itemsToShow).map((item, index) => (
-          <li key={index} className="flex items-start gap-2">
-            <span className="text-blue-500 mt-1 text-sm">•</span>
-            <span className="text-gray-700 text-sm">
-              {typeof item === 'object' ? renderCardContent(item, depth + 1, isExpanded) : item}
+        {data.map((item, i) => (
+          <li key={i} className="flex items-start gap-2 text-gray-700">
+            <span className="text-blue-500 mt-1">•</span>
+            <span>
+              {typeof item === "object"
+                ? renderData(item, depth + 1)
+                : String(item)}
             </span>
           </li>
         ))}
-        {!isExpanded && data.length > itemsToShow && (
-          <li className="text-gray-400 text-sm italic">...and {data.length - itemsToShow} more items</li>
-        )}
       </ul>
     );
   }
-  
-  if (typeof data === 'object') {
-    // Show more sections when expanded
-    const entriesToShow = isExpanded ? Object.entries(data).length : (depth === 0 ? 3 : 2);
-    const entries = Object.entries(data);
-    
+
+  if (typeof data === "object") {
+    // Pretty print known shapes
+    if (data.items && data.rationale && data.within_budget !== undefined) {
+      // budget shape
+      return (
+        <div className="space-y-3">
+          <p className="text-sm text-gray-700">
+            <strong>Rationale:</strong> {data.rationale}
+          </p>
+          <h5 className="font-semibold">Items</h5>
+          <ul className="space-y-1">
+            {data.items.map((it, i) => (
+              <li key={i} className="text-sm">
+                <span className="font-medium">{it.task}</span> — {it.channel} —{" "}
+                {it.percent}% {it.fits === false ? "(move to backlog)" : ""}
+              </li>
+            ))}
+          </ul>
+          {Array.isArray(data.backlog) && data.backlog.length > 0 && (
+            <>
+              <h5 className="font-semibold mt-2">Backlog</h5>
+              <ul className="space-y-1">
+                {data.backlog.map((b, i) => (
+                  <li key={i} className="text-sm">
+                    {b.task} — {b.reason || "Unfunded"}
+                  </li>
+                ))}
+              </ul>
+            </>
+          )}
+        </div>
+      );
+    }
+
     return (
-      <div className="space-y-4">
-        {entries.slice(0, entriesToShow).map(([key, value]) => (
-          <div key={key}>
-            <h5 className="font-semibold text-gray-800 text-sm mb-2 flex items-center gap-2">
-              <span className="w-1.5 h-1.5 bg-blue-400 rounded-full"></span>
-              {key.replace(/([A-Z_])/g, ' $1').trim()}
+      <div className="space-y-3">
+        {Object.entries(data).map(([k, v]) => (
+          <div key={k}>
+            <h5 className="font-semibold text-gray-800 text-sm mb-1">
+              {k.replace(/_/g, " ")}
             </h5>
-            <div className="ml-4 text-gray-600">
-              {renderCardContent(value, depth + 1, isExpanded)}
+            <div className="ml-2 text-sm text-gray-700">
+              {renderData(v, depth + 1)}
             </div>
           </div>
         ))}
-        {!isExpanded && entries.length > entriesToShow && (
-          <p className="text-gray-400 text-sm italic">...and {entries.length - entriesToShow} more sections</p>
-        )}
       </div>
     );
   }
-  
-  return <p className="text-gray-700 text-sm leading-relaxed">{String(data)}</p>;
+
+  return <p className="text-gray-700">{String(data)}</p>;
 }
 
-/* 1. Stepper Interface - Navigate through phases one by one */
-function StepperView({ phases }) {
-  const [currentStep, setCurrentStep] = useState(0);
-  const phase = phases[currentStep];
-
-  if (!phase) return <div className="text-center text-gray-500">No data available</div>;
-
-  return (
-    <div className="max-w-4xl mx-auto">
-      {/* Progress bar */}
-      <div className="mb-8">
-        <div className="flex justify-between items-center mb-2">
-          <span className="text-sm font-medium text-gray-700">Progress</span>
-          <span className="text-sm text-gray-500">{currentStep + 1} of {phases.length}</span>
-        </div>
-        <div className="w-full bg-gray-200 rounded-full h-2">
-          <div 
-            className="bg-blue-600 h-2 rounded-full transition-all duration-300"
-            style={{ width: `${((currentStep + 1) / phases.length) * 100}%` }}
-          ></div>
-        </div>
-      </div>
-
-      {/* Current phase content */}
-      <div className="bg-white rounded-xl shadow-lg p-8 mb-6">
-        <div className="flex items-center gap-4 mb-6">
-          <div className={`w-16 h-16 rounded-full flex items-center justify-center text-2xl ${getPhaseColor(phase.color)}`}>
-            {phase.icon}
-          </div>
-          <div>
-            <div className="text-sm font-semibold text-gray-500 uppercase tracking-wide">
-              Phase {phase.id}: {phase.phase}
-            </div>
-            <h3 className="text-2xl font-bold text-gray-900">{phase.title}</h3>
-            <p className="text-gray-600">{phase.description}</p>
-          </div>
-        </div>
-        
-        <div className="prose max-w-none">
-          {renderTimelineData(phase.data)}
-        </div>
-      </div>
-
-      {/* Navigation */}
-      <div className="flex justify-between items-center">
-        <button
-          onClick={() => setCurrentStep(Math.max(0, currentStep - 1))}
-          disabled={currentStep === 0}
-          className="flex items-center gap-2 px-4 py-2 bg-gray-100 text-gray-700 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-200 transition-colors"
-        >
-          ← Previous
-        </button>
-
-        <div className="flex gap-2">
-          {phases.map((_, index) => (
-            <button
-              key={index}
-              onClick={() => setCurrentStep(index)}
-              className={`w-3 h-3 rounded-full transition-colors ${index === currentStep ? 'bg-blue-600' : 'bg-gray-300'}`}
-            />
-          ))}
-        </div>
-
-        <button
-          onClick={() => setCurrentStep(Math.min(phases.length - 1, currentStep + 1))}
-          disabled={currentStep === phases.length - 1}
-          className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-blue-700 transition-colors"
-        >
-          Next →
-        </button>
-      </div>
-    </div>
-  );
-}
-
-/* 4. Summary + Drill-down - Overview cards that expand for details */
-function SummaryView({ phases }) {
-  const [expandedPhase, setExpandedPhase] = useState(null);
-
-  return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-      {phases.map((phase) => (
-        <div key={phase.id} className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden hover:shadow-md transition-shadow">
-          {/* Summary card */}
-          <div className={`p-4 ${getPhaseColor(phase.color)} bg-opacity-10`}>
-            <div className="flex items-center gap-3 mb-3">
-              <span className="text-2xl">{phase.icon}</span>
-              <div>
-                <div className="text-xs font-semibold text-gray-500 uppercase tracking-wide">
-                  Phase {phase.id}
-                </div>
-                <h3 className="font-bold text-gray-900">{phase.title}</h3>
-              </div>
-            </div>
-            <p className="text-sm text-gray-600 mb-4">{phase.description}</p>
-            <button
-              onClick={() => setExpandedPhase(expandedPhase === phase.id ? null : phase.id)}
-              className="w-full bg-white bg-opacity-50 hover:bg-opacity-75 text-gray-700 px-3 py-2 rounded text-sm font-medium transition-colors"
-            >
-              {expandedPhase === phase.id ? 'Hide Details' : 'View Details'}
-            </button>
-          </div>
-          
-          {/* Expanded content */}
-          {expandedPhase === phase.id && (
-            <div className="p-4 border-t border-gray-100 bg-gray-50">
-              <div className="text-sm">
-                {renderTimelineData(phase.data)}
-              </div>
-            </div>
-          )}
-        </div>
-      ))}
-    </div>
-  );
-}
-
-/* 5. Interactive Phases - Click through with smooth transitions */
-function InteractiveView({ phases }) {
-  const [selectedPhase, setSelectedPhase] = useState(phases[0]?.id || 1);
-  const currentPhase = phases.find(p => p.id === selectedPhase) || phases[0];
-
-  return (
-    <div className="flex gap-8">
-      {/* Phase navigation sidebar */}
-      <div className="w-80 bg-gray-50 rounded-xl p-6">
-        <h3 className="font-bold text-gray-900 mb-4">Strategy Phases</h3>
-        <div className="space-y-3">
-          {phases.map((phase) => (
-            <button
-              key={phase.id}
-              onClick={() => setSelectedPhase(phase.id)}
-              className={`w-full text-left p-3 rounded-lg transition-all ${
-                selectedPhase === phase.id 
-                  ? `${getPhaseColor(phase.color)} bg-opacity-20 border-l-4 ${getBorderColor(phase.color)}` 
-                  : 'hover:bg-gray-100'
-              }`}
-            >
-              <div className="flex items-center gap-3">
-                <span className="text-lg">{phase.icon}</span>
-                <div>
-                  <div className="text-xs font-semibold text-gray-500 uppercase tracking-wide">
-                    Phase {phase.id}
-                  </div>
-                  <div className="font-medium text-gray-900">{phase.title}</div>
-                  <div className="text-xs text-gray-600">{phase.duration}</div>
-                </div>
-              </div>
-            </button>
-          ))}
-        </div>
-      </div>
-
-      {/* Main content area */}
-      <div className="flex-1">
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-8">
-          <div className="flex items-center gap-4 mb-6">
-            <div className={`w-12 h-12 rounded-full flex items-center justify-center text-xl ${getPhaseColor(currentPhase.color)}`}>
-              {currentPhase.icon}
-            </div>
-            <div>
-              <div className="text-sm font-semibold text-gray-500 uppercase tracking-wide">
-                Phase {currentPhase.id}: {currentPhase.phase}
-              </div>
-              <h2 className="text-2xl font-bold text-gray-900">{currentPhase.title}</h2>
-              <p className="text-gray-600">{currentPhase.description}</p>
-            </div>
-          </div>
-          
-          <div className="prose max-w-none">
-            {renderTimelineData(currentPhase.data)}
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-/* Helper functions */
-function getPhaseColor(color) {
-  const colors = {
-    blue: "bg-blue-100 text-blue-800",
-    purple: "bg-purple-100 text-purple-800",
-    green: "bg-green-100 text-green-800",
-    orange: "bg-orange-100 text-orange-800",
-    indigo: "bg-indigo-100 text-indigo-800"
-  };
-  return colors[color] || colors.blue;
-}
-
-function getBorderColor(color) {
-  const colors = {
-    blue: "border-blue-500",
-    purple: "border-purple-500",
-    green: "border-green-500",
-    orange: "border-orange-500",
-    indigo: "border-indigo-500"
-  };
-  return colors[color] || colors.blue;
-}
-
-/* Skeleton Loading Animation */
+/* Skeleton loader */
 function SkeletonTimeline() {
-  const skeletonPhases = [
-    { color: "blue", duration: "Week 1-2" },
-    { color: "purple", duration: "Week 3-4" },
-    { color: "green", duration: "Week 4-5" },
-    { color: "orange", duration: "Week 6+" },
-    { color: "indigo", duration: "Ongoing" }
-  ];
-
   return (
     <div className="mt-8 w-full max-w-6xl mx-auto px-4">
-      {/* Header skeleton */}
       <div className="text-center mb-12">
         <div className="h-10 bg-gray-200 rounded-lg w-3/4 mx-auto mb-4 animate-pulse"></div>
         <div className="h-6 bg-gray-200 rounded w-1/2 mx-auto animate-pulse"></div>
       </div>
-      
-      {/* Timeline skeleton */}
-      <div className="relative">
-        {/* Timeline line */}
-        <div className="absolute left-8 top-0 bottom-0 w-0.5 bg-gradient-to-b from-gray-300 via-gray-300 to-gray-300 animate-pulse"></div>
-        
-        {/* Skeleton phases */}
-        <div className="space-y-12">
-          {skeletonPhases.map((phase, index) => (
-            <SkeletonStep key={index} phase={phase} />
-          ))}
-        </div>
-      </div>
-      
-      {/* Action bar skeleton */}
-      <div className="mt-8 flex flex-wrap gap-3 justify-center bg-gray-50 p-4 rounded-lg">
-        <div className="h-10 bg-gray-200 rounded-lg w-32 animate-pulse"></div>
-        <div className="h-10 bg-gray-200 rounded-lg w-24 animate-pulse"></div>
-      </div>
-    </div>
-  );
-}
-
-function SkeletonStep({ phase }) {
-  const dotColors = {
-    blue: "bg-blue-300",
-    purple: "bg-purple-300", 
-    green: "bg-green-300",
-    orange: "bg-orange-300",
-    indigo: "bg-indigo-300"
-  };
-
-  return (
-    <div className="relative">
-      {/* Timeline dot */}
-      <div className={`absolute left-6 w-4 h-4 ${dotColors[phase.color]} rounded-full border-4 border-white shadow-lg z-10 animate-pulse`}></div>
-      
-      {/* Content */}
-      <div className="ml-20">
-        {/* Phase header skeleton */}
-        <div className="flex items-center gap-3 mb-3">
-          <div className="w-12 h-12 bg-gray-200 rounded animate-pulse"></div>
-          <div className="flex-1">
-            <div className="flex items-center gap-3">
-              <div className="h-4 bg-gray-200 rounded w-32 animate-pulse"></div>
-              <div className="h-6 bg-gray-200 rounded-full w-20 animate-pulse"></div>
-            </div>
-            <div className="h-8 bg-gray-200 rounded w-80 mt-2 animate-pulse"></div>
-            <div className="h-5 bg-gray-200 rounded w-96 mt-2 animate-pulse"></div>
-          </div>
-        </div>
-        
-        {/* Content card skeleton */}
-        <div className="bg-white border-l-4 border-gray-300 rounded-r-lg shadow-sm p-6 mb-4">
-          <div className="space-y-4">
-            <div className="h-6 bg-gray-200 rounded w-3/4 animate-pulse"></div>
+      <div className="grid md:grid-cols-2 gap-6">
+        {[1, 2, 3, 4].map((i) => (
+          <div
+            key={i}
+            className="bg-white rounded-xl border border-gray-200 p-6"
+          >
+            <div className="h-6 bg-gray-200 rounded w-2/3 mb-4 animate-pulse"></div>
             <div className="space-y-2">
               <div className="h-4 bg-gray-200 rounded w-full animate-pulse"></div>
               <div className="h-4 bg-gray-200 rounded w-5/6 animate-pulse"></div>
-              <div className="h-4 bg-gray-200 rounded w-4/5 animate-pulse"></div>
-            </div>
-            <div className="h-6 bg-gray-200 rounded w-2/3 animate-pulse"></div>
-            <div className="space-y-2">
-              <div className="h-4 bg-gray-200 rounded w-full animate-pulse"></div>
               <div className="h-4 bg-gray-200 rounded w-3/4 animate-pulse"></div>
             </div>
           </div>
-        </div>
+        ))}
       </div>
     </div>
   );
-}
-
-/* Timeline Step component for beautiful roadmap display */
-function TimelineStep({ phase, index, isLast }) {
-  const colorClasses = {
-    blue: "border-blue-500 bg-blue-50",
-    purple: "border-purple-500 bg-purple-50", 
-    green: "border-green-500 bg-green-50",
-    orange: "border-orange-500 bg-orange-50",
-    indigo: "border-indigo-500 bg-indigo-50"
-  };
-
-  const dotColors = {
-    blue: "bg-blue-500",
-    purple: "bg-purple-500", 
-    green: "bg-green-500",
-    orange: "bg-orange-500",
-    indigo: "bg-indigo-500"
-  };
-
-  return (
-    <div className="relative">
-      {/* Timeline dot */}
-      <div className={`absolute left-6 w-4 h-4 ${dotColors[phase.color]} rounded-full border-4 border-white shadow-lg z-10`}></div>
-      
-      {/* Content */}
-      <div className="ml-20">
-        {/* Phase header */}
-        <div className="flex items-center gap-3 mb-3">
-          <span className="text-3xl">{phase.icon}</span>
-          <div>
-            <div className="flex items-center gap-3">
-              <span className="text-sm font-semibold text-gray-500 uppercase tracking-wide">Phase {phase.id}: {phase.phase}</span>
-              <span className="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded-full">{phase.duration}</span>
-            </div>
-            <h3 className="text-2xl font-bold text-gray-900 mt-1">{phase.title}</h3>
-            <p className="text-gray-600 mt-1">{phase.description}</p>
-          </div>
-        </div>
-        
-        {/* Content card */}
-        <div className={`bg-white border-l-4 ${colorClasses[phase.color]} rounded-r-lg shadow-sm p-6 mb-4`}>
-          {renderTimelineData(phase.data)}
-        </div>
-      </div>
-    </div>
-  );
-}
-
-/* Enhanced data renderer for timeline */
-function renderTimelineData(data, depth = 0) {
-  if (!data) return <p className="text-gray-500 italic">No data available for this phase.</p>;
-  
-  if (Array.isArray(data)) {
-    return (
-      <ul className="space-y-2">
-        {data.map((item, index) => (
-          <li key={index} className="flex items-start gap-3">
-            <span className="text-blue-500 mt-1 text-sm">▶</span>
-            <span className="text-gray-700">{typeof item === 'object' ? renderTimelineData(item, depth + 1) : item}</span>
-          </li>
-        ))}
-      </ul>
-    );
-  }
-  
-  if (typeof data === 'object') {
-    return (
-      <div className="space-y-4">
-        {Object.entries(data).map(([key, value]) => (
-          <div key={key} className={depth > 0 ? "ml-4" : ""}>
-            <h4 className="font-semibold text-gray-800 text-lg mb-2 flex items-center gap-2">
-              <span className="w-2 h-2 bg-blue-400 rounded-full"></span>
-              {key.replace(/([A-Z])/g, ' $1').trim()}
-            </h4>
-            <div className="text-gray-600 ml-4">
-              {renderTimelineData(value, depth + 1)}
-            </div>
-          </div>
-        ))}
-      </div>
-    );
-  }
-  
-  return <p className="text-gray-700 leading-relaxed">{String(data)}</p>;
-}
-
-/* Card component for beautiful section display */
-function Card({ icon, title, color, data, description }) {
-  const colorClasses = {
-    blue: "from-blue-500 to-blue-600 border-blue-200",
-    purple: "from-purple-500 to-purple-600 border-purple-200", 
-    green: "from-green-500 to-green-600 border-green-200",
-    orange: "from-orange-500 to-orange-600 border-orange-200",
-    indigo: "from-indigo-500 to-indigo-600 border-indigo-200",
-    pink: "from-pink-500 to-pink-600 border-pink-200",
-    gray: "from-gray-500 to-gray-600 border-gray-200"
-  };
-
-  return (
-    <div className="bg-white rounded-xl border border-gray-200 shadow-sm hover:shadow-md transition-shadow duration-200 overflow-hidden">
-      {/* Card Header */}
-      <div className={`bg-gradient-to-r ${colorClasses[color]} text-white p-4`}>
-        <div className="flex items-center gap-3">
-          <span className="text-2xl">{icon}</span>
-          <div>
-            <h3 className="text-lg font-semibold">{title}</h3>
-            <p className="text-sm opacity-90">{description}</p>
-          </div>
-        </div>
-      </div>
-      
-      {/* Card Content */}
-      <div className="p-4">
-        {renderCardData(data)}
-      </div>
-    </div>
-  );
-}
-
-/* Enhanced data renderer for cards */
-function renderCardData(data, depth = 0) {
-  if (!data) return null;
-  
-  if (Array.isArray(data)) {
-    return (
-      <ul className="space-y-2">
-        {data.map((item, index) => (
-          <li key={index} className="flex items-start gap-2 text-gray-700">
-            <span className="text-blue-500 mt-1">•</span>
-            <span>{typeof item === 'object' ? renderCardData(item, depth + 1) : item}</span>
-          </li>
-        ))}
-      </ul>
-    );
-  }
-  
-  if (typeof data === 'object') {
-    return (
-      <div className="space-y-3">
-        {Object.entries(data).map(([key, value]) => (
-          <div key={key} className={depth > 0 ? "ml-3" : ""}>
-            <h4 className="font-medium text-gray-800 text-sm mb-1">
-              {key.replace(/([A-Z])/g, ' $1').trim()}
-            </h4>
-            <div className="text-gray-600 text-sm">
-              {renderCardData(value, depth + 1)}
-            </div>
-          </div>
-        ))}
-      </div>
-    );
-  }
-  
-  return (
-    <p className="text-gray-700 text-sm leading-relaxed">{String(data)}</p>
-  );
-}
-
-/* Recursive data renderer */
-function renderData(data, depth = 0) {
-  if (!data) return null;
-  
-  if (Array.isArray(data)) {
-    return (
-      <ul className="list-disc list-inside space-y-1 ml-4">
-        {data.map((item, index) => (
-          <li key={index} className="text-gray-700">
-            {typeof item === 'object' ? renderData(item, depth + 1) : item}
-          </li>
-        ))}
-      </ul>
-    );
-  }
-  
-  if (typeof data === 'object') {
-    return (
-      <div className={`space-y-2 ${depth > 0 ? 'ml-4' : ''}`}>
-        {Object.entries(data).map(([key, value]) => (
-          <div key={key}>
-            <h4 className={`font-medium text-gray-800 ${depth === 0 ? 'text-base' : 'text-sm'}`}>
-              {key.replace(/([A-Z])/g, ' $1').trim()}:
-            </h4>
-            <div className="ml-2">
-              {renderData(value, depth + 1)}
-            </div>
-          </div>
-        ))}
-      </div>
-    );
-  }
-  
-  return <p className="text-gray-700">{String(data)}</p>;
 }
