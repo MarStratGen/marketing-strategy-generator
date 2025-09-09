@@ -1,5 +1,14 @@
 import { useState } from "react";
 
+/* Helper function to format subheadings with proper Sentence case */
+function formatSubheading(key) {
+  return key
+    .replace(/_/g, " ")
+    .replace(/([A-Z])/g, " $1")
+    .trim()
+    .replace(/^\w/, (c) => c.toUpperCase());
+}
+
 export default function Report({ plan, loading }) {
   const [viewMode] = useState("cards"); // simple view
 
@@ -254,7 +263,7 @@ function renderData(data, depth = 0) {
         {Object.entries(data).map(([k, v]) => (
           <div key={k}>
             <h5 className="font-semibold text-gray-800 text-sm mb-1">
-              {k.replace(/_/g, " ")}
+              {formatSubheading(k)}
             </h5>
             <div className="ml-2 text-sm text-gray-700">
               {renderData(v, depth + 1)}
