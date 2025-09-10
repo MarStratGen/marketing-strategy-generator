@@ -434,16 +434,19 @@ function FormattedText({ text }) {
                 );
               }
               
-              // Check if this looks like glossary terms (multiple "term: definition" separated by commas)
-              if (cleanLine.includes(':') && cleanLine.includes(',') && 
-                  cleanLine.match(/[A-Z][A-Z]+:\s*[^,]+,\s*[A-Z][A-Z]+:/)) {
-                // Split on commas but keep the term definitions together
-                const terms = cleanLine.split(/,\s*(?=[A-Z][A-Z]+:)/).map(term => term.trim());
+              // Check if this line contains multiple metrics/terms that should be split
+              // Pattern: looks for multiple "Word Word:" or "Word:" patterns in the same line
+              const multipleTermsPattern = /([A-Z][a-zA-Z\s-]+:)/g;
+              const matches = cleanLine.match(multipleTermsPattern);
+              
+              if (matches && matches.length > 1) {
+                // Split the line at each term pattern
+                const parts = cleanLine.split(/(?=[A-Z][a-zA-Z\s-]+:)/).filter(part => part.trim());
                 return (
                   <div key={lineIndex} style={{marginTop: '0px', marginBottom: '12px'}}>
-                    {terms.map((term, termIndex) => (
-                      <p key={termIndex} className="text-slate-700" style={{marginTop: '0px', marginBottom: '4px', paddingTop: '0px', paddingBottom: '0px', lineHeight: '1.6'}}>
-                        {term}
+                    {parts.map((part, partIndex) => (
+                      <p key={partIndex} className="text-slate-700" style={{marginTop: '0px', marginBottom: '4px', paddingTop: '0px', paddingBottom: '0px', lineHeight: '1.6'}}>
+                        {part.trim()}
                       </p>
                     ))}
                   </div>
