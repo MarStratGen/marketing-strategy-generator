@@ -16,12 +16,12 @@ const Pill = ({ text, onRemove }) => (
 );
 
 const Field = ({ label, children, tooltip, required }) => (
-  <div className="space-y-3">
-    <label className="block text-lg font-semibold text-gray-900">
+  <div className="space-y-2">
+    <label className="block text-sm font-medium text-white">
       {label}
-      {required && <span className="text-red-500 ml-1">*</span>}
+      {required && <span className="text-red-400 ml-1">*</span>}
       {tooltip && (
-        <div className="text-sm font-normal text-gray-600 mt-1">{tooltip}</div>
+        <span className="ml-1 text-slate-300 cursor-help text-xs">ℹ️ {tooltip}</span>
       )}
     </label>
     {children}
@@ -193,28 +193,25 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="min-h-screen py-16">
-        <div className="max-w-xl mx-auto px-6">
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-indigo-900 to-purple-900">
+      <div className="min-h-screen py-12">
+        <div className="max-w-2xl mx-auto px-6">
           {/* Header */}
-          <header className="mb-16">
-            <h1 className="text-5xl font-bold text-gray-900 mb-6 tracking-tight">
-              Marketing Plan Generator
+          <header className="text-center mb-12">
+            <h1 className="text-4xl font-bold text-white mb-4">
+              Tiny Marketing Plan Generator
             </h1>
-            <p className="text-xl text-gray-600 leading-relaxed">
-              Tell us about your business, and we'll create a comprehensive go-to-market strategy in minutes.
+            <p className="text-lg text-slate-300">
+              Create comprehensive go-to-market strategies with AI-powered insights
             </p>
           </header>
 
-          {/* Form Container */}
-          <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8">
+          {/* Glass Form Container */}
+          <div className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl shadow-xl p-8">
 
             {error && (
-              <div className="bg-red-50 border border-red-200 text-red-800 px-6 py-4 rounded-xl mb-8">
-                <div className="flex items-center">
-                  <span className="text-red-500 mr-2">⚠️</span>
-                  <span>{error}</span>
-                </div>
+              <div className="bg-red-500/20 border border-red-300/50 text-red-100 px-4 py-3 rounded-lg mb-6">
+                {error}
               </div>
             )}
 
@@ -227,7 +224,7 @@ export default function App() {
             <select
               value={country}
               onChange={(e) => setCountry(e.target.value)}
-              className="w-full px-4 py-4 text-lg border border-gray-200 rounded-xl bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 placeholder-gray-500"
+              className="w-full px-4 py-3 rounded-xl border border-white/20 bg-white/10 backdrop-blur-md text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-white/40 focus:border-white/30 transition-all duration-200 shadow-lg hover:shadow-xl hover:bg-white/15"
             >
               {COUNTRIES.map((c) => (
                 <option key={c.code} value={c.code}>
@@ -240,7 +237,7 @@ export default function App() {
                 ref={ccRef}
                 value={customCountry}
                 onChange={(e) => setCCountry(e.target.value)}
-                className="w-full px-4 py-4 text-lg border border-gray-200 rounded-xl bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 placeholder-gray-500"
+                className="w-full px-4 py-3 rounded-xl border border-white/20 bg-white/10 backdrop-blur-md text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-white/40 focus:border-white/30 transition-all duration-200 shadow-lg hover:shadow-xl hover:bg-white/15"
                 placeholder="Type your country"
               />
             )}
@@ -253,7 +250,7 @@ export default function App() {
             <select
               value={sector}
               onChange={(e) => setSector(e.target.value)}
-              className="w-full px-4 py-4 text-lg border border-gray-200 rounded-xl bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 placeholder-gray-500"
+              className="w-full px-4 py-3 rounded-xl border border-white/20 bg-white/10 backdrop-blur-md text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-white/40 focus:border-white/30 transition-all duration-200 shadow-lg hover:shadow-xl hover:bg-white/15"
             >
               <option value="" disabled>Choose your industry (optional)</option>
               {[
@@ -270,7 +267,7 @@ export default function App() {
                 ref={csRef}
                 value={customSector}
                 onChange={(e) => setCSector(e.target.value)}
-                className="w-full px-4 py-4 text-lg border border-gray-200 rounded-xl bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 placeholder-gray-500"
+                className="w-full px-4 py-3 rounded-xl border border-white/20 bg-white/10 backdrop-blur-md text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-white/40 focus:border-white/30 transition-all duration-200 shadow-lg hover:shadow-xl hover:bg-white/15"
                 placeholder="Type your sector"
               />
             )}
@@ -284,7 +281,7 @@ export default function App() {
             <input
               value={product}
               onChange={(e) => setProduct(e.target.value)}
-              className="w-full px-4 py-4 text-lg border border-gray-200 rounded-xl bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 placeholder-gray-500"
+              className="w-full px-4 py-3 rounded-xl border border-white/20 bg-white/10 backdrop-blur-md text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-white/40 focus:border-white/30 transition-all duration-200 shadow-lg hover:shadow-xl hover:bg-white/15"
               placeholder="e.g., Organic heirloom tomato seeds, AI-powered project management software"
               required
             />
@@ -306,11 +303,11 @@ export default function App() {
               value={segInp}
               onChange={(e) => setSegInp(e.target.value)}
               onKeyDown={(e) => onComma(e, setSeg, setSegInp)}
-              className="w-full px-4 py-4 text-lg border border-gray-200 rounded-xl bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 placeholder-gray-500"
+              className="w-full px-4 py-3 rounded-xl border border-white/20 bg-white/10 backdrop-blur-md text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-white/40 focus:border-white/30 transition-all duration-200 shadow-lg hover:shadow-xl hover:bg-white/15"
               placeholder="e.g., Home gardeners aged 35-55"
             />
-            <p className="text-sm text-gray-500 mt-2">
-              Press comma or Enter to add each group. Up to 3 groups (optional).
+            <p className="text-sm text-white/60 mt-1">
+              Press comma or Enter to add. Up to 3 customer groups (optional).
             </p>
           </Field>
 
@@ -322,7 +319,7 @@ export default function App() {
             <select
               value={motion}
               onChange={(e) => setMotion(e.target.value)}
-              className="w-full px-4 py-4 text-lg border border-gray-200 rounded-xl bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 placeholder-gray-500"
+              className="w-full px-4 py-3 rounded-xl border border-white/20 bg-white/10 backdrop-blur-md text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-white/40 focus:border-white/30 transition-all duration-200 shadow-lg hover:shadow-xl hover:bg-white/15"
               required
             >
               {MOTIONS.map((m) => (
@@ -336,14 +333,14 @@ export default function App() {
               <input
                 value={customMotion}
                 onChange={(e) => setCustomMotion(e.target.value)}
-                className="w-full px-4 py-4 text-lg border border-gray-200 rounded-xl bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 placeholder-gray-500"
+                className="w-full px-4 py-3 rounded-xl border border-white/20 bg-white/10 backdrop-blur-md text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-white/40 focus:border-white/30 transition-all duration-200 shadow-lg hover:shadow-xl hover:bg-white/15"
                 placeholder="Describe the action, e.g., ‘Call to book’, ‘Visit store’, ‘Request sample kit’"
                 required
               />
             )}
 
-            <p className="text-sm text-gray-500 mt-2">
-              💡 This shapes your entire marketing strategy and the metrics we'll track.
+            <p className="text-sm text-slate-300 mt-2">
+              💡 This determines your marketing funnel and KPIs - can be online or offline actions.
             </p>
           </Field>
           <Field 
@@ -362,8 +359,8 @@ export default function App() {
                 </option>
               ))}
             </select>
-            <p className="text-sm text-gray-500 mt-2">
-              💰 We'll suggest budget allocations as percentages, not specific dollar amounts.
+            <p className="text-sm text-slate-300 mt-2">
+              💰 We'll provide percentage allocations rather than specific dollar amounts.
             </p>
           </Field>
 
@@ -386,19 +383,19 @@ export default function App() {
               value={compInp}
               onChange={(e) => setCompInp(e.target.value)}
               onKeyDown={(e) => onComma(e, setComp, setCompInp, 3)}
-              className="w-full px-4 py-4 text-lg border border-gray-200 rounded-xl bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 placeholder-gray-500"
+              className="w-full px-4 py-3 rounded-xl border border-white/20 bg-white/10 backdrop-blur-md text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-white/40 focus:border-white/30 transition-all duration-200 shadow-lg hover:shadow-xl hover:bg-white/15"
               placeholder="e.g., Amazon, Local garden center, Seeds4Life"
             />
-            <p className="text-sm text-gray-500 mt-2">
-              Press comma or Enter to add each competitor. Up to 3 is plenty.
+            <p className="text-sm text-white/60 mt-1">
+              Press comma or Enter to add. Up to 3 competitors.
             </p>
           </Field>
               
               <button
                 disabled={loading}
-                className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-4 px-8 rounded-xl transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed text-lg shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
+                className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white font-semibold py-4 px-6 rounded-xl transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {loading ? <LoadingSpinner /> : "Create My Marketing Plan"}
+                {loading ? <LoadingSpinner /> : "🚀 Generate Marketing Plan"}
               </button>
             </form>
           </div>
