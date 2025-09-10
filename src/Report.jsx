@@ -1,5 +1,8 @@
 import { useState } from "react";
 import { ChevronDownIcon, ChevronRightIcon } from "@heroicons/react/24/outline";
+import * as XLSX from 'xlsx';
+import { Document, Packer, Paragraph, HeadingLevel, TextRun } from 'docx';
+import { saveAs } from 'file-saver';
 
 /* ── helpers ────────────────────────────────────────────── */
 const formatSubheading = (k) =>
@@ -43,43 +46,46 @@ export default function Report({ plan, loading }) {
   return (
     <div className="mt-12 w-full max-w-5xl mx-auto px-4">
       {/* header */}
-      <div className="text-center mb-12">
-        <h2 className="text-3xl font-bold text-gray-900 mb-3">
+      <div className="text-center mb-16">
+        <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-r from-blue-600 to-purple-600 rounded-2xl mb-6">
+          <span className="text-2xl">🎯</span>
+        </div>
+        <h2 className="text-4xl font-bold text-slate-900 mb-4 tracking-tight">
           Your Marketing Strategy
         </h2>
-        <p className="text-lg text-gray-600 max-w-2xl mx-auto leading-relaxed">
-          A comprehensive plan organised into actionable sections
+        <p className="text-xl text-slate-700 max-w-3xl mx-auto leading-relaxed font-medium">
+          A comprehensive plan organised into actionable sections for immediate implementation
         </p>
       </div>
 
       <ContentSections data={data} />
 
       {/* actions */}
-      <div className="flex flex-wrap gap-4 justify-center bg-gray-50 p-6 rounded-xl mt-12">
-        <button
-          onClick={() => {
-            const blob = new Blob([JSON.stringify(plan, null, 2)], {
-              type: "application/json",
-            });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement("a");
-            a.href = url;
-            a.download = "marketing-strategy.json";
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            URL.revokeObjectURL(url);
-          }}
-          className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-medium shadow-sm hover:shadow-md"
-        >
-          📄 Download JSON
-        </button>
-        <button
-          onClick={() => window.print()}
-          className="bg-gray-600 hover:bg-gray-700 text-white px-6 py-3 rounded-lg font-medium shadow-sm hover:shadow-md"
-        >
-          🖨️ Print Strategy
-        </button>
+      <div className="mt-16 bg-gradient-to-r from-slate-50 to-blue-50 border border-slate-200 rounded-2xl p-8">
+        <div className="text-center mb-6">
+          <h3 className="text-xl font-bold text-slate-900 mb-2">Download Your Strategy</h3>
+          <p className="text-slate-600 text-sm">Export your marketing strategy in your preferred format</p>
+        </div>
+        <div className="flex flex-wrap gap-3 justify-center">
+          <button
+            onClick={() => downloadExcel(data)}
+            className="bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-3 rounded-xl font-semibold shadow-sm hover:shadow-lg transition-all duration-200 flex items-center gap-2"
+          >
+            📊 Excel Report
+          </button>
+          <button
+            onClick={() => downloadWord(data)}
+            className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-xl font-semibold shadow-sm hover:shadow-lg transition-all duration-200 flex items-center gap-2"
+          >
+            📄 Word Document
+          </button>
+          <button
+            onClick={() => window.print()}
+            className="bg-slate-600 hover:bg-slate-700 text-white px-6 py-3 rounded-xl font-semibold shadow-sm hover:shadow-lg transition-all duration-200 flex items-center gap-2"
+          >
+            🖨️ Print PDF
+          </button>
+        </div>
       </div>
     </div>
   );
@@ -152,52 +158,77 @@ function ContentSections({ data }) {
   );
 }
 
-/* ── UI blocks (unchanged) ─────────────────────────────── */
+/* ── UI blocks (REDESIGNED) ─────────────────────────────── */
 function ContentSection({ section, isFirst }) {
   const [isOpen, setOpen] = useState(isFirst);
   const colors = {
-    blue: "from-blue-500 to-blue-600 border-blue-200 bg-blue-50",
-    purple: "from-purple-500 to-purple-600 border-purple-200 bg-purple-50",
-    green: "from-green-500 to-green-600 border-green-200 bg-green-50",
-    indigo: "from-indigo-500 to-indigo-600 border-indigo-200 bg-indigo-50",
+    blue: {
+      gradient: "from-blue-500 to-blue-600", 
+      bg: "bg-blue-50", 
+      border: "border-blue-200",
+      text: "text-blue-700"
+    },
+    purple: {
+      gradient: "from-purple-500 to-purple-600", 
+      bg: "bg-purple-50", 
+      border: "border-purple-200",
+      text: "text-purple-700"
+    },
+    green: {
+      gradient: "from-green-500 to-green-600", 
+      bg: "bg-green-50", 
+      border: "border-green-200",
+      text: "text-green-700"
+    },
+    indigo: {
+      gradient: "from-indigo-500 to-indigo-600", 
+      bg: "bg-indigo-50", 
+      border: "border-indigo-200",
+      text: "text-indigo-700"
+    },
   };
 
   const hasContent = section.items.some((i) => i.data);
   if (!hasContent) return null;
 
   return (
-    <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+    <div className="bg-white rounded-2xl border border-slate-200 shadow-lg shadow-slate-100 overflow-hidden mb-8">
       <button
         onClick={() => setOpen(!isOpen)}
-        className="w-full p-6 text-left hover:bg-gray-50 transition-colors"
+        className="w-full p-8 text-left hover:bg-slate-50 transition-all duration-200"
       >
         <div className="flex items-center justify-between">
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-6">
             <div
-              className={`w-12 h-12 rounded-lg bg-gradient-to-r ${
-                colors[section.color].split(" ")[0]
-              } ${colors[section.color].split(" ")[1]} flex items-center justify-center text-white text-xl`}
+              className={`w-16 h-16 rounded-2xl bg-gradient-to-r ${colors[section.color].gradient} flex items-center justify-center text-white text-2xl shadow-lg`}
             >
               {section.icon}
             </div>
             <div>
-              <h3 className="text-xl font-bold text-gray-900 mb-1">
+              <h3 className="text-2xl font-bold text-slate-900 mb-2 tracking-tight">
                 {section.title}
               </h3>
-              <p className="text-sm text-gray-600">{section.description}</p>
+              <p className="text-base text-slate-600 font-medium leading-relaxed">{section.description}</p>
             </div>
           </div>
-          {isOpen ? (
-            <ChevronDownIcon className="w-5 h-5 text-gray-400" />
-          ) : (
-            <ChevronRightIcon className="w-5 h-5 text-gray-400" />
-          )}
+          <div className="flex items-center gap-3">
+            {isFirst && (
+              <span className="px-3 py-1 bg-blue-100 text-blue-700 text-xs font-bold rounded-full">
+                START HERE
+              </span>
+            )}
+            {isOpen ? (
+              <ChevronDownIcon className="w-6 h-6 text-slate-400" />
+            ) : (
+              <ChevronRightIcon className="w-6 h-6 text-slate-400" />
+            )}
+          </div>
         </div>
       </button>
 
       {isOpen && (
-        <div className="border-t border-gray-100">
-          <div className="p-6 space-y-6">
+        <div className="border-t border-slate-100">
+          <div className="p-8 space-y-8 bg-gradient-to-b from-white to-slate-50">
             {section.items
               .filter((i) => i.data)
               .map((item, idx) => (
@@ -217,16 +248,16 @@ function ContentSection({ section, isFirst }) {
 
 function ContentCard({ title, data, color }) {
   const colours = {
-    blue: "border-blue-200 bg-blue-50",
-    purple: "border-purple-200 bg-purple-50",
-    green: "border-green-200 bg-green-50",
-    indigo: "border-indigo-200 bg-indigo-50",
+    blue: "border-blue-100 bg-gradient-to-br from-blue-50 to-blue-100/50",
+    purple: "border-purple-100 bg-gradient-to-br from-purple-50 to-purple-100/50",
+    green: "border-green-100 bg-gradient-to-br from-green-50 to-green-100/50",
+    indigo: "border-indigo-100 bg-gradient-to-br from-indigo-50 to-indigo-100/50",
   };
 
   return (
-    <div className={`border ${colours[color]} rounded-lg p-5`}>
-      <h4 className="text-lg font-semibold text-gray-900 mb-4">{title}</h4>
-      <div className="prose prose-sm max-w-none">
+    <div className={`border-2 ${colours[color]} rounded-xl p-6 shadow-sm`}>
+      <h4 className="text-xl font-bold text-slate-900 mb-5 tracking-tight">{title}</h4>
+      <div className="prose prose-slate max-w-none text-slate-700 leading-relaxed">
         <OptimizedContent data={data} />
       </div>
     </div>
@@ -293,6 +324,135 @@ function FormattedText({ text }) {
     </div>
   );
 }
+
+/* ── Download Functions (NO EXTRA COST - CLIENT-SIDE) ─────── */
+const downloadExcel = (data) => {
+  try {
+    const workbook = XLSX.utils.book_new();
+    
+    // Create summary sheet
+    const summaryData = [
+      ['Marketing Strategy Report'],
+      ['Generated:', new Date().toLocaleDateString()],
+      [''],
+      ['Overview'],
+      ['Introduction', data.introduction || 'N/A'],
+      [''],
+      ['Strategy Pillars'],
+      ...(data.strategy_pillars || []).map((pillar, i) => [`Pillar ${i + 1}`, pillar]),
+      [''],
+      ['Personas'],
+      ...(data.personas || []).map((persona, i) => [`Persona ${i + 1}`, `${persona.name}: ${persona.summary}`]),
+    ];
+    
+    const worksheet = XLSX.utils.aoa_to_sheet(summaryData);
+    XLSX.utils.book_append_sheet(workbook, worksheet, 'Strategy Summary');
+    
+    // Add detailed sheets for each section
+    if (data.marketing_mix_7ps) {
+      const mixData = [['Marketing Mix (7 Ps)'], ['Component', 'Details']];
+      Object.entries(data.marketing_mix_7ps).forEach(([key, value]) => {
+        mixData.push([key, typeof value === 'object' ? JSON.stringify(value) : value]);
+      });
+      const mixSheet = XLSX.utils.aoa_to_sheet(mixData);
+      XLSX.utils.book_append_sheet(workbook, mixSheet, 'Marketing Mix');
+    }
+    
+    if (data.calendar_next_90_days) {
+      const calendarData = [['90-Day Calendar'], ['Timeline', 'Activities']];
+      Object.entries(data.calendar_next_90_days).forEach(([period, activities]) => {
+        calendarData.push([period, Array.isArray(activities) ? activities.join('; ') : activities]);
+      });
+      const calendarSheet = XLSX.utils.aoa_to_sheet(calendarData);
+      XLSX.utils.book_append_sheet(workbook, calendarSheet, '90-Day Plan');
+    }
+    
+    XLSX.writeFile(workbook, 'marketing-strategy.xlsx');
+  } catch (error) {
+    console.error('Excel download failed:', error);
+    alert('Excel download failed. Please try again.');
+  }
+};
+
+const downloadWord = async (data) => {
+  try {
+    const doc = new Document({
+      sections: [{
+        properties: {},
+        children: [
+          new Paragraph({
+            children: [new TextRun({ text: "Marketing Strategy Report", bold: true, size: 32 })],
+            heading: HeadingLevel.TITLE,
+          }),
+          new Paragraph({
+            children: [new TextRun({ text: `Generated: ${new Date().toLocaleDateString()}`, size: 20 })],
+          }),
+          new Paragraph({ text: "" }),
+          
+          new Paragraph({
+            children: [new TextRun({ text: "Introduction", bold: true, size: 28 })],
+            heading: HeadingLevel.HEADING_1,
+          }),
+          new Paragraph({
+            children: [new TextRun({ text: data.introduction || 'No introduction provided.', size: 22 })],
+          }),
+          new Paragraph({ text: "" }),
+          
+          new Paragraph({
+            children: [new TextRun({ text: "Strategy Pillars", bold: true, size: 28 })],
+            heading: HeadingLevel.HEADING_1,
+          }),
+          ...(data.strategy_pillars || []).map((pillar, i) => 
+            new Paragraph({
+              children: [new TextRun({ text: `${i + 1}. ${pillar}`, size: 22 })],
+            })
+          ),
+          new Paragraph({ text: "" }),
+          
+          new Paragraph({
+            children: [new TextRun({ text: "Personas", bold: true, size: 28 })],
+            heading: HeadingLevel.HEADING_1,
+          }),
+          ...(data.personas || []).flatMap((persona) => [
+            new Paragraph({
+              children: [new TextRun({ text: persona.name || 'Unnamed Persona', bold: true, size: 24 })],
+              heading: HeadingLevel.HEADING_2,
+            }),
+            new Paragraph({
+              children: [new TextRun({ text: persona.summary || 'No summary provided.', size: 22 })],
+            }),
+            new Paragraph({ text: "" }),
+          ]),
+          
+          new Paragraph({
+            children: [new TextRun({ text: "Marketing Mix (7 Ps)", bold: true, size: 28 })],
+            heading: HeadingLevel.HEADING_1,
+          }),
+          ...Object.entries(data.marketing_mix_7ps || {}).flatMap(([key, value]) => [
+            new Paragraph({
+              children: [new TextRun({ text: key.replace(/_/g, ' ').toUpperCase(), bold: true, size: 24 })],
+              heading: HeadingLevel.HEADING_2,
+            }),
+            new Paragraph({
+              children: [new TextRun({ 
+                text: typeof value === 'object' ? JSON.stringify(value, null, 2) : value || 'No details provided.',
+                size: 22 
+              })],
+            }),
+            new Paragraph({ text: "" }),
+          ]),
+        ],
+      }],
+    });
+
+    const buffer = await Packer.toBuffer(doc);
+    const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' });
+    saveAs(blob, 'marketing-strategy.docx');
+  } catch (error) {
+    console.error('Word download failed:', error);
+    alert('Word download failed. Please try again.');
+  }
+};
 
 /* skeleton loader */
 function SkeletonTimeline() {
