@@ -372,13 +372,13 @@ function OptimizedContent({ data }) {
 
     const entries = Object.entries(data);
     return (
-      <div className="space-y-3">
-        {entries.map(([k, v]) => (
-          <div key={k}>
-            <h5 className="font-semibold text-slate-900 text-base mb-1">
+      <div>
+        {entries.map(([k, v], index) => (
+          <div key={k} style={{marginTop: index > 0 ? '32px' : '0px'}}>
+            <h5 className="font-semibold text-slate-900 text-base" style={{marginBottom: '2px'}}>
               {friendlyLabel(k)}
             </h5>
-            <div className="text-slate-700">
+            <div className="text-slate-700" style={{marginTop: '0px'}}>
               <OptimizedContent data={v} />
             </div>
           </div>
@@ -428,8 +428,8 @@ function FormattedText({ text }) {
               
               if (isSubheading) {
                 return (
-                  <h6 key={lineIndex} className="font-bold text-slate-900 text-base" style={{marginTop: '32px', marginBottom: '0px', lineHeight: '1.2'}}>
-                    {cleanLine}
+                  <h6 key={lineIndex} className="font-bold text-red-500 text-2xl" style={{marginTop: '32px', marginBottom: '0px', lineHeight: '1.2', backgroundColor: 'yellow', padding: '10px', border: '3px solid red'}}>
+                    🔥 SUBHEADING: {cleanLine}
                   </h6>
                 );
               }
