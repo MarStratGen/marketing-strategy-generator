@@ -283,7 +283,7 @@ function App() {
           <Field 
             label="Which country are you targeting?" 
             required 
-            tooltip="This helps us tailor regional insights and market trends."
+            tooltip="This helps tailor regional insights and market trends."
           >
             <select
               value={country}
@@ -340,7 +340,7 @@ function App() {
           <Field 
             label="What are you selling?" 
             required 
-            tooltip="The more specific you are, the better our recommendations will be."
+            tooltip="The more specific you are, the better the recommendations will be."
           >
             <input
               value={product}
@@ -410,7 +410,7 @@ function App() {
           <Field 
             label="What's your marketing budget like?" 
             required
-            tooltip="We'll suggest strategies that fit your budget, focusing on percentages rather than dollar amounts."
+            tooltip="Strategies will be suggested that fit your budget, focusing on percentages rather than dollar amounts."
           >
             <select
               value={budgetBand}
@@ -430,7 +430,7 @@ function App() {
 
           <Field 
             label="Who are you up against?" 
-            tooltip="List your main competitors so we can help you stand out. Optional, but really helpful."
+            tooltip="List your main competitors so the generator can help you stand out. Optional, but really helpful."
           >
             <div className="mb-1">
               {competitors.map((c, i) => (
@@ -478,7 +478,7 @@ function App() {
           <div className="space-y-4">
             <FAQItemDark 
               question="How does the marketing plan generator work?"
-              answer="Our AI analyzes your business inputs and creates comprehensive marketing strategies tailored to your specific industry, target market, and budget constraints."
+              answer="The AI analyzes your business inputs and creates comprehensive marketing strategies tailored to your specific industry, target market, and budget constraints."
             />
             <FAQItemDark 
               question="How accurate are the marketing recommendations?"
@@ -486,7 +486,7 @@ function App() {
             />
             <FAQItemDark 
               question="Can I use this for any type of business?"
-              answer="Yes, our generator works for businesses across all industries, from startups to established companies, both B2B and B2C markets."
+              answer="Yes, this generator works for businesses across all industries, from startups to established companies, both B2B and B2C markets."
             />
             <FAQItemDark 
               question="What's included in the marketing plan?"
@@ -498,7 +498,7 @@ function App() {
             />
             <FAQItemDark 
               question="Is my business information kept private?"
-              answer="Yes, we prioritize your privacy. Your business information is used only to generate your marketing plan and is not stored or shared."
+              answer="Yes, your privacy is prioritized. Your business information is used only to generate your marketing plan and is not stored or shared."
             />
           </div>
         </div>
