@@ -1,5 +1,12 @@
 import { useState } from "react";
 
+const toTitle = (s = "") =>
+  s
+    .replace(/[_\-]+/g, " ")
+    .replace(/\s+/g, " ")
+    .trim()
+    .replace(/\b\w/g, (m) => m.toUpperCase());
+
 /* Helper function to format subheadings with proper Sentence case */
 function formatSubheading(key) {
   return key
@@ -92,17 +99,25 @@ export default function Report({ plan, loading }) {
 function CardGroups({ data }) {
   const groups = [
     {
-      title: "🎯 Positioning",
-      description: "Focus, targets, promise, proof",
+      title: "🎯 Market foundation",
+      description: "Segmentation, targeting, positioning and proof",
       color: "blue",
       items: [
+        {
+          title: "STP",
+          icon: "🧭",
+          data:
+            data.stp ||
+            data.Market_Analysis_and_Positioning ||
+            data.MarketAnalysisAndPositioning,
+        },
         {
           title: "Positioning",
           icon: "📌",
           data:
-            data.positioning ||
-            data.Market_Analysis_and_Positioning ||
-            data.MarketAnalysisAndPositioning,
+            data.stp && data.stp.positioning
+              ? data.stp.positioning
+              : data.positioning,
         },
       ],
     },
