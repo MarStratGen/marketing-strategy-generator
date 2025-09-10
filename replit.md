@@ -1,6 +1,6 @@
 # Overview
 
-This is a Tiny Marketing Plan Generator - a React-based web application that creates comprehensive marketing plans using AI. The app collects user inputs about their business and generates detailed go-to-market strategies including STP analysis, 7 Ps of marketing, budget allocations, calendars, and KPIs. It's built as a modern single-page application with a clean, gradient-styled interface.
+This is a Marketing Strategy Generator - a React-based web application that creates comprehensive marketing strategies using AI. The app collects user inputs about their business and generates detailed go-to-market strategies including STP analysis, 7 Ps of marketing, budget allocations, calendars, and KPIs. It features a modern single-page application design with a vintage office background, gradient tints, and optimized UX following digital design best practices.
 
 # User Preferences
 
@@ -18,8 +18,10 @@ Preferred communication style: Simple, everyday language.
 ## Styling Strategy
 - **Tailwind CSS** for rapid UI development without custom CSS files
 - **Google Fonts (Poppins)** for consistent typography
-- **Gradient backgrounds** and modern design aesthetic
-- **Responsive design** principles built into component structure
+- **Vintage office photography** as foundation background with gradient color tints
+- **Progressive disclosure** in report sections for optimal information consumption
+- **Modern digital design principles** with proper visual hierarchy and readability optimization
+- **Edge-to-edge responsive design** that works across all screen sizes
 
 ## API Integration
 - **Cloudflare Workers** backend for serverless AI processing
@@ -29,8 +31,9 @@ Preferred communication style: Simple, everyday language.
 
 ## Data Flow
 - **Form-based input collection** for business parameters
-- **JSON schema validation** ensuring consistent AI responses
-- **Structured output format** for marketing plan components (STP, 7 Ps, budget, calendar, KPIs)
+- **JSON schema validation** ensuring consistent AI responses  
+- **Enhanced structured output** including strategy pillars, personas, competitive analysis, differentiation moves, and risk assessments
+- **UX-optimized report presentation** with collapsible sections, proper typography hierarchy, and progressive disclosure
 - **Error handling** for API failures and malformed requests
 
 ## Development Environment
