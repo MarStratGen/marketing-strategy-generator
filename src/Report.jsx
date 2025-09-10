@@ -267,7 +267,7 @@ function OptimizedContent({ data }) {
 
   if (Array.isArray(data)) {
     return (
-      <ul className="space-y-2 list-none">
+      <ul className="space-y-6 list-none">
         {data.map((item, i) => (
           <li key={i} className="flex items-start gap-3 text-slate-700 leading-relaxed">
             <span className="text-blue-600 font-bold mt-0.5">•</span>
