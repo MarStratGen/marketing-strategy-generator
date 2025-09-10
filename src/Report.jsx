@@ -50,7 +50,7 @@ export default function Report({ plan, loading }) {
         <h2 className="text-4xl font-bold text-slate-900 mb-4 tracking-tight">
           Your Marketing Strategy
         </h2>
-        <p className="text-xl text-slate-800 max-w-3xl mx-auto leading-relaxed font-medium">
+        <p className="text-xl text-slate-700 max-w-3xl mx-auto leading-relaxed font-medium">
           A comprehensive plan organised into actionable sections for immediate implementation
         </p>
       </div>
@@ -205,7 +205,7 @@ function ContentSection({ section, isFirst }) {
               <h3 className="text-2xl font-bold text-slate-900 mb-2 tracking-tight">
                 {section.title}
               </h3>
-              <p className="text-base text-slate-800 font-medium leading-relaxed">{section.description}</p>
+              <p className="text-base text-slate-700 font-medium leading-relaxed">{section.description}</p>
             </div>
           </div>
           <div className="flex items-center gap-3">
@@ -254,7 +254,7 @@ function ContentCard({ title, data, color }) {
   return (
     <div className={`border-2 ${colours[color]} rounded-xl p-6 shadow-sm`}>
       <h4 className="text-xl font-bold text-slate-900 mb-5 tracking-tight">{title}</h4>
-      <div className="prose prose-slate max-w-none text-slate-800 leading-relaxed">
+      <div className="prose prose-slate max-w-none text-slate-700 leading-relaxed">
         <OptimizedContent data={data} />
       </div>
     </div>
@@ -269,7 +269,7 @@ function OptimizedContent({ data }) {
     return (
       <ul className="space-y-1 list-disc list-inside ml-2">
         {data.map((item, i) => (
-          <li key={i} className="text-slate-800 leading-tight pl-1">
+          <li key={i} className="text-slate-700 leading-tight pl-1">
             {typeof item === "object" ? (
               <OptimizedContent data={item} />
             ) : (
@@ -289,7 +289,7 @@ function OptimizedContent({ data }) {
             <h5 className="font-bold text-slate-900 mb-1 text-base tracking-tight">
               {formatSubheading(k)}
             </h5>
-            <div className="ml-1 text-slate-800">
+            <div className="ml-1 text-slate-700">
               <OptimizedContent data={v} />
             </div>
           </div>
@@ -299,7 +299,7 @@ function OptimizedContent({ data }) {
   }
 
   return (
-    <div className="text-slate-800 leading-relaxed">
+    <div className="text-slate-700 leading-relaxed">
       <FormattedText text={String(data)} />
     </div>
   );
@@ -311,7 +311,7 @@ function FormattedText({ text }) {
   return (
     <div className="space-y-2">
       {paras.map((p, i) => (
-        <p key={i} className="leading-snug text-slate-800">
+        <p key={i} className="leading-snug text-slate-700">
           {p.trim()}
         </p>
       ))}
