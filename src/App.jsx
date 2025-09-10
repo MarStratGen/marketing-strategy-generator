@@ -241,17 +241,17 @@ function App() {
   };
 
   return (
-    <div>
-      {/* Hero Section with Photo Background */}
-      <div 
-        className="min-h-screen relative"
-        style={{
-          backgroundImage: `url('/attached_assets/birmingham-museums-trust-YvNiIyGdMfs-unsplash_1757466351093.jpg')`,
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-          backgroundAttachment: 'fixed'
-        }}
-      >
+    <div 
+      className="min-h-screen"
+      style={{
+        backgroundImage: `url('/attached_assets/birmingham-museums-trust-YvNiIyGdMfs-unsplash_1757466351093.jpg')`,
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundAttachment: 'fixed'
+      }}
+    >
+      {/* Hero Section with Gradient Overlay */}
+      <div className="min-h-screen relative">
         {/* Color Gradient Overlay */}
         <div className="absolute inset-0 bg-gradient-to-br from-blue-600/85 via-purple-600/85 to-pink-600/85"></div>
         
