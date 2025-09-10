@@ -267,7 +267,7 @@ function OptimizedContent({ data }) {
 
   if (Array.isArray(data)) {
     return (
-      <ul className="space-y-6 list-none">
+      <ul className="space-y-8 list-none">
         {data.map((item, i) => (
           <li key={i} className="flex items-start gap-3 text-slate-700 leading-relaxed">
             <span className="text-blue-600 font-bold mt-0.5">•</span>
@@ -319,10 +319,10 @@ function OptimizedContent({ data }) {
     
     // Fallback for other structures
     return (
-      <div className="space-y-4">
+      <div className="space-y-1">
         {entries.map(([k, v]) => (
           <div key={k}>
-            <h5 className="font-semibold text-slate-900 text-base mb-2">
+            <h5 className="font-semibold text-slate-900 text-base mb-1">
               {formatSubheading(k)}
             </h5>
             <div className="ml-4 text-slate-700">
