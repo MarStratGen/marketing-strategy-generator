@@ -504,7 +504,7 @@ export default function App() {
           <h2 className="text-3xl font-bold text-gray-900 text-center mb-12">
             Frequently Asked Questions
           </h2>
-          <div className="space-y-2">
+          <div className="space-y-8">
             <div>
               <h3 className="text-lg font-semibold text-gray-900 mb-2">
                 How does the Marketing Strategy Generator work?
