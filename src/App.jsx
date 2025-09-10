@@ -193,41 +193,47 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 py-12">
-      <div className="max-w-4xl mx-auto px-6">
-        {/* Header */}
-        <header className="text-center mb-16">
-          <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-2xl mb-6 shadow-lg">
-            <span className="text-2xl">🚀</span>
-          </div>
-          <h1 className="text-5xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent mb-4">
-            Tiny Marketing Plan Generator
-          </h1>
-          <p className="text-xl text-gray-600 max-w-2xl mx-auto leading-relaxed">
-            Create comprehensive go-to-market strategies with AI-powered insights
-          </p>
-        </header>
+    <div className="min-h-screen bg-gradient-to-br from-indigo-900/20 via-purple-900/20 to-pink-900/20 relative overflow-hidden">
+      {/* Glassmorphism Background Elements */}
+      <div className="absolute inset-0 bg-gradient-to-br from-blue-400/10 via-indigo-500/10 to-purple-600/10"></div>
+      <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-indigo-400/20 rounded-full filter blur-3xl animate-pulse"></div>
+      <div className="absolute bottom-1/4 right-1/4 w-72 h-72 bg-purple-400/20 rounded-full filter blur-3xl animate-pulse delay-1000"></div>
+      
+      <div className="relative z-10 min-h-screen py-12">
+        <div className="max-w-4xl mx-auto px-6">
+          {/* Header */}
+          <header className="text-center mb-16">
+            <div className="inline-flex items-center justify-center w-20 h-20 bg-white/20 backdrop-blur-md border border-white/30 rounded-3xl mb-8 shadow-2xl">
+              <span className="text-3xl">🚀</span>
+            </div>
+            <h1 className="text-6xl font-bold bg-gradient-to-r from-white via-indigo-100 to-purple-100 bg-clip-text text-transparent mb-6 drop-shadow-lg">
+              Tiny Marketing Plan Generator
+            </h1>
+            <p className="text-xl text-white/80 max-w-2xl mx-auto leading-relaxed backdrop-blur-sm">
+              Create comprehensive go-to-market strategies with AI-powered insights
+            </p>
+          </header>
 
-        {/* Form Container */}
-        <div className="bg-white/80 backdrop-blur-xl rounded-3xl shadow-2xl shadow-indigo-100/50 overflow-hidden">
-          <div className="bg-gradient-to-r from-indigo-500/10 to-purple-500/10 px-8 py-6 border-b border-indigo-100">
-            <h2 className="text-2xl font-semibold text-gray-800">Business Details</h2>
-            <p className="text-gray-600 mt-1">Tell us about your business and target market</p>
-          </div>
-          <div className="p-8">
+          {/* Glassmorphism Form Container */}
+          <div className="bg-white/10 backdrop-blur-2xl border border-white/20 rounded-3xl shadow-2xl shadow-black/10 overflow-hidden">
+            <div className="bg-gradient-to-r from-white/10 to-white/5 backdrop-blur-sm px-8 py-6 border-b border-white/20">
+              <h2 className="text-2xl font-semibold text-white/90">Business Details</h2>
+              <p className="text-white/70 mt-1">Tell us about your business and target market</p>
+            </div>
+            <div className="p-8">
 
             {error && (
-              <div className="bg-red-50 border border-red-200 text-red-700 px-6 py-4 rounded-xl mb-6 flex items-center gap-3">
-                <span className="text-red-500">⚠️</span>
+              <div className="bg-red-500/20 backdrop-blur-md border border-red-300/30 text-red-100 px-6 py-4 rounded-2xl mb-6 flex items-center gap-3">
+                <span className="text-red-200">⚠️</span>
                 <span>{error}</span>
               </div>
             )}
 
             <form onSubmit={handleSubmit} className="space-y-8">
               {/* Business Foundation Section */}
-              <div className="bg-gradient-to-r from-indigo-50/50 to-purple-50/50 rounded-2xl p-6 border border-indigo-100/50">
-                <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
-                  <span className="w-6 h-6 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-full flex items-center justify-center text-white text-sm">1</span>
+              <div className="bg-white/5 backdrop-blur-lg rounded-2xl p-6 border border-white/10 shadow-xl">
+                <h3 className="text-lg font-semibold text-white/90 mb-4 flex items-center gap-3">
+                  <span className="w-8 h-8 bg-gradient-to-r from-indigo-400/80 to-purple-400/80 backdrop-blur-sm rounded-full flex items-center justify-center text-white text-sm font-bold shadow-lg">1</span>
                   Market Foundation
                 </h3>
                 <div className="space-y-6">
@@ -305,9 +311,9 @@ export default function App() {
               </div>
 
               {/* Customer Strategy Section */}
-              <div className="bg-gradient-to-r from-purple-50/50 to-pink-50/50 rounded-2xl p-6 border border-purple-100/50">
-                <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
-                  <span className="w-6 h-6 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full flex items-center justify-center text-white text-sm">2</span>
+              <div className="bg-white/5 backdrop-blur-lg rounded-2xl p-6 border border-white/10 shadow-xl">
+                <h3 className="text-lg font-semibold text-white/90 mb-4 flex items-center gap-3">
+                  <span className="w-8 h-8 bg-gradient-to-r from-purple-400/80 to-pink-400/80 backdrop-blur-sm rounded-full flex items-center justify-center text-white text-sm font-bold shadow-lg">2</span>
                   Customer Strategy
                 </h3>
                 <div className="space-y-6">
@@ -372,9 +378,9 @@ export default function App() {
               </div>
 
               {/* Business Intelligence Section */}
-              <div className="bg-gradient-to-r from-green-50/50 to-teal-50/50 rounded-2xl p-6 border border-green-100/50">
-                <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
-                  <span className="w-6 h-6 bg-gradient-to-r from-green-500 to-teal-500 rounded-full flex items-center justify-center text-white text-sm">3</span>
+              <div className="bg-white/5 backdrop-blur-lg rounded-2xl p-6 border border-white/10 shadow-xl">
+                <h3 className="text-lg font-semibold text-white/90 mb-4 flex items-center gap-3">
+                  <span className="w-8 h-8 bg-gradient-to-r from-emerald-400/80 to-teal-400/80 backdrop-blur-sm rounded-full flex items-center justify-center text-white text-sm font-bold shadow-lg">3</span>
                   Business Intelligence
                 </h3>
                 <div className="space-y-6">
