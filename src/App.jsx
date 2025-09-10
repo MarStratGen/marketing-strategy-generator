@@ -115,7 +115,7 @@ export default function App() {
   // state
   const [country, setCountry] = useState("Australia");
   const [customCountry, setCCountry] = useState("");
-  const [sector, setSector] = useState(SECTORS[0]);
+  const [sector, setSector] = useState("");
   const [customSector, setCSector] = useState("");
   const [product, setProduct] = useState("");
   const [segments, setSeg] = useState([]);
@@ -209,9 +209,9 @@ export default function App() {
         <form onSubmit={handleSubmit} className="space-y-4">
           {/* Country */}
           <Field 
-            label="Country" 
+            label="Target market country" 
             required 
-            tooltip="Select your primary market country"
+            tooltip="Which country are you targeting for this marketing plan?"
           >
             <select
               value={country}
@@ -245,6 +245,7 @@ export default function App() {
               onChange={(e) => setSector(e.target.value)}
               className="w-full mt-1 mb-2 px-4 py-2 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-400"
             >
+              <option value="" disabled>Choose your industry (optional)</option>
               {[
                 ...SECTORS.map((s) => ({ code: s, label: s })),
                 { code: "__custom_sector", label: "Other (custom)" },
@@ -282,8 +283,8 @@ export default function App() {
 
           {/* Target segment(s) */}
           <Field 
-            label="Target customer segments" 
-            tooltip="Describe specific groups of customers (e.g., 'Working parents aged 30-45')"
+            label="Target customer groups" 
+            tooltip="Who are your ideal customers? Be specific about demographics, behaviors, or needs"
           >
             <div className="mb-1">
               {segments.map((s, i) => (
