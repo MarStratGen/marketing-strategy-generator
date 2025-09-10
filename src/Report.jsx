@@ -319,13 +319,13 @@ function OptimizedContent({ data }) {
     
     // Fallback for other structures
     return (
-      <div className="space-y-1">
+      <div className="space-y-3">
         {entries.map(([k, v]) => (
           <div key={k}>
             <h5 className="font-semibold text-slate-900 text-base mb-1">
               {formatSubheading(k)}
             </h5>
-            <div className="ml-4 text-slate-700">
+            <div className="text-slate-700">
               <OptimizedContent data={v} />
             </div>
           </div>
