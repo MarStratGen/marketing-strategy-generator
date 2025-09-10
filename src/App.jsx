@@ -115,7 +115,6 @@ const BUDGET_BANDS = [
   { label: "High", value: "high" },
 ];
 
-
 /* ──────────────────────────────────────────────────────────
    Main component
    ────────────────────────────────────────────────────────── */
@@ -168,17 +167,18 @@ export default function App() {
     setLoading(true);
 
     // Basic validation
-    const finalCountry = country === "__custom_country" ? customCountry : country;
+    const finalCountry =
+      country === "__custom_country" ? customCountry : country;
     const finalSector = sector === "__custom_sector" ? customSector : sector;
-    
+
     if (!finalCountry.trim()) {
       setErr("Please select a country.");
       setLoading(false);
       return;
     }
-    
+
     // Sector is optional, so we don't validate it
-    
+
     if (!offering.trim()) {
       setErr("Please describe what you're selling.");
       setLoading(false);
@@ -205,7 +205,7 @@ export default function App() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(body),
       });
-      
+
       if (!r.ok) {
         const errorText = await r.text();
         console.error("API Error:", errorText);
@@ -214,9 +214,11 @@ export default function App() {
 
       // Get response text first to check if it's empty
       const responseText = await r.text();
-      
-      if (!responseText || responseText.trim() === '') {
-        throw new Error("Cloudflare Worker returned empty response. Please check the Worker configuration and ensure it has an OpenAI API key.");
+
+      if (!responseText || responseText.trim() === "") {
+        throw new Error(
+          "Cloudflare Worker returned empty response. Please check the Worker configuration and ensure it has an OpenAI API key.",
+        );
       }
 
       let data;
@@ -225,26 +227,38 @@ export default function App() {
       } catch (parseError) {
         console.error("JSON Parse Error:", parseError);
         console.error("Response text that failed to parse:", responseText);
-        throw new Error(`Worker returned invalid JSON: ${responseText.substring(0, 100)}...`);
+        throw new Error(
+          `Worker returned invalid JSON: ${responseText.substring(0, 100)}...`,
+        );
       }
-      
-      
+
       // Check if the response contains actual marketing strategy data
       if (!data || Object.keys(data).length === 0) {
-        throw new Error("API returned empty response. The Cloudflare Worker might not be properly configured.");
+        throw new Error(
+          "API returned empty response. The Cloudflare Worker might not be properly configured.",
+        );
       }
-      
+
       // Check for expected structure based on the updated Cloudflare Worker response format
-      if (!data.meta && !data.introduction && !data.marketing_mix_7ps && !data.error) {
+      if (
+        !data.meta &&
+        !data.introduction &&
+        !data.marketing_mix_7ps &&
+        !data.error
+      ) {
         console.warn("Unexpected response structure:", data);
-        throw new Error("API returned unexpected data format. Please check the Cloudflare Worker implementation.");
+        throw new Error(
+          "API returned unexpected data format. Please check the Cloudflare Worker implementation.",
+        );
       }
-      
+
       // Check for Worker-level errors
       if (data.error) {
-        throw new Error(`Worker error: ${data.error} - ${data.detail || 'No details available'}`);
+        throw new Error(
+          `Worker error: ${data.error} - ${data.detail || "No details available"}`,
+        );
       }
-      
+
       setResult(data);
     } catch (err) {
       console.error(err);
@@ -496,49 +510,68 @@ export default function App() {
                 How detailed are the marketing strategies?
               </h3>
               <p className="text-gray-700 leading-relaxed">
-                Each strategy includes comprehensive analysis across all key areas: market foundation, competitor analysis, customer personas, 7 Ps marketing mix, budget allocation, 90-day action plan, KPIs, and risk mitigation. Reports are typically 15-20 pages when exported.
+                Each strategy includes comprehensive analysis across all key
+                areas: market foundation, competitor analysis, customer
+                personas, 7 Ps marketing mix, budget allocation, 90-day action
+                plan, KPIs, and risk mitigation. Reports are typically 15-20
+                pages when exported.
               </p>
             </div>
-            
+
             <div>
               <h3 className="text-lg font-semibold text-gray-900 mb-2">
                 Can I export the strategy to share with my team?
               </h3>
               <p className="text-gray-700 leading-relaxed">
-                Yes! You can export your strategy as a Word document or Excel spreadsheet using the download buttons at the top of each report. Perfect for presentations and team collaboration.
+                Yes! You can export your strategy as a Word document or Excel
+                spreadsheet using the download buttons at the top of each
+                report. Perfect for presentations and team collaboration.
               </p>
             </div>
-            
+
             <div>
               <h3 className="text-lg font-semibold text-gray-900 mb-2">
                 Are the competitor analyses based on real data?
               </h3>
               <p className="text-gray-700 leading-relaxed">
-                The strategies include analysis frameworks and strategic approaches for competitive positioning. For the most current competitive data, we recommend supplementing with your own market research and competitive intelligence.
+                The strategies include analysis frameworks and strategic
+                approaches for competitive positioning. For the most current
+                competitive data, we recommend supplementing with your own
+                market research and competitive intelligence.
               </p>
             </div>
-            
+
             <div>
               <h3 className="text-lg font-semibold text-gray-900 mb-2">
                 How are the budget allocations calculated?
               </h3>
               <p className="text-gray-700 leading-relaxed">
-                Budget allocations are provided as percentages based on proven marketing frameworks and best practices for your selected business model and goals. This allows you to scale the recommendations to any budget size.
+                Budget allocations are provided as percentages based on proven
+                marketing frameworks and best practices for your selected
+                business model and goals. This allows you to scale the
+                recommendations to any budget size.
               </p>
             </div>
           </div>
         </div>
       </div>
-      
+
       {/* Footer */}
       <footer className="bg-gray-800 py-8">
-        <div className="max-w-2xl mx-auto px-4 text-center">
+        <div className="max-w-5xl mx-auto px-4 text-center">
           <p className="text-xs text-gray-400 leading-relaxed">
-            The marketing strategies generated by this tool are for guidance and educational purposes only. They are based on general marketing principles and frameworks, not specific market research or real-time data analysis. While the strategies follow proven methodologies, we recommend conducting your own market research, testing assumptions, and adapting recommendations to your specific circumstances before implementation. Always verify claims, validate assumptions, and consider seeking professional marketing consultation for significant business decisions or large budget allocations.
+            *The marketing strategies generated by this tool are for guidance
+            and educational purposes only. They are based on general marketing
+            principles and frameworks, not specific market research or real-time
+            data analysis. While the strategies follow proven methodologies, we
+            recommend conducting your own market research, testing assumptions,
+            and adapting recommendations to your specific circumstances before
+            implementation. Always verify claims, validate assumptions, and
+            consider seeking professional marketing consultation for significant
+            business decisions or large budget allocations.
           </p>
         </div>
       </footer>
     </div>
   );
 }
-
