@@ -399,7 +399,7 @@ function FormattedText({ text }) {
   const paras = text.split("\n\n").filter((p) => p.trim());
   
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
       {paras.map((p, i) => {
         const trimmed = p.trim();
         
@@ -407,7 +407,7 @@ function FormattedText({ text }) {
         const lines = trimmed.split("\n").filter(line => line.trim());
         
         return (
-          <div key={i} className="space-y-1">
+          <div key={i}>
             {lines.map((line, lineIndex) => {
               const cleanLine = line.trim();
               
@@ -428,14 +428,14 @@ function FormattedText({ text }) {
               
               if (isSubheading) {
                 return (
-                  <h6 key={lineIndex} className="font-bold text-slate-900 text-base mt-8 mb-0 first:mt-0">
+                  <h6 key={lineIndex} className="font-bold text-slate-900 text-base mt-6 mb-1 first:mt-0">
                     {cleanLine}
                   </h6>
                 );
               }
               
               return (
-                <p key={lineIndex} className="leading-relaxed text-slate-700">
+                <p key={lineIndex} className="leading-relaxed text-slate-700 mb-3">
                   {cleanLine}
                 </p>
               );
