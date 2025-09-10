@@ -1,0 +1,247 @@
+/*  ─────────────────────────────────────────────
+    Cloudflare Worker  ·  glow-api (SYNTAX FIXED)
+    ───────────────────────────────────────────── */
+	export default {
+		async fetch(req, env) {
+		  /* 1. CORS pre-flight */
+		  if (req.method === "OPTIONS") return new Response(null, cors());
+	  
+		  /* 2. Accept POST /generate only */
+		  const url = new URL(req.url);
+		  if (req.method !== "POST" || url.pathname !== "/generate") {
+			return new Response(
+			  JSON.stringify({ ok: true, routes: ["/generate"] }),
+			  cors()
+			);
+		  }
+	  
+		  /* 3. Parse JSON body */
+		  let form;
+		  try {
+			form = await req.json();
+		  } catch {
+			return new Response(JSON.stringify({ error: "bad_json" }), cors(400));
+		  }
+	  
+		  /* ── lookup tables ────────────────────────── */
+		  const channelByMotion = {
+			ecom_checkout: [
+			  { channel: "Search", intent: "high", role: "capture" },
+			  { channel: "Paid social", intent: "mid", role: "spark demand" }
+			],
+			saas_checkout: [
+			  { channel: "Search", intent: "high", role: "capture" },
+			  { channel: "Paid social", intent: "mid", role: "scale" }
+			],
+			marketplace_checkout: [
+			  { channel: "Marketplace ads", intent: "high", role: "capture" },
+			  { channel: "Search", intent: "mid", role: "assist" }
+			],
+			store_visit: [
+			  { channel: "Local search", intent: "high", role: "drive visits" },
+			  { channel: "Maps/GBP", intent: "high", role: "presence" }
+			],
+			call_now: [
+			  { channel: "Call-extensions search", intent: "high", role: "click to call" },
+			  { channel: "Local search", intent: "high", role: "capture" }
+			],
+			lead_capture: [
+			  { channel: "Search", intent: "high", role: "capture" },
+			  { channel: "Retargeting", intent: "mid", role: "nudge" }
+			],
+			booking: [
+			  { channel: "Search", intent: "high", role: "capture" },
+			  { channel: "Local social", intent: "mid", role: "presence" }
+			],
+			saas_trial: [
+			  { channel: "Search", intent: "high", role: "capture" },
+			  { channel: "Content/SEO", intent: "mid", role: "educate" }
+			],
+			saas_demo: [
+			  { channel: "Search", intent: "high", role: "capture" },
+			  { channel: "LinkedIn", intent: "mid", role: "target accounts" }
+			],
+			app_install: [
+			  { channel: "App store ads", intent: "high", role: "convert" },
+			  { channel: "Paid social", intent: "mid", role: "scale" }
+			],
+			donation: [
+			  { channel: "Search", intent: "high", role: "capture intent" },
+			  { channel: "Email", intent: "mid", role: "appeal" }
+			],
+			wholesale_inquiry: [
+			  { channel: "Search", intent: "high", role: "capture B2B" },
+			  { channel: "LinkedIn", intent: "mid", role: "prospect" }
+			],
+			partner_recruitment: [
+			  { channel: "Search", intent: "high", role: "capture partners" },
+			  { channel: "Partnership outreach", intent: "mid", role: "recruit" }
+			]
+		  };
+	  
+		  const defaultGoalByMotion = {
+			ecom_checkout: "Online orders",
+			saas_checkout: "Paid subscriptions",
+			marketplace_checkout: "Marketplace orders", 
+			store_visit: "In-store sales",
+			call_now: "Bookings",
+			lead_capture: "Qualified leads",
+			booking: "Bookings",
+			saas_trial: "Qualified leads",
+			saas_demo: "Meetings booked",
+			app_install: "Installs with activation",
+			donation: "Donations",
+			wholesale_inquiry: "Wholesale purchase orders",
+			partner_recruitment: "Partner sign-ups",
+			custom: "Goal aligned to custom action"
+		  };
+	  
+		  /* ── helper functions ─────────────────────── */
+		  function applyMotionDefaults(report, form) {
+			if (typeof report.budget !== "object" || report.budget === null || Array.isArray(report.budget)) {
+			  report.budget = {};
+			}
+	  
+			const isCustom = form.motion === "custom";
+			if (!isCustom && (!Array.isArray(report.channel_playbook) || report.channel_playbook.length === 0)) {
+			  report.channel_playbook = channelByMotion[form.motion] || [];
+			}
+	  
+			report.budget.band = form.budget_band || report.budget.band || "low";
+			return report;
+		  }
+	  
+		  function stripCurrencyAndAmounts(report) {
+			const walk = (obj) => {
+			  if (!obj || typeof obj !== "object") return;
+			  for (const k of Object.keys(obj)) {
+				const v = obj[k];
+				if (v && typeof v === "object") walk(v);
+				if (["amount", "currency", "cost", "budget_total"].includes(k)) {
+				  delete obj[k];
+				}
+				if (typeof v === "string") {
+				  obj[k] = v.replace(/[£$€₹¥]/g, "");
+				}
+			  }
+			};
+			walk(report);
+			return report;
+		  }
+	  
+		  /* ── build prompt ───────────────────────────── */
+		  const hintChannels = JSON.stringify(channelByMotion[form.motion] || []);
+		  
+		  const derivedGoal = form.motion === "custom" && form.action_custom
+			? "Goal aligned to: " + form.action_custom  
+			: defaultGoalByMotion[form.motion] || "Goal aligned to main action";
+	  
+		  const customLine = form.motion === "custom" && form.action_custom
+			? "Custom main action: " + form.action_custom + "\n"
+			: "";
+	  
+		  const audiences = Array.isArray(form.audiences) && form.audiences.length
+			? form.audiences.join(", ")
+			: "General market";
+	  
+		  const competitors = Array.isArray(form.competitors) && form.competitors.length
+			? form.competitors.join(", ")
+			: "Not specified";
+	  
+		  const prompt = "You are Mark Ritson and Philip Kotler combined. " +
+			"Use UK English spelling. Never use en/em dashes. Explain every " +
+			"marketing acronym the first time it appears. Each major block starts with " +
+			'"Why this matters" and ends with "How to use it" so a non-marketer can act.\n\n' +
+			"INPUT\n" +
+			"Country: " + form.country + "\n" +
+			"Sector: " + form.sector + "\n" +
+			"Offering: " + form.product_type + "\n" +
+			"Target segments: " + audiences + "\n" +
+			"Primary goal: " + derivedGoal + "\n" +
+			"Main action: " + form.motion + "\n" +
+			customLine +
+			"Budget level: " + (form.budget_band || "low") + "\n" +
+			"Competitors: " + competitors + "\n\n" +
+			"HINTS\n" +
+			"- channel_intent_map: " + hintChannels + "\n\n" +
+			"Add these extra sections:\n" +
+			'- "strategy_pillars": three guiding ideas (2-3 lines each)\n' +
+			'- "personas": three persona objects { name, summary, pain_points }\n' +
+			'- "competitors_brief": { name, strengths, weaknesses, share_of_voice }[]\n' +
+			'- "differentiation_moves": actions that make us stand out\n' +
+			'- "risks_and_safety_nets": { risk, safety_net }[]\n' +
+			'- "glossary": plain-English definitions of every acronym you used\n\n' +
+			"Flesh-out every list item with 1-2 sentences (no single-word bullets).\n" +
+			"Avoid repetition; merge similar ideas.\n\n" +
+			"TASK\n" +
+			"Return ONLY valid JSON with keys:\n" +
+			"meta, introduction, market_foundation, strategy_pillars,\n" +
+			"marketing_mix_7ps, channel_playbook, budget,\n" +
+			"calendar_next_90_days, kpis, risks_and_safety_nets, glossary,\n" +
+			"personas, competitors_brief, differentiation_moves.\n\n" +
+			"OUTPUT\n" +
+			"Return valid JSON only - no markdown, no extra text.";
+	  
+		  /* ── call OpenAI ─────────────────────────────── */
+		  try {
+			const ai = await fetch("https://api.openai.com/v1/chat/completions", {
+			  method: "POST",
+			  headers: {
+				"Content-Type": "application/json",
+				Authorization: "Bearer " + env.OPENAI_API_KEY
+			  },
+			  body: JSON.stringify({
+				model: form.model || "gpt-4o-mini",
+				messages: [{ role: "user", content: prompt }],
+				response_format: { type: "json_object" },
+				max_tokens: 1600,
+				temperature: 0.4
+			  })
+			});
+	  
+			const out = await ai.json();
+			if (!ai.ok) {
+			  return new Response(
+				JSON.stringify({ error: "openai_error", detail: out }),
+				cors(ai.status)
+			  );
+			}
+	  
+			let json;
+			try {
+			  const content = out.choices && out.choices[0] && out.choices[0].message && out.choices[0].message.content;
+			  json = content ? JSON.parse(content) : { error: "no_content", detail: out };
+			} catch (e) {
+			  json = { error: "bad_model_json", raw: out, parseError: String(e) };
+			}
+	  
+			if (!json.error) {
+			  json = applyMotionDefaults(json, form);
+			  json = stripCurrencyAndAmounts(json);
+			}
+	  
+			return new Response(JSON.stringify(json), {
+			  ...cors(),
+			  headers: { ...cors().headers, "Content-Type": "application/json" }
+			});
+		  } catch (err) {
+			return new Response(
+			  JSON.stringify({ error: "worker_crash", detail: String(err) }),
+			  cors(500)
+			);
+		  }
+		}
+	  };
+	  
+	  /* ── CORS helper ───────────────────────────────── */
+	  function cors(status = 200) {
+		return {
+		  status: status,
+		  headers: {
+			"Access-Control-Allow-Origin": "*",
+			"Access-Control-Allow-Headers": "Content-Type, Authorization",
+			"Access-Control-Allow-Methods": "POST,OPTIONS",
+			"Access-Control-Max-Age": "86400"
+		  }
+		};
+	  }
