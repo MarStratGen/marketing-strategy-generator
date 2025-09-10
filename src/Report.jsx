@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { ChevronDownIcon, ChevronRightIcon } from "@heroicons/react/24/outline";
 
 const toTitle = (s = "") =>
   s
@@ -7,7 +8,6 @@ const toTitle = (s = "") =>
     .trim()
     .replace(/\b\w/g, (m) => m.toUpperCase());
 
-/* Helper function to format subheadings with proper Sentence case */
 function formatSubheading(key) {
   return key
     .replace(/_/g, " ")
@@ -17,8 +17,6 @@ function formatSubheading(key) {
 }
 
 export default function Report({ plan, loading }) {
-  const [viewMode] = useState("cards"); // simple view
-
   if (loading) return <SkeletonTimeline />;
   if (!plan) return null;
 
@@ -51,22 +49,22 @@ export default function Report({ plan, loading }) {
   const data = plan.GoToMarketPlan || plan.GTM_Plan || plan;
 
   return (
-    <div className="mt-8 w-full max-w-7xl mx-auto px-4">
-      {/* Header */}
-      <div className="text-center mb-8">
-        <h2 className="text-4xl font-bold text-gray-900 mb-4">
-          🚀 Your Marketing Plan
+    <div className="mt-12 w-full max-w-5xl mx-auto px-4">
+      {/* Header with better hierarchy */}
+      <div className="text-center mb-12">
+        <h2 className="text-3xl font-bold text-gray-900 mb-3">
+          Your Marketing Strategy
         </h2>
-        <p className="text-lg text-gray-600 max-w-2xl mx-auto mb-6">
-          Organised into clear, scannable sections
+        <p className="text-lg text-gray-600 max-w-2xl mx-auto leading-relaxed">
+          A comprehensive plan organized into actionable sections
         </p>
       </div>
 
-      {/* Card Groups */}
-      <CardGroups data={data} />
+      {/* Content sections with proper UX flow */}
+      <ContentSections data={data} />
 
-      {/* Action Bar */}
-      <div className="flex flex-wrap gap-3 justify-center bg-gray-50 p-4 rounded-lg">
+      {/* Action bar with better spacing */}
+      <div className="flex flex-wrap gap-4 justify-center bg-gray-50 p-6 rounded-xl mt-12">
         <button
           onClick={() => {
             const blob = new Blob([JSON.stringify(plan, null, 2)], {
@@ -75,164 +73,201 @@ export default function Report({ plan, loading }) {
             const url = URL.createObjectURL(blob);
             const a = document.createElement("a");
             a.href = url;
-            a.download = "marketing-plan.json";
+            a.download = "marketing-strategy.json";
             document.body.appendChild(a);
             a.click();
             document.body.removeChild(a);
             URL.revokeObjectURL(url);
           }}
-          className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors flex items-center gap-2"
+          className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-medium transition-all duration-200 flex items-center gap-2 shadow-sm hover:shadow-md"
         >
           📄 Download JSON
         </button>
         <button
           onClick={() => window.print()}
-          className="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors flex items-center gap-2"
+          className="bg-gray-600 hover:bg-gray-700 text-white px-6 py-3 rounded-lg font-medium transition-all duration-200 flex items-center gap-2 shadow-sm hover:shadow-md"
         >
-          🖨️ Print Plan
+          🖨️ Print Strategy
         </button>
       </div>
     </div>
   );
 }
 
-function CardGroups({ data }) {
-  const groups = [
+function ContentSections({ data }) {
+  const sections = [
     {
-      title: "🎯 Market foundation",
-      description: "Segmentation, targeting, positioning and proof",
+      id: "foundation",
+      title: "Market Foundation",
+      description: "Understanding your market position and target audience",
+      icon: "🎯",
       color: "blue",
+      priority: "high",
       items: [
         {
-          title: "STP",
-          icon: "🧭",
-          data:
-            data.stp ||
-            data.Market_Analysis_and_Positioning ||
-            data.MarketAnalysisAndPositioning,
+          title: "Market Analysis & Positioning",
+          data: data.stp || data.Market_Analysis_and_Positioning || data.MarketAnalysisAndPositioning,
         },
         {
-          title: "Positioning",
-          icon: "📌",
-          data:
-            data.stp && data.stp.positioning
-              ? data.stp.positioning
-              : data.positioning,
+          title: "Positioning Strategy", 
+          data: data.stp?.positioning || data.positioning,
         },
       ],
     },
     {
-      title: "🔧 Strategy Framework",
-      description: "Marketing mix and channels",
+      id: "strategy",
+      title: "Strategic Framework", 
+      description: "Your marketing mix and channel strategy",
+      icon: "⚡",
       color: "purple",
+      priority: "high",
       items: [
         {
           title: "Marketing Mix (7 Ps)",
-          icon: "⚡",
           data: data.mix_7ps || data.Marketing_Mix || data.MarketingMix,
         },
         {
-          title: "Channels and intent",
-          icon: "🧭",
+          title: "Channel Strategy",
           data: data.channel_intent_map,
         },
       ],
     },
     {
-      title: "💰 Investment and Timeline",
-      description: "Budget split and 90 day plan",
-      color: "green",
+      id: "execution",
+      title: "Execution Plan",
+      description: "Budget allocation and 90-day timeline",
+      icon: "🚀",
+      color: "green", 
+      priority: "high",
       items: [
-        { title: "Budget", icon: "💸", data: data.budget },
-        { title: "90 day calendar", icon: "📅", data: data.calendar_90d },
+        { title: "Budget Allocation", data: data.budget },
+        { title: "90-Day Action Plan", data: data.calendar_90d },
       ],
     },
     {
-      title: "📈 Measurement and Tests",
-      description: "KPIs, experiments and evidence",
+      id: "measurement",
+      title: "Measurement & Optimization",
+      description: "KPIs, experiments, and performance tracking",
+      icon: "📊",
       color: "indigo",
+      priority: "medium",
       items: [
-        { title: "KPIs", icon: "🎯", data: data.kpis },
-        { title: "Experiments", icon: "🧪", data: data.experiments },
-        { title: "Evidence ledger", icon: "📂", data: data.evidence_ledger },
-        { title: "Funnel maths", icon: "🧮", data: data.funnel_math },
+        { title: "Key Performance Indicators", data: data.kpis },
+        { title: "Marketing Experiments", data: data.experiments },
+        { title: "Evidence Tracking", data: data.evidence_ledger },
+        { title: "Funnel Analysis", data: data.funnel_math },
       ],
     },
   ];
 
   return (
-    <div className="space-y-12">
-      {groups.map((g, i) => (
-        <CardGroup key={i} group={g} />
+    <div className="space-y-8">
+      {sections.map((section) => (
+        <ContentSection key={section.id} section={section} />
       ))}
     </div>
   );
 }
 
-function CardGroup({ group }) {
+function ContentSection({ section }) {
+  const [isExpanded, setIsExpanded] = useState(section.priority === "high");
+  
   const colors = {
-    blue: "from-blue-500 to-blue-600 border-blue-200",
-    purple: "from-purple-500 to-purple-600 border-purple-200",
-    green: "from-green-500 to-green-600 border-green-200",
-    indigo: "from-indigo-500 to-indigo-600 border-indigo-200",
+    blue: "from-blue-500 to-blue-600 border-blue-200 bg-blue-50",
+    purple: "from-purple-500 to-purple-600 border-purple-200 bg-purple-50", 
+    green: "from-green-500 to-green-600 border-green-200 bg-green-50",
+    indigo: "from-indigo-500 to-indigo-600 border-indigo-200 bg-indigo-50",
+  };
+
+  const hasContent = section.items.some(item => item.data);
+  if (!hasContent) return null;
+
+  return (
+    <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+      {/* Section header with progressive disclosure */}
+      <button
+        onClick={() => setIsExpanded(!isExpanded)}
+        className="w-full p-6 text-left hover:bg-gray-50 transition-colors duration-200"
+      >
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-4">
+            <div className={`w-12 h-12 rounded-lg bg-gradient-to-r ${colors[section.color].split(' ')[0]} ${colors[section.color].split(' ')[1]} flex items-center justify-center text-white text-xl`}>
+              {section.icon}
+            </div>
+            <div>
+              <h3 className="text-xl font-bold text-gray-900 mb-1">
+                {section.title}
+              </h3>
+              <p className="text-sm text-gray-600 max-w-2xl">
+                {section.description}
+              </p>
+            </div>
+          </div>
+          <div className="flex-shrink-0">
+            {isExpanded ? (
+              <ChevronDownIcon className="w-5 h-5 text-gray-400" />
+            ) : (
+              <ChevronRightIcon className="w-5 h-5 text-gray-400" />
+            )}
+          </div>
+        </div>
+      </button>
+
+      {/* Expandable content */}
+      {isExpanded && (
+        <div className="border-t border-gray-100">
+          <div className="p-6 space-y-6">
+            {section.items
+              .filter(item => item.data)
+              .map((item, idx) => (
+                <ContentCard 
+                  key={idx}
+                  title={item.title}
+                  data={item.data}
+                  color={section.color}
+                />
+              ))}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function ContentCard({ title, data, color }) {
+  const colors = {
+    blue: "border-blue-200 bg-blue-50",
+    purple: "border-purple-200 bg-purple-50",
+    green: "border-green-200 bg-green-50", 
+    indigo: "border-indigo-200 bg-indigo-50",
   };
 
   return (
-    <div className="space-y-6">
-      <div className="text-center">
-        <h3 className="text-2xl font-bold text-gray-900 mb-2">{group.title}</h3>
-        <p className="text-gray-600 max-w-lg mx-auto">{group.description}</p>
-      </div>
-
-      <div
-        className={`grid gap-6 ${group.items.length === 1 ? "grid-cols-1 max-w-4xl mx-auto" : "grid-cols-1 md:grid-cols-2"}`}
-      >
-        {group.items
-          .filter((it) => it.data)
-          .map((it, idx) => (
-            <BusinessCard
-              key={idx}
-              title={it.title}
-              icon={it.icon}
-              color={colors[group.color]}
-              data={it.data}
-            />
-          ))}
+    <div className={`border ${colors[color]} rounded-lg p-5`}>
+      <h4 className="text-lg font-semibold text-gray-900 mb-4">{title}</h4>
+      <div className="prose prose-sm max-w-none">
+        <OptimizedContent data={data} />
       </div>
     </div>
   );
 }
 
-function BusinessCard({ title, icon, color, data }) {
-  return (
-    <div
-      className={`bg-white rounded-xl border border-gray-200 shadow-sm hover:shadow-md transition duration-200 overflow-hidden`}
-    >
-      <div className={`bg-gradient-to-r ${color} text-white p-4`}>
-        <div className="flex items-center gap-3">
-          <span className="text-2xl">{icon}</span>
-          <h4 className="text-lg font-semibold">{title}</h4>
-        </div>
-      </div>
-      <div className="p-4">{renderData(data)}</div>
-    </div>
-  );
-}
-
-function renderData(data, depth = 0) {
-  if (!data) return <p className="text-gray-500 italic">No data</p>;
+function OptimizedContent({ data }) {
+  if (!data) return <p className="text-gray-500 italic">No data available</p>;
 
   if (Array.isArray(data)) {
     return (
-      <ul className="space-y-2">
+      <ul className="space-y-3">
         {data.map((item, i) => (
-          <li key={i} className="flex items-start gap-2 text-gray-700">
-            <span className="text-blue-500 mt-1">•</span>
-            <span>
-              {typeof item === "object"
-                ? renderData(item, depth + 1)
-                : String(item)}
-            </span>
+          <li key={i} className="flex items-start gap-3">
+            <span className="text-blue-500 mt-1.5 text-sm">•</span>
+            <div className="flex-1 text-gray-700 leading-relaxed">
+              {typeof item === "object" ? (
+                <OptimizedContent data={item} />
+              ) : (
+                <FormattedText text={String(item)} />
+              )}
+            </div>
           </li>
         ))}
       </ul>
@@ -240,48 +275,64 @@ function renderData(data, depth = 0) {
   }
 
   if (typeof data === "object") {
-    // Pretty print known shapes
+    // Special formatting for budget data
     if (data.items && data.rationale && data.within_budget !== undefined) {
-      // budget shape
       return (
-        <div className="space-y-3">
-          <p className="text-sm text-gray-700">
-            <strong>Rationale:</strong> {data.rationale}
-          </p>
-          <h5 className="font-semibold">Items</h5>
-          <ul className="space-y-1">
-            {data.items.map((it, i) => (
-              <li key={i} className="text-sm">
-                <span className="font-medium">{it.task}</span> — {it.channel} —{" "}
-                {it.percent}% {it.fits === false ? "(move to backlog)" : ""}
-              </li>
-            ))}
-          </ul>
+        <div className="space-y-5">
+          <div className="bg-white p-4 rounded-lg border border-gray-200">
+            <h5 className="font-semibold text-gray-900 mb-2">Strategy Rationale</h5>
+            <p className="text-gray-700 leading-relaxed">
+              <FormattedText text={data.rationale} />
+            </p>
+          </div>
+          
+          <div>
+            <h5 className="font-semibold text-gray-900 mb-3">Budget Breakdown</h5>
+            <div className="grid gap-3">
+              {data.items.map((item, i) => (
+                <div key={i} className="flex items-center justify-between p-3 bg-white rounded-lg border border-gray-100">
+                  <div className="flex-1">
+                    <div className="font-medium text-gray-900">{item.task}</div>
+                    <div className="text-sm text-gray-600">{item.channel}</div>
+                  </div>
+                  <div className="text-right">
+                    <div className="font-semibold text-gray-900">{item.percent}%</div>
+                    {item.fits === false && (
+                      <div className="text-xs text-amber-600">Backlog</div>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
           {Array.isArray(data.backlog) && data.backlog.length > 0 && (
-            <>
-              <h5 className="font-semibold mt-2">Backlog</h5>
-              <ul className="space-y-1">
-                {data.backlog.map((b, i) => (
-                  <li key={i} className="text-sm">
-                    {b.task} — {b.reason || "Unfunded"}
-                  </li>
+            <div>
+              <h5 className="font-semibold text-gray-900 mb-3">Future Opportunities</h5>
+              <div className="space-y-2">
+                {data.backlog.map((item, i) => (
+                  <div key={i} className="p-3 bg-amber-50 border border-amber-200 rounded-lg">
+                    <div className="font-medium text-gray-900">{item.task}</div>
+                    <div className="text-sm text-gray-600">{item.reason || "Requires additional budget"}</div>
+                  </div>
                 ))}
-              </ul>
-            </>
+              </div>
+            </div>
           )}
         </div>
       );
     }
 
+    // Standard object formatting with better hierarchy
     return (
-      <div className="space-y-3">
-        {Object.entries(data).map(([k, v]) => (
-          <div key={k}>
-            <h5 className="font-semibold text-gray-800 text-sm mb-1">
-              {formatSubheading(k)}
+      <div className="space-y-4">
+        {Object.entries(data).map(([key, value]) => (
+          <div key={key}>
+            <h5 className="font-medium text-gray-900 mb-2 text-base">
+              {formatSubheading(key)}
             </h5>
-            <div className="ml-2 text-sm text-gray-700">
-              {renderData(v, depth + 1)}
+            <div className="ml-3 text-gray-700">
+              <OptimizedContent data={value} />
             </div>
           </div>
         ))}
@@ -289,25 +340,68 @@ function renderData(data, depth = 0) {
     );
   }
 
-  return <p className="text-gray-700">{String(data)}</p>;
+  return (
+    <div className="text-gray-700 leading-relaxed">
+      <FormattedText text={String(data)} />
+    </div>
+  );
 }
 
-/* Skeleton loader */
+function FormattedText({ text }) {
+  // Convert long text blocks into more readable format
+  const paragraphs = text.split('\n\n').filter(p => p.trim());
+  
+  if (paragraphs.length === 1) {
+    // Single paragraph - check if it contains list-like content
+    const sentences = text.split(/[.!?]+/).filter(s => s.trim());
+    if (sentences.length > 4 && text.length > 300) {
+      // Long content - break into readable chunks
+      return (
+        <div className="space-y-2">
+          {sentences.map((sentence, i) => {
+            const trimmed = sentence.trim();
+            if (!trimmed) return null;
+            return (
+              <p key={i} className="leading-relaxed">
+                {trimmed}.
+              </p>
+            );
+          })}
+        </div>
+      );
+    }
+  }
+
+  return (
+    <div className="space-y-3">
+      {paragraphs.map((paragraph, i) => (
+        <p key={i} className="leading-relaxed">
+          {paragraph.trim()}
+        </p>
+      ))}
+    </div>
+  );
+}
+
 function SkeletonTimeline() {
   return (
-    <div className="mt-8 w-full max-w-6xl mx-auto px-4">
+    <div className="mt-12 w-full max-w-5xl mx-auto px-4">
       <div className="text-center mb-12">
-        <div className="h-10 bg-gray-200 rounded-lg w-3/4 mx-auto mb-4 animate-pulse"></div>
-        <div className="h-6 bg-gray-200 rounded w-1/2 mx-auto animate-pulse"></div>
+        <div className="h-8 bg-gray-200 rounded-lg w-64 mx-auto mb-3 animate-pulse"></div>
+        <div className="h-5 bg-gray-200 rounded w-96 mx-auto animate-pulse"></div>
       </div>
-      <div className="grid md:grid-cols-2 gap-6">
+      
+      <div className="space-y-6">
         {[1, 2, 3, 4].map((i) => (
-          <div
-            key={i}
-            className="bg-white rounded-xl border border-gray-200 p-6"
-          >
-            <div className="h-6 bg-gray-200 rounded w-2/3 mb-4 animate-pulse"></div>
-            <div className="space-y-2">
+          <div key={i} className="bg-white rounded-xl border border-gray-200 p-6">
+            <div className="flex items-center gap-4 mb-4">
+              <div className="w-12 h-12 bg-gray-200 rounded-lg animate-pulse"></div>
+              <div className="flex-1">
+                <div className="h-5 bg-gray-200 rounded w-48 mb-2 animate-pulse"></div>
+                <div className="h-4 bg-gray-200 rounded w-64 animate-pulse"></div>
+              </div>
+            </div>
+            <div className="space-y-3">
               <div className="h-4 bg-gray-200 rounded w-full animate-pulse"></div>
               <div className="h-4 bg-gray-200 rounded w-5/6 animate-pulse"></div>
               <div className="h-4 bg-gray-200 rounded w-3/4 animate-pulse"></div>
