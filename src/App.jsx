@@ -220,9 +220,9 @@ export default function App() {
 
             <form onSubmit={handleSubmit} className="space-y-8">
           <Field 
-            label="Target market country" 
+            label="Which country are you targeting?" 
             required 
-            tooltip="Which country are you targeting for this marketing plan?"
+            tooltip="This helps us tailor regional insights and market trends."
           >
             <select
               value={country}
@@ -247,8 +247,8 @@ export default function App() {
           </Field>
 
           <Field 
-            label="Industry sector" 
-            tooltip="Choose the industry that best describes your business"
+            label="What industry are you in?" 
+            tooltip="Don't worry if yours isn't listed - you can specify something custom."
           >
             <select
               value={sector}
@@ -277,21 +277,21 @@ export default function App() {
           </Field>
 
           <Field 
-            label="Product or service" 
+            label="What are you selling?" 
             required 
-            tooltip="Describe what you're selling - be specific and clear"
+            tooltip="The more specific you are, the better our recommendations will be."
           >
             <input
               value={product}
               onChange={(e) => setProduct(e.target.value)}
-              className="w-full mt-1 mb-2 px-4 py-2 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:border-transparent"
-              placeholder="e.g., Organic vegetable seeds, SaaS project management tool"
+              className="w-full px-4 py-4 text-lg border border-gray-200 rounded-xl bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 placeholder-gray-500"
+              placeholder="e.g., Organic heirloom tomato seeds, AI-powered project management software"
               required
             />
           </Field>
           <Field 
-            label="Target customer groups" 
-            tooltip="Who are your ideal customers? Be specific about demographics, behaviors, or needs"
+            label="Who are your ideal customers?" 
+            tooltip="Think demographics, behaviors, or specific needs. Like 'busy parents' or 'small business owners'."
           >
             <div className="mb-1">
               {segments.map((s, i) => (
@@ -309,15 +309,15 @@ export default function App() {
               className="w-full px-4 py-4 text-lg border border-gray-200 rounded-xl bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 placeholder-gray-500"
               placeholder="e.g., Home gardeners aged 35-55"
             />
-            <p className="text-sm text-white/60 mt-1">
-              Press comma or Enter to add. Up to 3 customer groups (optional).
+            <p className="text-sm text-gray-500 mt-2">
+              Press comma or Enter to add each group. Up to 3 groups (optional).
             </p>
           </Field>
 
           <Field 
-            label="Desired customer action" 
+            label="What should customers do next?" 
             required
-            tooltip="What do you want customers to do? This determines your marketing funnel and KPIs"
+            tooltip="Pick the main action you want people to take. This shapes your entire marketing strategy."
           >
             <select
               value={motion}
@@ -342,14 +342,14 @@ export default function App() {
               />
             )}
 
-            <p className="text-sm text-slate-300 mt-2">
-              💡 This determines your marketing funnel and KPIs - can be online or offline actions.
+            <p className="text-sm text-gray-500 mt-2">
+              💡 This shapes your entire marketing strategy and the metrics we'll track.
             </p>
           </Field>
           <Field 
-            label="Marketing budget level" 
+            label="What's your marketing budget like?" 
             required
-            tooltip="Select your overall marketing budget range"
+            tooltip="We'll suggest strategies that fit your budget, focusing on percentages rather than dollar amounts."
           >
             <select
               value={budgetBand}
@@ -362,14 +362,14 @@ export default function App() {
                 </option>
               ))}
             </select>
-            <p className="text-sm text-slate-300 mt-2">
-              💰 We'll provide percentage allocations rather than specific dollar amounts.
+            <p className="text-sm text-gray-500 mt-2">
+              💰 We'll suggest budget allocations as percentages, not specific dollar amounts.
             </p>
           </Field>
 
           <Field 
-            label="Key competitors (optional)" 
-            tooltip="Who else is competing for your customers? List up to 3 main competitors"
+            label="Who are you up against?" 
+            tooltip="List your main competitors so we can help you stand out. Optional, but really helpful."
           >
             <div className="mb-1">
               {competitors.map((c, i) => (
@@ -389,16 +389,16 @@ export default function App() {
               className="w-full px-4 py-4 text-lg border border-gray-200 rounded-xl bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 placeholder-gray-500"
               placeholder="e.g., Amazon, Local garden center, Seeds4Life"
             />
-            <p className="text-sm text-white/60 mt-1">
-              Press comma or Enter to add. Up to 3 competitors.
+            <p className="text-sm text-gray-500 mt-2">
+              Press comma or Enter to add each competitor. Up to 3 is plenty.
             </p>
           </Field>
               
               <button
                 disabled={loading}
-                className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white font-semibold py-4 px-6 rounded-xl transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-4 px-8 rounded-xl transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed text-lg shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
               >
-                {loading ? <LoadingSpinner /> : "🚀 Generate Marketing Plan"}
+                {loading ? <LoadingSpinner /> : "Create My Marketing Plan"}
               </button>
             </form>
           </div>
