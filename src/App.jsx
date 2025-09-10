@@ -263,10 +263,10 @@ function App() {
           {/* Header - Outside Form */}
           <div className="text-center mb-16">
             <h1 className="text-5xl font-bold text-white mb-6 tracking-tight">
-              Marketing Strategy Generator*
+              Marketing Strategy Generator
             </h1>
             <p className="text-xl text-white/90 max-w-3xl mx-auto leading-relaxed">
-              Create comprehensive go-to-market strategies with AI-powered insights
+              Create comprehensive go-to-market strategies with AI-powered insights*
             </p>
           </div>
 
