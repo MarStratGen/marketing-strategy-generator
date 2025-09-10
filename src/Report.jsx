@@ -286,13 +286,13 @@ function OptimizedContent({ data }) {
 
   if (typeof data === "object") {
     return (
-      <div className="space-y-6">
+      <div className="space-y-5">
         {Object.entries(data).map(([k, v]) => (
           <div key={k}>
-            <h5 className="font-bold text-slate-900 text-lg mb-3 pb-2 border-b border-slate-200">
+            <h5 className="font-semibold text-slate-900 text-base mb-2">
               {formatSubheading(k)}
             </h5>
-            <div className="ml-0 text-slate-700">
+            <div className="ml-4 text-slate-700 mb-4">
               <OptimizedContent data={v} />
             </div>
           </div>
