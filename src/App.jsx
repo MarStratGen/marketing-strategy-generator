@@ -241,34 +241,28 @@ function App() {
   };
 
   return (
-    <div 
-      className="min-h-screen"
-      style={{
-        backgroundImage: `url('/attached_assets/birmingham-museums-trust-YvNiIyGdMfs-unsplash_1757466351093.jpg')`,
-        backgroundSize: 'cover',
-        backgroundPosition: 'center',
-        backgroundAttachment: 'fixed'
-      }}
-    >
-      {/* Hero Section with Gradient Overlay */}
-      <div className="min-h-screen relative">
-        {/* Color Gradient Overlay */}
-        <div className="absolute inset-0 bg-gradient-to-br from-blue-600/85 via-purple-600/85 to-pink-600/85"></div>
-        
-        {/* Content Layer */}
-        <div className="relative z-10 py-16 px-4">
-          {/* Header - Outside Form */}
-          <div className="text-center mb-16">
-            <h1 className="text-5xl font-bold text-white mb-6 tracking-tight">
-              Marketing Plan Generator
-            </h1>
-            <p className="text-xl text-white/90 max-w-3xl mx-auto leading-relaxed">
-              Create comprehensive go-to-market strategies with AI-powered insights
-            </p>
-          </div>
+    <div>
+      {/* Hero Section with Gradient Background */}
+      <div className="min-h-screen bg-gradient-to-br from-blue-600 via-purple-600 to-pink-600 py-16 px-4">
+        {/* Header - Outside Form */}
+        <div className="text-center mb-16">
+          <h1 className="text-5xl font-bold text-white mb-6 tracking-tight">
+            Marketing Plan Generator
+          </h1>
+          <p className="text-xl text-white/90 max-w-3xl mx-auto leading-relaxed">
+            Create comprehensive go-to-market strategies with AI-powered insights
+          </p>
+        </div>
 
-          {/* Form Container - Semi-transparent to show photo behind */}
-          <div className="bg-white/90 backdrop-blur-sm rounded-3xl shadow-xl p-10 max-w-lg mx-auto border border-white/20 mb-20">
+        {/* Form Container with Photo Background */}
+        <div 
+          className="rounded-3xl shadow-xl p-10 max-w-lg mx-auto border border-white/20 mb-20 relative"
+          style={{
+            backgroundImage: `linear-gradient(rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.9)), url('/attached_assets/birmingham-museums-trust-YvNiIyGdMfs-unsplash_1757466351093.jpg')`,
+            backgroundSize: 'cover',
+            backgroundPosition: 'center'
+          }}
+        >
 
             {error && (
               <div className="bg-red-50 border border-red-200 text-red-800 px-4 py-3 rounded-lg mb-6">
