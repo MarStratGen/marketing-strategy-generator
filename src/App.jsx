@@ -21,7 +21,7 @@ const Pill = ({ text, onRemove }) => (
 );
 
 const Field = ({ label, children, tooltip, required }) => (
-  <div className="space-y-3">
+  <div className="space-y-1">
     <div>
       <label className="block text-sm font-semibold text-gray-800">
         {label}
@@ -309,7 +309,7 @@ export default function App() {
               </div>
             )}
 
-            <form onSubmit={handleSubmit} className="space-y-7">
+            <form onSubmit={handleSubmit} className="space-y-2">
               {/* country */}
               <Field
                 label="Which country are you targeting?"
@@ -504,7 +504,7 @@ export default function App() {
           <h2 className="text-3xl font-bold text-gray-900 text-center mb-12">
             Frequently Asked Questions
           </h2>
-          <div className="space-y-6">
+          <div className="space-y-2">
             <div>
               <h3 className="text-lg font-semibold text-gray-900 mb-2">
                 How detailed are the marketing strategies?

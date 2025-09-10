@@ -160,7 +160,7 @@ function ContentSections({ data }) {
   ];
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-2">
       {sections.map((s, index) => (
         <ContentSection key={s.id} section={s} isFirst={index === 0} />
       ))}
@@ -240,7 +240,7 @@ function ContentSection({ section, isFirst }) {
 
       {isOpen && (
         <div className="border-t border-slate-100">
-          <div className="p-8 space-y-8 bg-gradient-to-b from-white to-slate-50">
+          <div className="p-8 space-y-2 bg-gradient-to-b from-white to-slate-50">
             {section.items
               .filter((i) => i.data)
               .map((item, idx) => (
@@ -286,7 +286,7 @@ function OptimizedContent({ data }) {
 
   if (Array.isArray(data)) {
     return (
-      <ul className="space-y-8 list-none">
+      <ul className="space-y-2 list-none">
         {data.map((item, i) => (
           <li
             key={i}
@@ -319,9 +319,9 @@ function OptimizedContent({ data }) {
       data[0].role
     ) {
       return (
-        <ul className="space-y-10 list-none">
+        <ul className="space-y-2 list-none">
           {data.map((row, idx) => (
-            <li key={idx} className="space-y-3">
+            <li key={idx} className="space-y-1">
               <p className="font-bold text-lg text-slate-900">
                 {idx + 1}. {row.channel}
               </p>
@@ -399,7 +399,7 @@ function FormattedText({ text }) {
   const paras = text.split("\n\n").filter((p) => p.trim());
   
   return (
-    <div className="space-y-8">
+    <div className="space-y-2">
       {paras.map((p, i) => {
         const trimmed = p.trim();
         
@@ -667,7 +667,7 @@ function SkeletonTimeline() {
         <div className="h-8 bg-gray-200 rounded-lg w-64 mx-auto mb-3 animate-pulse"></div>
         <div className="h-5 bg-gray-200 rounded w-96 mx-auto animate-pulse"></div>
       </div>
-      <div className="space-y-6">
+      <div className="space-y-2">
         {[1, 2, 3, 4].map((i) => (
           <div
             key={i}
@@ -680,7 +680,7 @@ function SkeletonTimeline() {
                 <div className="h-4 bg-gray-200 rounded w-64 animate-pulse"></div>
               </div>
             </div>
-            <div className="space-y-3">
+            <div className="space-y-1">
               <div className="h-4 bg-gray-200 rounded w-full animate-pulse"></div>
               <div className="h-4 bg-gray-200 rounded w-5/6 animate-pulse"></div>
               <div className="h-4 bg-gray-200 rounded w-3/4 animate-pulse"></div>
