@@ -434,6 +434,27 @@ function FormattedText({ text }) {
                 );
               }
               
+              // Check for multiple definitions/KPIs that should be on separate lines
+              // Pattern 1: Comma + space + uppercase abbreviation + colon (e.g., "KPI: definition, CTR: definition")
+              // Pattern 2: Period + space + words + colon (e.g., "sentence. New Term: definition")
+              if (cleanLine.includes(':') && 
+                  (cleanLine.match(/, [A-Z]{2,}:/g) || cleanLine.match(/\. [A-Z][a-zA-Z\s]+:/g))) {
+                
+                // Split on comma before abbreviations or period before terms
+                let parts = cleanLine.split(/, (?=[A-Z]{2,}:)|(?<=\.) (?=[A-Z][a-zA-Z\s]+:)/)
+                  .map(part => part.trim())
+                  .filter(part => part.length > 0);
+                
+                return (
+                  <div key={lineIndex} style={{marginTop: '0px', marginBottom: '12px'}}>
+                    {parts.map((part, partIndex) => (
+                      <p key={partIndex} className="text-slate-700" style={{marginTop: '0px', marginBottom: '4px', paddingTop: '0px', paddingBottom: '0px', lineHeight: '1.6'}}>
+                        {part}
+                      </p>
+                    ))}
+                  </div>
+                );
+              }
               
               return (
                 <p key={lineIndex} className="text-slate-700" style={{marginTop: '0px', marginBottom: '12px', paddingTop: '0px', paddingBottom: '0px', lineHeight: '1.6'}}>
