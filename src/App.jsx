@@ -198,16 +198,11 @@ export default function App() {
         budget_band: budgetBand,
       };
 
-      console.log("Submitting with body:", body);
-      
       const r = await fetch(WORKER_URL, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(body),
       });
-
-      console.log("Response status:", r.status);
-      console.log("Response headers:", Object.fromEntries(r.headers.entries()));
       
       if (!r.ok) {
         const errorText = await r.text();
@@ -217,8 +212,6 @@ export default function App() {
 
       // Get response text first to check if it's empty
       const responseText = await r.text();
-      console.log("Raw response text:", responseText);
-      console.log("Response text length:", responseText.length);
       
       if (!responseText || responseText.trim() === '') {
         throw new Error("Cloudflare Worker returned empty response. Please check the Worker configuration and ensure it has an OpenAI API key.");
@@ -233,7 +226,6 @@ export default function App() {
         throw new Error(`Worker returned invalid JSON: ${responseText.substring(0, 100)}...`);
       }
       
-      console.log("Parsed response data:", data);
       
       // Check if the response contains actual marketing strategy data
       if (!data || Object.keys(data).length === 0) {

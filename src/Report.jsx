@@ -145,16 +145,16 @@ function ContentSections({ data }) {
 
   return (
     <div className="space-y-8">
-      {sections.map((s) => (
-        <ContentSection key={s.id} section={s} />
+      {sections.map((s, index) => (
+        <ContentSection key={s.id} section={s} isFirst={index === 0} />
       ))}
     </div>
   );
 }
 
 /* ── UI blocks (unchanged) ─────────────────────────────── */
-function ContentSection({ section }) {
-  const [isOpen, setOpen] = useState(section.priority === "high");
+function ContentSection({ section, isFirst }) {
+  const [isOpen, setOpen] = useState(isFirst);
   const colors = {
     blue: "from-blue-500 to-blue-600 border-blue-200 bg-blue-50",
     purple: "from-purple-500 to-purple-600 border-purple-200 bg-purple-50",
