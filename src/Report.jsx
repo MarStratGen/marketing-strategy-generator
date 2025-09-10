@@ -285,16 +285,20 @@ function OptimizedContent({ data }) {
   }
 
   if (typeof data === "object") {
+    const entries = Object.entries(data);
     return (
-      <div className="space-y-4">
-        {Object.entries(data).map(([k, v], index) => (
-          <div key={k} className={`p-3 rounded-lg ${index % 2 === 0 ? 'bg-white' : 'bg-slate-50'}`}>
-            <h5 className="font-semibold text-slate-900 text-base mb-2">
+      <div>
+        {entries.map(([k, v], index) => (
+          <div key={k}>
+            <h5 className="font-semibold text-slate-900 text-base mb-2 mt-6 first:mt-0">
               {formatSubheading(k)}
             </h5>
             <div className="ml-4 text-slate-700">
               <OptimizedContent data={v} />
             </div>
+            {index < entries.length - 1 && (
+              <hr className="border-slate-300 my-4" />
+            )}
           </div>
         ))}
       </div>
