@@ -67,13 +67,6 @@ const SECTORS = [
   "Waste management",
 ];
 
-const GOALS = [
-  { label: "Online sales", value: "online_sales" },
-  { label: "Lead generation", value: "lead_gen" },
-  { label: "Brand awareness", value: "brand_awareness" },
-  { label: "In-store sales", value: "in-store_sales" },
-  { label: "User retention", value: "user_retention" },
-];
 
 /* Alphabetical options, Other last */
 const MOTIONS = [
@@ -107,8 +100,6 @@ export default function App() {
   const [customCountry, setCCountry] = useState("");
   const [sector, setSector] = useState(SECTORS[0]);
   const [customSector, setCSector] = useState("");
-  const [goal, setGoal] = useState("online_sales");
-  const [customGoal, setCGoal] = useState("");
   const [product, setProduct] = useState("");
   const [segments, setSeg] = useState([]);
   const [segInp, setSegInp] = useState("");
@@ -126,7 +117,6 @@ export default function App() {
   // refs for custom-input autofocus
   const ccRef = useRef(null);
   const csRef = useRef(null);
-  const cgRef = useRef(null);
 
   useEffect(() => {
     if (country === "__custom_country") ccRef.current?.focus();
@@ -134,9 +124,6 @@ export default function App() {
   useEffect(() => {
     if (sector === "__custom_sector") csRef.current?.focus();
   }, [sector]);
-  useEffect(() => {
-    if (goal === "__custom_goal") cgRef.current?.focus();
-  }, [goal]);
 
   // comma→pill helper
   const onComma = (e, setter, inputSetter, max = 99) => {
@@ -161,7 +148,6 @@ export default function App() {
         sector: sector === "__custom_sector" ? customSector : sector,
         product_type: product,
         audiences: segments,
-        goal: goal === "__custom_goal" ? customGoal : goal,
         competitors,
         model: "gpt-4o-mini",
 
@@ -288,32 +274,6 @@ export default function App() {
             </p>
           </Field>
 
-          {/* Goal */}
-          <Field label="Primary goal">
-            <select
-              value={goal}
-              onChange={(e) => setGoal(e.target.value)}
-              className="w-full mt-1 mb-2 px-4 py-2 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-400"
-            >
-              {[
-                ...GOALS,
-                { label: "Other (custom)", value: "__custom_goal" },
-              ].map((g) => (
-                <option key={g.value} value={g.value}>
-                  {g.label}
-                </option>
-              ))}
-            </select>
-            {goal === "__custom_goal" && (
-              <input
-                ref={cgRef}
-                value={customGoal}
-                onChange={(e) => setCGoal(e.target.value)}
-                className="w-full mt-1 mb-4 px-4 py-2 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-400"
-                placeholder="Describe your goal"
-              />
-            )}
-          </Field>
 
           {/* Primary action for the target segment */}
           <Field label="What is the primary action you want your target segment to take?">
