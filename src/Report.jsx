@@ -434,14 +434,19 @@ function FormattedText({ text }) {
                 );
               }
               
-              // Check for multiple definitions/KPIs that should be on separate lines
+              // Check for multiple definitions/KPIs/weeks that should be on separate lines
               // Pattern 1: Comma + space + uppercase abbreviation + colon (e.g., "KPI: definition, CTR: definition")
               // Pattern 2: Period + space + words + colon (e.g., "sentence. New Term: definition")
-              if (cleanLine.includes(':') && 
-                  (cleanLine.match(/, [A-Z]{2,}:/g) || cleanLine.match(/\. [A-Z][a-zA-Z\s]+:/g))) {
+              // Pattern 3: Period + Week (for action plans like "adverts.Week 3-4:")
+              if ((cleanLine.includes(':') && 
+                  (cleanLine.match(/, [A-Z]{2,}:/g) || cleanLine.match(/\. [A-Z][a-zA-Z\s]+:/g))) ||
+                  cleanLine.match(/\.\s*Week \d/g)) {
                 
-                // Split on comma before abbreviations or period before terms
-                let parts = cleanLine.split(/, (?=[A-Z]{2,}:)|(?<=\.) (?=[A-Z][a-zA-Z\s]+:)/)
+                // Split on:
+                // - comma before abbreviations  
+                // - period before terms with colons
+                // - period before "Week" 
+                let parts = cleanLine.split(/, (?=[A-Z]{2,}:)|(?<=\.) (?=[A-Z][a-zA-Z\s]+:)|(?<=\.)\s*(?=Week \d)/)
                   .map(part => part.trim())
                   .filter(part => part.length > 0);
                 
