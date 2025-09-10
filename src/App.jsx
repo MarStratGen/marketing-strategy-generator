@@ -207,6 +207,7 @@ export default function App() {
       });
 
       console.log("Response status:", r.status);
+      console.log("Response headers:", Object.fromEntries(r.headers.entries()));
       
       if (!r.ok) {
         const errorText = await r.text();
@@ -217,6 +218,7 @@ export default function App() {
       // Get response text first to check if it's empty
       const responseText = await r.text();
       console.log("Raw response text:", responseText);
+      console.log("Response text length:", responseText.length);
       
       if (!responseText || responseText.trim() === '') {
         throw new Error("Cloudflare Worker returned empty response. Please check the Worker configuration and ensure it has an OpenAI API key.");

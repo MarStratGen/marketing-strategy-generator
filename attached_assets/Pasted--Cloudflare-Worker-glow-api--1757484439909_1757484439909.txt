@@ -1,0 +1,164 @@
+/*  ─────────────────────────────────────────────
+    Cloudflare Worker  ·  glow-api
+    ───────────────────────────────────────────── */
+	export default {
+		async fetch(req, env) {
+		  /* 1. CORS pre-flight */
+		  if (req.method === "OPTIONS") return new Response(null, cors());
+	  
+		  /* 2. Accept POST /generate only */
+		  const url = new URL(req.url);
+		  if (req.method !== "POST" || url.pathname !== "/generate") {
+			return new Response(
+			  JSON.stringify({ ok: true, routes: ["/generate"] }),
+			  cors()
+			);
+		  }
+	  
+		  /* 3. Parse JSON body */
+		  let form;
+		  try {
+			form = await req.json();
+		  } catch {
+			return new Response(JSON.stringify({ error: "bad_json" }), cors(400));
+		  }
+	  
+		  /* ── lookup helpers (trimmed for space) ────────────── */
+		  const channelByMotion = { /* … keep your map … */ };
+		  const funnelByMotion  = { /* … */ };
+		  const kpisByMotion    = { /* … */ };
+		  const defaultGoalByMotion = { /* … */ };
+	  
+		  function applyMotionDefaults(report, form) { /* … unchanged … */ }
+		  function stripCurrencyAndAmounts(report)  { /* … unchanged … */ }
+	  
+		  /* ── build richer prompt ───────────────────────────── */
+		  const hintChannels = JSON.stringify(channelByMotion[form.motion] || []);
+		  const hintFunnel   = funnelByMotion[form.motion]  || "";
+		  const hintKpis     = JSON.stringify(kpisByMotion[form.motion] || []);
+	  
+		  const derivedGoal =
+			form.motion === "custom" && form.action_custom
+			  ? `Goal aligned to: ${form.action_custom}`
+			  : defaultGoalByMotion[form.motion] || "Goal aligned to main action";
+	  
+		  const customLine =
+			form.motion === "custom" && form.action_custom
+			  ? `Custom main action: ${form.action_custom}\n`
+			  : "";
+	  
+		  const prompt = `You are Mark Ritson × Philip Kotler in one brain.
+	  Use UK English spelling. Never use en/em dashes. Explain every
+	  marketing acronym (e.g. KPI = Key Performance Indicator) the first
+	  time it appears. Each major block starts with “Why this matters”
+	  and ends with “How to use it” so a non-marketer can act.
+	  
+	  INPUT
+	  Country: ${form.country}
+	  Sector: ${form.sector}
+	  Offering: ${form.product_type}
+	  Target segments: ${
+			Array.isArray(form.audiences) && form.audiences.length
+			  ? form.audiences.join(", ")
+			  : "General market"
+		  }
+	  Primary goal: ${derivedGoal}
+	  Main action: ${form.motion}
+	  ${customLine}Budget level: ${form.budget_band || "low"}  # none | low | medium | high
+	  Competitors: ${
+			Array.isArray(form.competitors) && form.competitors.length
+			  ? form.competitors.join(", ")
+			  : "Not specified"
+		  }
+	  
+	  HINTS
+	  - channel_intent_map: ${hintChannels}
+	  - funnel_equations  : ${hintFunnel}
+	  - kpi_suggestions   : ${hintKpis}
+	  
+	  ❱  Add these extra sections:
+	  - "strategy_pillars"        : three guiding ideas (2-3 lines each)
+	  - "personas"                : three persona objects { name, summary, pain_points }
+	  - "competitors_brief"       : { name, strengths, weaknesses, share_of_voice }[]
+	  - "differentiation_moves"   : actions that make us stand out
+	  - "risks_and_safety_nets"   : { risk, safety_net }[]
+	  - "glossary"                : plain-English definitions of every acronym you used
+	  
+	  ❱  Flesh-out every list item with 1–2 sentences (no single-word bullets).
+	  ❱  Avoid repetition; merge similar ideas.
+	  ❱  Funnel_math must include concrete equations (no “unknown” placeholders).
+	  
+	  TASK
+	  Return ONLY valid JSON with keys:
+	  meta, introduction, market_foundation, strategy_pillars,
+	  marketing_mix_7ps, channel_playbook, budget,
+	  calendar_next_90_days, kpis, risks_and_safety_nets, glossary,
+	  personas, competitors_brief, differentiation_moves.
+	  
+	  OUTPUT
+	  Return valid JSON only – no markdown, no extra text.`;
+	  
+		  /* ── call OpenAI Chat Completions ─────────────────── */
+		  try {
+			const ai = await fetch("https://api.openai.com/v1/chat/completions", {
+			  method: "POST",
+			  headers: {
+				"Content-Type": "application/json",
+				Authorization: `Bearer ${env.OPENAI_API_KEY}`,
+			  },
+			  body: JSON.stringify({
+				model: form.model || "gpt-4o-mini",
+				messages: [{ role: "user", content: prompt }],
+				response_format: { type: "json_object" },
+				max_tokens: 1600,
+				temperature: 0.4
+			  })
+			});
+	  
+			const out = await ai.json();
+			if (!ai.ok) {
+			  return new Response(
+				JSON.stringify({ error: "openai_error", detail: out }),
+				cors(ai.status)
+			  );
+			}
+	  
+			let json;
+			try {
+			  const content = out.choices?.[0]?.message?.content;
+			  json = content ? JSON.parse(content) : { error: "no_content", detail: out };
+			} catch (e) {
+			  json = { error: "bad_model_json", raw: out, parseError: String(e) };
+			}
+	  
+			if (!json.error) {
+			  json = applyMotionDefaults(json, form);
+			  json = stripCurrencyAndAmounts(json);
+			}
+	  
+			return new Response(JSON.stringify(json), {
+			  ...cors(),
+			  headers: { ...cors().headers, "Content-Type": "application/json" }
+			});
+		  } catch (err) {
+			return new Response(
+			  JSON.stringify({ error: "worker_crash", detail: String(err) }),
+			  cors(500)
+			);
+		  }
+		}
+	  };
+	  
+	  /* ── tiny CORS helper ───────────────────────────────── */
+	  function cors(status = 200) {
+		return {
+		  status,
+		  headers: {
+			"Access-Control-Allow-Origin": "*",
+			"Access-Control-Allow-Headers": "Content-Type, Authorization",
+			"Access-Control-Allow-Methods": "POST,OPTIONS",
+			"Access-Control-Max-Age": "86400"
+		  }
+		};
+	  }
+	  
