@@ -1,0 +1,43 @@
+      {/* FAQ Section - Solid Background */}
+      <div className="bg-gray-100 py-20">
+        <div className="max-w-3xl mx-auto px-4">
+          <h2 className="text-3xl font-bold text-gray-900 text-center mb-12">
+            Frequently Asked Questions
+          </h2>
+          <div className="space-y-4">
+            <FAQItemDark 
+              question="How does the marketing plan generator work?"
+              answer="The AI analyzes your business inputs and creates comprehensive marketing strategies tailored to your specific industry, target market, and budget constraints."
+            />
+            <FAQItemDark 
+              question="How accurate are the marketing recommendations?"
+              answer="The recommendations are based on proven marketing frameworks and industry best practices, customized to your specific business context and market conditions."
+            />
+            <FAQItemDark 
+              question="Can I use this for any type of business?"
+              answer="Yes, this generator works for businesses across all industries, from startups to established companies, both B2B and B2C markets."
+            />
+            <FAQItemDark 
+              question="What's included in the marketing plan?"
+              answer="Each plan includes STP analysis, marketing mix (7 Ps), budget allocation, tactical calendar, KPIs, and strategic recommendations."
+            />
+            <FAQItemDark 
+              question="How long does it take to generate a plan?"
+              answer="Most plans are generated within 30-60 seconds, depending on the complexity of your requirements and current system load."
+            />
+            <FAQItemDark 
+              question="Is my business information kept private?"
+              answer="Yes, your privacy is prioritized. Your business information is used only to generate your marketing plan and is not stored or shared."
+            />
+          </div>
+        </div>
+      </div>
+      
+      {/* Footer */}
+      <footer className="bg-gray-800 py-8">
+        <div className="max-w-2xl mx-auto px-4 text-center">
+          <p className="text-xs text-gray-400 leading-relaxed">
+            *This page provides general information only. It is not legal, financial, tax, or professional advice. Outputs may contain errors or omissions. Review them and apply your own judgement before acting. Results are not guaranteed. This page is provided "as is" and "as available". To the maximum extent permitted by applicable law, liability for any loss or damage arising from use of this page is excluded. Nothing here excludes liability that cannot be excluded by law.
+          </p>
+        </div>
+      </footer>
