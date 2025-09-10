@@ -96,18 +96,11 @@ function ContentSections({ data }) {
       color: "blue",
       priority: "high",
       items: [
-        {
-          title:
-            "Market Analysis & Positioning (STP – Segmentation, Targeting, Positioning)",
-          data: data.stp,
-        },
-        {
-          title: "Positioning Strategy",
-          data: data.stp?.positioning,
-        },
-        { title: "Competitor snapshot", data: data.competitors_brief },
-        { title: "How we stand out", data: data.differentiation_moves },
-        { title: "Risks and mitigations", data: data.risks },
+        { title: "Introduction", data: data.introduction },
+        { title: "Market Foundation", data: data.market_foundation },
+        { title: "Competitor Analysis", data: data.competitors_brief },
+        { title: "Differentiation Moves", data: data.differentiation_moves },
+        { title: "Risks and Safety Nets", data: data.risks_and_safety_nets },
       ],
     },
     {
@@ -118,9 +111,9 @@ function ContentSections({ data }) {
       color: "purple",
       priority: "high",
       items: [
-        { title: "Marketing Mix (7 Ps)", data: data.mix_7ps },
-        { title: "Channel Strategy", data: data.channel_intent_map },
-        { title: "Strategy pillars", data: data.strategy_pillars },
+        { title: "Strategy Pillars", data: data.strategy_pillars },
+        { title: "Marketing Mix (7 Ps)", data: data.marketing_mix_7ps },
+        { title: "Channel Playbook", data: data.channel_playbook },
         { title: "Personas", data: data.personas },
       ],
     },
@@ -133,21 +126,19 @@ function ContentSections({ data }) {
       priority: "high",
       items: [
         { title: "Budget Allocation", data: data.budget },
-        { title: "90-Day Action Plan", data: data.calendar_90d },
+        { title: "Next 90 Days Action Plan", data: data.calendar_next_90_days },
       ],
     },
     {
       id: "measurement",
-      title: "Measurement & Optimisation",
-      description: "KPIs, experiments, and funnel maths",
+      title: "Measurement & Analysis",
+      description: "KPIs and performance tracking",
       icon: "📊",
       color: "indigo",
       priority: "medium",
       items: [
         { title: "Key Performance Indicators", data: data.kpis },
-        { title: "Marketing Experiments", data: data.experiments },
-        { title: "Funnel Analysis", data: data.funnel_math },
-        { title: "Evidence Tracking", data: data.evidence_ledger },
+        { title: "Glossary", data: data.glossary },
       ],
     },
   ];
