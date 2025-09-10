@@ -3,6 +3,7 @@
    Tiny Marketing-Plan Generator (UK English)
    ────────────────────────────────────────────────────────── */
 import { useState, useRef, useEffect } from "react";
+import { ChevronDownIcon, ChevronRightIcon } from "@heroicons/react/24/outline";
 import Report from "./Report.jsx";
 
 /* ----- tiny UI helpers ----- */
@@ -113,6 +114,59 @@ const BUDGET_BANDS = [
   { label: "Medium", value: "medium" },
   { label: "High", value: "high" },
 ];
+
+// FAQ Accordions Component
+function FAQAccordions() {
+  const [openIndex, setOpenIndex] = useState(null);
+
+  const faqs = [
+    {
+      question: "How detailed are the marketing strategies?",
+      answer: "Each strategy includes comprehensive analysis across all key areas: market foundation, competitor analysis, customer personas, 7 Ps marketing mix, budget allocation, 90-day action plan, KPIs, and risk mitigation. Reports are typically 15-20 pages when exported."
+    },
+    {
+      question: "Can I export the strategy to share with my team?",
+      answer: "Yes! You can export your strategy as a Word document or Excel spreadsheet using the download buttons at the top of each report. Perfect for presentations and team collaboration."
+    },
+    {
+      question: "Are the competitor analyses based on real data?",
+      answer: "The strategies include analysis frameworks and strategic approaches for competitive positioning. For the most current competitive data, we recommend supplementing with your own market research and competitive intelligence."
+    },
+    {
+      question: "How are the budget allocations calculated?",
+      answer: "Budget allocations are provided as percentages based on proven marketing frameworks and best practices for your selected business model and goals. This allows you to scale the recommendations to any budget size."
+    }
+  ];
+
+  return (
+    <div className="space-y-4">
+      {faqs.map((faq, index) => (
+        <div key={index} className="border border-white/20 rounded-lg overflow-hidden">
+          <button
+            onClick={() => setOpenIndex(openIndex === index ? null : index)}
+            className="w-full text-left px-6 py-4 bg-white/5 hover:bg-white/10 transition-colors duration-200 flex items-center justify-between"
+          >
+            <h3 className="text-lg font-semibold text-white">
+              {faq.question}
+            </h3>
+            {openIndex === index ? (
+              <ChevronDownIcon className="w-5 h-5 text-white" />
+            ) : (
+              <ChevronRightIcon className="w-5 h-5 text-white" />
+            )}
+          </button>
+          {openIndex === index && (
+            <div className="px-6 py-4 bg-white/5">
+              <p className="text-gray-200 leading-relaxed">
+                {faq.answer}
+              </p>
+            </div>
+          )}
+        </div>
+      ))}
+    </div>
+  );
+}
 
 /* ──────────────────────────────────────────────────────────
    Main component
@@ -484,70 +538,32 @@ export default function App() {
 
       {/* FAQ Section */}
       <div className="max-w-4xl mx-auto mt-20 mb-12 px-6">
-        <div className="bg-slate-900/95 backdrop-blur-lg border border-slate-700 rounded-2xl p-10 shadow-2xl">
-          <h2 className="text-3xl font-bold text-white mb-8 text-center">
+        <div className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-2xl p-8">
+          <h2 className="text-2xl font-bold text-white mb-6 text-center">
             Frequently Asked Questions
           </h2>
           
-          <div className="space-y-8">
-            <div className="bg-slate-800/50 rounded-xl p-6 border border-slate-600">
-              <h3 className="text-xl font-bold text-white mb-3">
-                How detailed are the marketing strategies?
-              </h3>
-              <p className="text-slate-200 leading-relaxed text-base">
-                Each strategy includes comprehensive analysis across all key areas: market foundation, competitor analysis, customer personas, 7 Ps marketing mix, budget allocation, 90-day action plan, KPIs, and risk mitigation. Reports are typically 15-20 pages when exported.
-              </p>
-            </div>
-            
-            <div className="bg-slate-800/50 rounded-xl p-6 border border-slate-600">
-              <h3 className="text-xl font-bold text-white mb-3">
-                Can I export the strategy to share with my team?
-              </h3>
-              <p className="text-slate-200 leading-relaxed text-base">
-                Yes! You can export your strategy as a Word document or Excel spreadsheet using the download buttons at the top of each report. Perfect for presentations and team collaboration.
-              </p>
-            </div>
-            
-            <div className="bg-slate-800/50 rounded-xl p-6 border border-slate-600">
-              <h3 className="text-xl font-bold text-white mb-3">
-                Are the competitor analyses based on real data?
-              </h3>
-              <p className="text-slate-200 leading-relaxed text-base">
-                The strategies include analysis frameworks and strategic approaches for competitive positioning. For the most current competitive data, we recommend supplementing with your own market research and competitive intelligence.
-              </p>
-            </div>
-            
-            <div className="bg-slate-800/50 rounded-xl p-6 border border-slate-600">
-              <h3 className="text-xl font-bold text-white mb-3">
-                How are the budget allocations calculated?
-              </h3>
-              <p className="text-slate-200 leading-relaxed text-base">
-                Budget allocations are provided as percentages based on proven marketing frameworks and best practices for your selected business model and goals. This allows you to scale the recommendations to any budget size.
-              </p>
-            </div>
-          </div>
+          <FAQAccordions />
         </div>
       </div>
 
       {/* Footer Disclaimer */}
-      <footer className="bg-slate-900/90 backdrop-blur-lg border-t border-slate-600 py-10 px-6">
-        <div className="max-w-4xl mx-auto text-center">
-          <div className="bg-slate-800/60 rounded-xl p-8 border border-slate-600">
-            <h3 className="text-lg font-bold text-white mb-4">Important Disclaimer</h3>
-            <p className="text-slate-200 text-base leading-relaxed mb-6">
-              <strong className="text-white">Important:</strong> The marketing strategies generated by this tool are for guidance and educational purposes only. 
-              They are based on general marketing principles and frameworks, not specific market research or real-time data analysis. 
-              While the strategies follow proven methodologies, we recommend conducting your own market research, 
-              testing assumptions, and adapting recommendations to your specific circumstances before implementation.
-            </p>
-            
-            <p className="text-slate-300 text-sm border-t border-slate-600 pt-4">
-              Always verify claims, validate assumptions, and consider seeking professional marketing consultation 
-              for significant business decisions or large budget allocations.
-            </p>
-          </div>
+      <footer className="text-center py-8 px-6 border-t border-white/10">
+        <div className="max-w-4xl mx-auto">
+          <p className="text-gray-300 text-sm leading-relaxed mb-4">
+            <strong>Important:</strong> The marketing strategies generated by this tool are for guidance and educational purposes only. 
+            They are based on general marketing principles and frameworks, not specific market research or real-time data analysis. 
+            While the strategies follow proven methodologies, we recommend conducting your own market research, 
+            testing assumptions, and adapting recommendations to your specific circumstances before implementation.
+          </p>
+          
+          <p className="text-gray-400 text-xs">
+            Always verify claims, validate assumptions, and consider seeking professional marketing consultation 
+            for significant business decisions or large budget allocations.
+          </p>
         </div>
       </footer>
     </div>
   );
 }
+
