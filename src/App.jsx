@@ -267,8 +267,8 @@ function App() {
             </p>
           </div>
 
-          {/* Form Container - Pure White */}
-          <div className="bg-white rounded-3xl shadow-xl p-10 max-w-lg mx-auto border border-gray-100 mb-20">
+          {/* Form Container - Semi-transparent to show photo behind */}
+          <div className="bg-white/90 backdrop-blur-sm rounded-3xl shadow-xl p-10 max-w-lg mx-auto border border-white/20 mb-20">
 
             {error && (
               <div className="bg-red-50 border border-red-200 text-red-800 px-4 py-3 rounded-lg mb-6">
