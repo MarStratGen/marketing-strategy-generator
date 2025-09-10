@@ -220,10 +220,22 @@ export default function App() {
 
       const data = await r.json();
       console.log("Response data:", data);
+      
+      // Check if the response contains actual marketing strategy data
+      if (!data || Object.keys(data).length === 0) {
+        throw new Error("API returned empty response. The Cloudflare Worker might not be properly configured.");
+      }
+      
+      // Check for expected structure (adjust based on your Worker's response format)
+      if (!data.strategy && !data.content && !data.marketing_plan) {
+        console.warn("Unexpected response structure:", data);
+        throw new Error("API returned unexpected data format. Please check the Cloudflare Worker implementation.");
+      }
+      
       setResult(data);
     } catch (err) {
       console.error(err);
-      setErr("Something went wrong.");
+      setErr(err.message || "Something went wrong.");
     } finally {
       setLoading(false);
     }
