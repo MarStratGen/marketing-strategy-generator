@@ -4,43 +4,36 @@
 const MODEL = "gpt-4o";
 
 const EXAMPLES = [
-`**Market Foundation**
+`Market Foundation
 
-**Market Overview**
+Market Overview
 The Australian seed market is diverse, with various offerings catering to gardening enthusiasts and agricultural professionals alike.
 
-**Customer Behaviour Insights**
-• **Seasonal purchasing patterns** - Peak demand during spring planting season (September-November)
-• **Research-driven buyers** - Customers spend 2-3 weeks researching before purchase
-• **Quality-focused decision making** - 78% prioritise germination rates over price
+Customer Behaviour Insights
+Peak demand occurs during spring planting season (September-November). Customers typically spend 2-3 weeks researching before purchase. Quality-focused decision making dominates, with 78% prioritising germination rates over price.
 
-**Key Market Trends**
-• **Organic movement** - 45% increase in organic seed demand year-over-year
-• **Small-space gardening** - Urban dwellers driving container gardening growth
-• **Educational content consumption** - Video tutorials influence 60% of purchases
+Key Market Trends
+Organic movement shows 45% increase in demand year-over-year. Small-space gardening drives urban container gardening growth. Educational content consumption influences 60% of purchases through video tutorials.
 
 Why this matters: Understanding these patterns allows for targeted timing and messaging.
 How to execute: Align marketing campaigns with seasonal peaks and create educational content.`,
 
-`**Budget Allocation**
+`Budget Allocation
 
-**Primary Channels**
-• **Search ads: 45%** - Capture high-intent traffic for immediate conversions
-• **Paid social: 30%** - Build awareness and drive consideration across demographics
-• **Content marketing: 15%** - Educational content for nurturing and retention
-• **Email marketing: 10%** - Customer lifecycle management and repeat purchases
+Primary Channels
+Search ads: 45% - Capture high-intent traffic for immediate conversions
+Paid social: 30% - Build awareness and drive consideration across demographics  
+Content marketing: 15% - Educational content for nurturing and retention
+Email marketing: 10% - Customer lifecycle management and repeat purchases
 
-**Allocation Rationale**
-• Search captures bottom-funnel demand when customers are ready to buy
-• Social media builds the top-funnel awareness needed for market expansion
-• Content establishes authority and supports organic discovery
-• Email maximises customer lifetime value through retention campaigns
+Allocation Rationale
+Search captures bottom-funnel demand when customers are ready to buy. Social media builds the top-funnel awareness needed for market expansion. Content establishes authority and supports organic discovery. Email maximises customer lifetime value through retention campaigns.
 
-**Competitor Analysis: SeedCo**
-• **Strengths:** Strong brand recognition, extensive product range, established retail partnerships
-• **Weaknesses:** Higher price points, limited digital presence, slow innovation cycles
-• **Share of voice:** 20% of market conversation
-• **Opportunity:** Target their price-sensitive customers with value positioning`
+Competitor Analysis: SeedCo
+Strengths: Strong brand recognition, extensive product range, established retail partnerships
+Weaknesses: Higher price points, limited digital presence, slow innovation cycles
+Share of voice: 20% of market conversation
+Opportunity: Target their price-sensitive customers with value positioning`
 ];
 
 export default {
@@ -211,17 +204,17 @@ export default {
       competitorAnalysisInstructions = "No specific competitors provided. Analyze the general competitive landscape.";
     }
 
-    let prompt = `You are Mark Ritson meets Philip Kotler - the world's leading marketing strategist. Write in British English with proper sentence case. Use structured content with headings, bullet points, and clear formatting - NOT wall-of-text paragraphs.
+    let prompt = `You are Mark Ritson meets Philip Kotler - the world's leading marketing strategist. Write in British English with proper sentence case. Use structured content with clear sections and headings - NOT markdown formatting or asterisks.
 
-**CRITICAL FORMATTING REQUIREMENTS:**
-- Use **bold headings** for sub-sections
-- Use bullet points (•) for lists and key insights
-- Include "Why this matters:" and "How to execute:" sections
-- NO currency symbols anywhere - percentages only for budgets
-- Proper sentence case throughout
-- Well-structured, scannable content with clear hierarchy
+CRITICAL FORMATTING REQUIREMENTS:
+- Use section headings without any markdown formatting (no asterisks or special symbols)
+- Write in clean, readable paragraphs with proper line breaks
+- NO asterisks, NO bullet symbols, NO markdown formatting anywhere
+- Use proper sentence case throughout
+- Well-structured, professional business report format
+- Include "Why this matters:" and "How to execute:" guidance sections
 
-**COMPETITOR ANALYSIS REQUIREMENT:**
+COMPETITOR ANALYSIS REQUIREMENT:
 ${competitorAnalysisInstructions}
 
 INPUT DATA:
@@ -246,52 +239,52 @@ REQUIRED JSON STRUCTURE WITH EXACT FIELD NAMES:
     "sector": "${form.sector}",
     "goal": "${derivedGoal}"
   },
-  "introduction": "**Executive Summary**\\n\\n**Strategic Overview**\\n• Key opportunity areas\\n• Primary recommendations\\n• Expected outcomes\\n\\n**Why this matters:** Context\\n**How to execute:** Implementation approach",
+  "introduction": "Executive Summary\\n\\nStrategic Overview\\nKey opportunity areas and primary recommendations. Expected outcomes and strategic direction for the campaign.\\n\\nWhy this matters: Context and strategic importance.\\nHow to execute: Implementation approach and next steps.",
   
-  "market_foundation": "**Market Overview**\\n• Market size and growth trends\\n• Key dynamics and forces\\n\\n**Customer Behaviour Insights**\\n• Purchasing patterns\\n• Decision-making factors\\n• Pain points and motivations\\n\\n**Market Opportunities**\\n• Underserved segments\\n• Emerging trends\\n• Growth areas\\n\\n**Why this matters:** Strategic context\\n**How to execute:** Action steps",
+  "market_foundation": "Market Overview\\nMarket size, growth trends, and key dynamics affecting the sector.\\n\\nCustomer Behaviour Insights\\nPurchasing patterns, decision-making factors, pain points and motivations that drive customer behaviour.\\n\\nMarket Opportunities\\nUnderserved segments, emerging trends, and growth areas to target.\\n\\nWhy this matters: Strategic context for market positioning.\\nHow to execute: Action steps for market entry and expansion.",
   
-  "strategy_pillars": "**Pillar 1: [Name]**\\n• Strategic focus\\n• Key activities\\n• Success metrics\\n\\n**Pillar 2: [Name]**\\n• Strategic focus\\n• Key activities\\n• Success metrics\\n\\n**Pillar 3: [Name]**\\n• Strategic focus\\n• Key activities\\n• Success metrics\\n\\n**Why this matters:** Strategic importance\\n**How to execute:** Implementation roadmap",
+  "strategy_pillars": "Pillar 1: Strategic Focus Name\\nStrategic focus, key activities, and success metrics for the first pillar.\\n\\nPillar 2: Strategic Focus Name\\nStrategic focus, key activities, and success metrics for the second pillar.\\n\\nPillar 3: Strategic Focus Name\\nStrategic focus, key activities, and success metrics for the third pillar.\\n\\nWhy this matters: Strategic importance of these pillars.\\nHow to execute: Implementation roadmap for all three pillars.",
   
-  "personas": "**Primary Persona: [Name]**\\n• Demographics and psychographics\\n• Pain points and challenges\\n• Goals and motivations\\n• Preferred channels\\n\\n**Secondary Persona: [Name]**\\n• Demographics and psychographics\\n• Pain points and challenges\\n• Goals and motivations\\n• Preferred channels\\n\\n**Tertiary Persona: [Name]**\\n• Demographics and psychographics\\n• Pain points and challenges\\n• Goals and motivations\\n• Preferred channels",
+  "personas": "Primary Persona: Name\\nDemographics and psychographics, pain points and challenges, goals and motivations, preferred channels.\\n\\nSecondary Persona: Name\\nDemographics and psychographics, pain points and challenges, goals and motivations, preferred channels.\\n\\nTertiary Persona: Name\\nDemographics and psychographics, pain points and challenges, goals and motivations, preferred channels.",
   
-  "competitors_brief": "**[Competitor Name]**\\n• Strengths and advantages\\n• Weaknesses and vulnerabilities\\n• Market positioning\\n• Share of voice\\n• Competitive threats\\n\\n**[Additional Competitors]**\\n• Analysis for each named competitor\\n\\n**Competitive Landscape Summary**\\n• Market dynamics\\n• Competitive gaps\\n• Positioning opportunities\\n\\n**Why this matters:** Competitive context\\n**How to execute:** Competitive response strategy",
+  "competitors_brief": "[Competitor Name Analysis]\\nStrengths and advantages, weaknesses and vulnerabilities, market positioning, share of voice, competitive threats.\\n\\n[Additional Competitors if provided]\\nAnalysis for each named competitor with specific focus on market position.\\n\\nCompetitive Landscape Summary\\nMarket dynamics, competitive gaps, and positioning opportunities.\\n\\nWhy this matters: Competitive context and strategic implications.\\nHow to execute: Competitive response strategy and positioning tactics.",
   
-  "differentiation_moves": "**Core Differentiation Strategy**\\n• Unique value proposition\\n• Key differentiators\\n• Competitive advantages\\n\\n**Positioning Tactics**\\n• Against [Competitor Name]\\n• Against [Competitor Name]\\n• Market positioning approach\\n\\n**Messaging Framework**\\n• Core messages\\n• Proof points\\n• Communication strategy\\n\\n**Why this matters:** Differentiation importance\\n**How to execute:** Positioning implementation",
+  "differentiation_moves": "Core Differentiation Strategy\\nUnique value proposition, key differentiators, and competitive advantages.\\n\\nPositioning Tactics\\nSpecific positioning against named competitors and market positioning approach.\\n\\nMessaging Framework\\nCore messages, proof points, and communication strategy.\\n\\nWhy this matters: Differentiation importance in the competitive landscape.\\nHow to execute: Positioning implementation and messaging deployment.",
   
-  "marketing_mix_7ps": "**Product**\\n• Product strategy\\n• Features and benefits\\n• Product development priorities\\n\\n**Price**\\n• Pricing strategy\\n• Competitive pricing analysis\\n• Value communication\\n\\n**Place**\\n• Distribution channels\\n• Channel strategy\\n• Market access approach\\n\\n**Promotion**\\n• Promotional strategy\\n• Communication channels\\n• Campaign approach\\n\\n**People**\\n• Target audiences\\n• Customer service strategy\\n• Team requirements\\n\\n**Process**\\n• Customer journey\\n• Service delivery\\n• Operational excellence\\n\\n**Physical Evidence**\\n• Brand assets\\n• Customer touchpoints\\n• Credibility factors",
+  "marketing_mix_7ps": "Product\\nProduct strategy, features and benefits, product development priorities.\\n\\nPrice\\nPricing strategy, competitive pricing analysis, value communication.\\n\\nPlace\\nDistribution channels, channel strategy, market access approach.\\n\\nPromotion\\nPromotional strategy, communication channels, campaign approach.\\n\\nPeople\\nTarget audiences, customer service strategy, team requirements.\\n\\nProcess\\nCustomer journey, service delivery, operational excellence.\\n\\nPhysical Evidence\\nBrand assets, customer touchpoints, credibility factors.",
   
-  "channel_playbook": "**Primary Channels**\\n• [Channel]: Role, audience, tactics\\n• [Channel]: Role, audience, tactics\\n• [Channel]: Role, audience, tactics\\n\\n**Secondary Channels**\\n• [Channel]: Role, audience, tactics\\n• [Channel]: Role, audience, tactics\\n\\n**Channel Integration Strategy**\\n• Cross-channel approach\\n• Customer journey mapping\\n• Attribution strategy\\n\\n**Why this matters:** Channel importance\\n**How to execute:** Channel activation plan",
+  "channel_playbook": "Primary Channels\\nChannel strategy for main channels including role, audience, and tactics for each.\\n\\nSecondary Channels\\nSupporting channels with specific roles and integration approach.\\n\\nChannel Integration Strategy\\nCross-channel approach, customer journey mapping, and attribution strategy.\\n\\nWhy this matters: Channel importance in reaching target audiences.\\nHow to execute: Channel activation plan and integration tactics.",
   
   "budget": {
     "band": "${form.budget_band || "Low"}",
-    "allocation": "**Primary Allocation**\\n• [Channel]: [X]% - Rationale\\n• [Channel]: [X]% - Rationale\\n• [Channel]: [X]% - Rationale\\n\\n**Secondary Allocation**\\n• [Channel]: [X]% - Rationale\\n• [Channel]: [X]% - Rationale\\n\\n**Allocation Rationale**\\n• Strategic reasoning\\n• Expected returns\\n• Risk considerations"
+    "allocation": "Primary Allocation\\nChannel allocation with percentages and rationale for each major channel.\\n\\nSecondary Allocation\\nSupporting channel allocations with strategic reasoning.\\n\\nAllocation Rationale\\nStrategic reasoning, expected returns, and risk considerations for budget distribution."
   },
   
-  "calendar_next_90_days": "**Month 1: Foundation**\\n• Week 1: Setup activities\\n• Week 2: Launch preparations\\n• Week 3: Initial campaigns\\n• Week 4: Optimization\\n\\n**Month 2: Scaling**\\n• Week 5-6: Scale activities\\n• Week 7-8: Expansion tactics\\n\\n**Month 3: Optimization**\\n• Week 9-10: Performance analysis\\n• Week 11-12: Strategic adjustments\\n\\n**Critical Milestones**\\n• Key deadlines\\n• Success checkpoints\\n• Decision points",
+  "calendar_next_90_days": "Month 1: Foundation\\nWeek-by-week breakdown of setup activities, launch preparations, initial campaigns, and optimization tasks.\\n\\nMonth 2: Scaling\\nScaling activities and expansion tactics for weeks 5-8.\\n\\nMonth 3: Optimization\\nPerformance analysis and strategic adjustments for weeks 9-12.\\n\\nCritical Milestones\\nKey deadlines, success checkpoints, and decision points throughout the 90 days.",
   
-  "kpis": "**Primary KPIs**\\n• [Metric]: Target and measurement\\n• [Metric]: Target and measurement\\n• [Metric]: Target and measurement\\n\\n**Secondary KPIs**\\n• [Metric]: Target and measurement\\n• [Metric]: Target and measurement\\n\\n**Leading Indicators**\\n• Early success signals\\n• Predictive metrics\\n• Warning indicators\\n\\n**Measurement Framework**\\n• Reporting frequency\\n• Data sources\\n• Analysis approach",
+  "kpis": "Primary KPIs\\nCore metrics with targets and measurement methodology.\\n\\nSecondary KPIs\\nSupporting metrics for performance tracking.\\n\\nLeading Indicators\\nEarly success signals, predictive metrics, and warning indicators.\\n\\nMeasurement Framework\\nReporting frequency, data sources, and analysis approach.",
   
-  "risks_and_safety_nets": "**High-Risk Scenarios**\\n• [Risk]: Impact and probability\\n• [Risk]: Impact and probability\\n• [Risk]: Impact and probability\\n\\n**Mitigation Strategies**\\n• Preventive measures\\n• Contingency plans\\n• Response protocols\\n\\n**Safety Nets**\\n• Backup plans\\n• Alternative approaches\\n• Recovery strategies\\n\\n**Why this matters:** Risk context\\n**How to execute:** Risk management approach",
+  "risks_and_safety_nets": "High-Risk Scenarios\\nKey risks with impact assessment and probability analysis.\\n\\nMitigation Strategies\\nPreventive measures, contingency plans, and response protocols.\\n\\nSafety Nets\\nBackup plans, alternative approaches, and recovery strategies.\\n\\nWhy this matters: Risk context and strategic importance.\\nHow to execute: Risk management approach and implementation.",
   
-  "experiments": "**Priority Tests**\\n• [Experiment]: Hypothesis, method, success criteria\\n• [Experiment]: Hypothesis, method, success criteria\\n• [Experiment]: Hypothesis, method, success criteria\\n\\n**Testing Framework**\\n• Test design principles\\n• Measurement approach\\n• Learning objectives\\n\\n**Implementation Plan**\\n• Testing sequence\\n• Resource requirements\\n• Timeline and milestones",
+  "experiments": "Priority Tests\\nKey experiments with hypothesis, methodology, and success criteria for each test.\\n\\nTesting Framework\\nTest design principles, measurement approach, and learning objectives.\\n\\nImplementation Plan\\nTesting sequence, resource requirements, timeline and milestones.",
   
-  "glossary": "**Marketing Terms**\\n• [Term]: Clear definition\\n• [Term]: Clear definition\\n• [Term]: Clear definition\\n\\n**Industry-Specific Terms**\\n• [Term]: Context-specific definition\\n• [Term]: Context-specific definition\\n\\n**Acronyms and Abbreviations**\\n• [Acronym]: Full meaning and explanation"
+  "glossary": "Marketing Terms\\nClear definitions of key marketing terms used in the strategy.\\n\\nIndustry-Specific Terms\\nContext-specific definitions relevant to the sector.\\n\\nAcronyms and Abbreviations\\nFull meanings and explanations of acronyms used throughout the report."
 }
 
 CONTENT REQUIREMENTS:
 - Each section 250-400 words minimum
-- Use bullet points and clear structure throughout
+- Use clear headings and well-structured paragraphs
 - Include specific competitor names where provided
-- Bold headings for easy scanning
+- NO asterisks, NO bullet points, NO markdown formatting
+- Clean, professional business report format
 - Actionable insights with "Why this matters" and "How to execute"
-- NO long paragraphs - break up content with structure
 - Percentage-only budget allocations (e.g., "Search: 45%")
 
 TASK:
-Create a comprehensive, well-structured marketing strategy using the exact JSON format above. Focus on scannable content with clear headings, bullet points, and actionable insights. Prominently feature any named competitors throughout the analysis.
+Create a comprehensive, well-structured marketing strategy using the exact JSON format above. Focus on clean, readable content with clear headings and actionable insights. Prominently feature any named competitors throughout the analysis.
 
 OUTPUT:
-Return valid JSON only with the exact field structure and formatting specified above.`;
+Return valid JSON only with the exact field structure and clean formatting specified above.`;
 
     /* 4. OpenAI call */
     try {
@@ -309,7 +302,7 @@ Return valid JSON only with the exact field structure and formatting specified a
           response_format: { type: "json_object" },
           messages: [
             { role: "system",
-              content: "You are Mark Ritson meets Philip Kotler - the world's leading marketing strategist. Write comprehensive, actionable marketing strategies in British English with proper sentence case. Use structured content with headings and bullet points - NOT wall-of-text paragraphs. Always prominently feature any named competitors provided. Use percentage allocations only for budgets - no currency symbols." },
+              content: "You are Mark Ritson meets Philip Kotler - the world's leading marketing strategist. Write comprehensive, actionable marketing strategies in British English with proper sentence case. Use clean, professional business report format with NO markdown formatting, NO asterisks, NO bullet symbols. Always prominently feature any named competitors provided. Use percentage allocations only for budgets - no currency symbols." },
             ...EXAMPLES.map(t => ({ role: "assistant", content: t })),
             { role: "user", content: prompt }
           ]
