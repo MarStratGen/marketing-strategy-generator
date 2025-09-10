@@ -284,6 +284,30 @@ function ContentCard({ title, data, color }) {
 function OptimizedContent({ data }) {
   if (!data) return <p className="text-slate-500 italic">No data available</p>;
 
+  // Special handling for budget band capitalization and context
+  if (typeof data === "object" && data.band && data.allocation) {
+    const bandMap = {
+      'none': 'No paid budget',
+      'low': 'Low', 
+      'medium': 'Medium',
+      'high': 'High'
+    };
+    
+    return (
+      <div>
+        <h6 className="font-bold text-slate-900 text-base" style={{marginTop: '32px', marginBottom: '0px'}}>
+          Budget Level
+        </h6>
+        <p className="text-slate-700" style={{marginTop: '0px', marginBottom: '12px', lineHeight: '1.6'}}>
+          {bandMap[data.band] || data.band} - This indicates the overall budget tier for your marketing activities.
+        </p>
+        <div className="text-slate-700 leading-relaxed">
+          <FormattedText text={String(data.allocation)} />
+        </div>
+      </div>
+    );
+  }
+
   if (Array.isArray(data)) {
     return (
       <ul className="space-y-2 list-none">
