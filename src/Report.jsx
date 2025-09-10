@@ -47,13 +47,10 @@ export default function Report({ plan, loading }) {
     <div className="mt-12 w-full max-w-5xl mx-auto px-4">
       {/* header */}
       <div className="text-center mb-16">
-        <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-r from-blue-600 to-purple-600 rounded-2xl mb-6">
-          <span className="text-2xl">🎯</span>
-        </div>
         <h2 className="text-4xl font-bold text-slate-900 mb-4 tracking-tight">
           Your Marketing Strategy
         </h2>
-        <p className="text-xl text-slate-700 max-w-3xl mx-auto leading-relaxed font-medium">
+        <p className="text-xl text-slate-800 max-w-3xl mx-auto leading-relaxed font-medium">
           A comprehensive plan organised into actionable sections for immediate implementation
         </p>
       </div>
@@ -69,19 +66,19 @@ export default function Report({ plan, loading }) {
         <div className="flex flex-wrap gap-3 justify-center">
           <button
             onClick={() => downloadExcel(data)}
-            className="bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-3 rounded-xl font-semibold shadow-sm hover:shadow-lg transition-all duration-200 flex items-center gap-2"
+            className="bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-3 rounded-xl font-semibold transition-all duration-200 flex items-center gap-2"
           >
             📊 Excel Report
           </button>
           <button
             onClick={() => downloadWord(data)}
-            className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-xl font-semibold shadow-sm hover:shadow-lg transition-all duration-200 flex items-center gap-2"
+            className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-xl font-semibold transition-all duration-200 flex items-center gap-2"
           >
             📄 Word Document
           </button>
           <button
             onClick={() => window.print()}
-            className="bg-slate-600 hover:bg-slate-700 text-white px-6 py-3 rounded-xl font-semibold shadow-sm hover:shadow-lg transition-all duration-200 flex items-center gap-2"
+            className="bg-slate-600 hover:bg-slate-700 text-white px-6 py-3 rounded-xl font-semibold transition-all duration-200 flex items-center gap-2"
           >
             🖨️ Print PDF
           </button>
@@ -192,7 +189,7 @@ function ContentSection({ section, isFirst }) {
   if (!hasContent) return null;
 
   return (
-    <div className="bg-white rounded-2xl border border-slate-200 shadow-lg shadow-slate-100 overflow-hidden mb-8">
+    <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden mb-8">
       <button
         onClick={() => setOpen(!isOpen)}
         className="w-full p-8 text-left hover:bg-slate-50 transition-all duration-200"
@@ -200,7 +197,7 @@ function ContentSection({ section, isFirst }) {
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-6">
             <div
-              className={`w-16 h-16 rounded-2xl bg-gradient-to-r ${colors[section.color].gradient} flex items-center justify-center text-white text-2xl shadow-lg`}
+              className={`w-16 h-16 rounded-2xl bg-gradient-to-r ${colors[section.color].gradient} flex items-center justify-center text-white text-2xl`}
             >
               {section.icon}
             </div>
@@ -208,7 +205,7 @@ function ContentSection({ section, isFirst }) {
               <h3 className="text-2xl font-bold text-slate-900 mb-2 tracking-tight">
                 {section.title}
               </h3>
-              <p className="text-base text-slate-600 font-medium leading-relaxed">{section.description}</p>
+              <p className="text-base text-slate-800 font-medium leading-relaxed">{section.description}</p>
             </div>
           </div>
           <div className="flex items-center gap-3">
@@ -257,30 +254,27 @@ function ContentCard({ title, data, color }) {
   return (
     <div className={`border-2 ${colours[color]} rounded-xl p-6 shadow-sm`}>
       <h4 className="text-xl font-bold text-slate-900 mb-5 tracking-tight">{title}</h4>
-      <div className="prose prose-slate max-w-none text-slate-700 leading-relaxed">
+      <div className="prose prose-slate max-w-none text-slate-800 leading-relaxed">
         <OptimizedContent data={data} />
       </div>
     </div>
   );
 }
 
-/* Recursive content renderer (unchanged except UK spelling) */
+/* Recursive content renderer (IMPROVED CLUSTERING) */
 function OptimizedContent({ data }) {
-  if (!data) return <p className="text-gray-500 italic">No data available</p>;
+  if (!data) return <p className="text-slate-500 italic">No data available</p>;
 
   if (Array.isArray(data)) {
     return (
-      <ul className="space-y-3">
+      <ul className="space-y-1 list-disc list-inside ml-2">
         {data.map((item, i) => (
-          <li key={i} className="flex items-start gap-3">
-            <span className="text-blue-500 mt-1.5 text-sm">•</span>
-            <div className="flex-1 text-gray-700 leading-relaxed">
-              {typeof item === "object" ? (
-                <OptimizedContent data={item} />
-              ) : (
-                <FormattedText text={String(item)} />
-              )}
-            </div>
+          <li key={i} className="text-slate-800 leading-tight pl-1">
+            {typeof item === "object" ? (
+              <OptimizedContent data={item} />
+            ) : (
+              <FormattedText text={String(item)} />
+            )}
           </li>
         ))}
       </ul>
@@ -289,13 +283,13 @@ function OptimizedContent({ data }) {
 
   if (typeof data === "object") {
     return (
-      <div className="space-y-4">
+      <div className="space-y-3">
         {Object.entries(data).map(([k, v]) => (
-          <div key={k}>
-            <h5 className="font-medium text-gray-900 mb-2 text-base">
+          <div key={k} className="border-l-2 border-slate-300 pl-3 py-1">
+            <h5 className="font-bold text-slate-900 mb-1 text-base tracking-tight">
               {formatSubheading(k)}
             </h5>
-            <div className="ml-3 text-gray-700">
+            <div className="ml-1 text-slate-800">
               <OptimizedContent data={v} />
             </div>
           </div>
@@ -305,7 +299,7 @@ function OptimizedContent({ data }) {
   }
 
   return (
-    <div className="text-gray-700 leading-relaxed">
+    <div className="text-slate-800 leading-relaxed">
       <FormattedText text={String(data)} />
     </div>
   );
@@ -315,9 +309,9 @@ function OptimizedContent({ data }) {
 function FormattedText({ text }) {
   const paras = text.split("\n\n").filter((p) => p.trim());
   return (
-    <div className="space-y-3">
+    <div className="space-y-2">
       {paras.map((p, i) => (
-        <p key={i} className="leading-relaxed">
+        <p key={i} className="leading-snug text-slate-800">
           {p.trim()}
         </p>
       ))}
