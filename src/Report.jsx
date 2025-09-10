@@ -428,14 +428,14 @@ function FormattedText({ text }) {
               
               if (isSubheading) {
                 return (
-                  <h6 key={lineIndex} className="font-bold text-slate-900 text-base mt-6 mb-1 first:mt-0">
+                  <h6 key={lineIndex} className="font-bold text-slate-900 text-base mt-8 mb-0 first:mt-0">
                     {cleanLine}
                   </h6>
                 );
               }
               
               return (
-                <p key={lineIndex} className="leading-relaxed text-slate-700 mb-3">
+                <p key={lineIndex} className="leading-relaxed text-slate-700 mb-2 mt-1">
                   {cleanLine}
                 </p>
               );
