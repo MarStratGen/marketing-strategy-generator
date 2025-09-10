@@ -238,10 +238,15 @@ export default function App() {
         throw new Error("API returned empty response. The Cloudflare Worker might not be properly configured.");
       }
       
-      // Check for expected structure (adjust based on your Worker's response format)
-      if (!data.strategy && !data.content && !data.marketing_plan) {
+      // Check for expected structure based on the Cloudflare Worker's actual response format
+      if (!data.stp && !data.mix_7ps && !data.meta && !data.error) {
         console.warn("Unexpected response structure:", data);
         throw new Error("API returned unexpected data format. Please check the Cloudflare Worker implementation.");
+      }
+      
+      // Check for Worker-level errors
+      if (data.error) {
+        throw new Error(`Worker error: ${data.error} - ${data.detail || 'No details available'}`);
       }
       
       setResult(data);

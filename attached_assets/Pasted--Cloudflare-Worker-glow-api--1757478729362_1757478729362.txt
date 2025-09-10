@@ -1,0 +1,361 @@
+/*  ─────────────────────────────────────────────
+    Cloudflare Worker · glow-api-…
+    ───────────────────────────────────────────── */
+
+	export default {
+		async fetch(req, env) {
+		  /* 1. CORS pre-flight */
+		  if (req.method === "OPTIONS") return new Response(null, cors());
+	  
+		  /* 2. Allow only POST /generate */
+		  const url = new URL(req.url);
+		  if (req.method !== "POST" || url.pathname !== "/generate") {
+			return new Response(
+			  JSON.stringify({ ok: true, routes: ["/generate"] }),
+			  cors()
+			);
+		  }
+	  
+		  /* 3. Parse JSON body */
+		  let form;
+		  try {
+			form = await req.json();
+		  } catch {
+			return new Response(JSON.stringify({ error: "bad_json" }), cors(400));
+		  }
+	  
+		  /* ─── lookup tables ─── */
+		  const channelByMotion = {
+			ecom_checkout: [
+			  { channel: "Search", intent: "high", role: "capture" },
+			  { channel: "Paid social", intent: "mid", role: "spark demand" },
+			],
+			saas_checkout: [
+			  { channel: "Search", intent: "high", role: "capture" },
+			  { channel: "Paid social", intent: "mid", role: "scale" },
+			],
+			marketplace_checkout: [
+			  { channel: "Marketplace ads", intent: "high", role: "capture" },
+			  { channel: "Search", intent: "mid", role: "assist" },
+			],
+			store_visit: [
+			  { channel: "Local search", intent: "high", role: "drive visits" },
+			  { channel: "Maps/GBP", intent: "high", role: "presence" },
+			],
+			call_now: [
+			  {
+				channel: "Call-extensions search",
+				intent: "high",
+				role: "click to call",
+			  },
+			  { channel: "Local search", intent: "high", role: "capture" },
+			],
+			lead_capture: [
+			  { channel: "Search", intent: "high", role: "capture" },
+			  { channel: "Retargeting", intent: "mid", role: "nudge" },
+			],
+			booking: [
+			  { channel: "Search", intent: "high", role: "capture" },
+			  { channel: "Local social", intent: "mid", role: "presence" },
+			],
+			saas_trial: [
+			  { channel: "Search", intent: "high", role: "capture" },
+			  { channel: "Content/SEO", intent: "mid", role: "educate" },
+			],
+			saas_demo: [
+			  { channel: "Search", intent: "high", role: "capture" },
+			  { channel: "LinkedIn", intent: "mid", role: "target accounts" },
+			],
+			app_install: [
+			  { channel: "App store ads", intent: "high", role: "convert" },
+			  { channel: "Paid social", intent: "mid", role: "scale" },
+			],
+			donation: [
+			  { channel: "Search", intent: "high", role: "capture intent" },
+			  { channel: "Email", intent: "mid", role: "appeal" },
+			],
+			enrolment: [
+			  { channel: "Search", intent: "high", role: "capture" },
+			  { channel: "Content", intent: "mid", role: "inform" },
+			],
+			wholesale_inquiry: [
+			  { channel: "Search", intent: "high", role: "capture B2B" },
+			  { channel: "LinkedIn", intent: "mid", role: "prospect" },
+			],
+			partner_recruitment: [
+			  { channel: "Search", intent: "high", role: "capture partners" },
+			  { channel: "Partnership outreach", intent: "mid", role: "recruit" },
+			],
+		  };
+	  
+		  const funnelByMotion = {
+			ecom_checkout:
+			  "Impressions × CTR = Clicks; Clicks × CVR = Orders; Orders × AOV = Revenue",
+			saas_checkout:
+			  "Impressions × CTR = Clicks; Clicks × CVR = Subscriptions; Subscriptions × ARPA = MRR",
+			marketplace_checkout:
+			  "Impressions × CTR = Clicks; Clicks × CVR = Orders; Orders × AOV = Revenue",
+			store_visit:
+			  "Impressions × CTR = Clicks; Clicks × Action rate = Directions; Directions × Visit rate = Visits",
+			call_now:
+			  "Impressions × CTR = Clicks; Clicks × Call rate = Calls; Calls × Booked rate = Jobs",
+			lead_capture:
+			  "Impressions × CTR = Clicks; Clicks × CVR = Leads; Leads × Qual rate = Qualified leads",
+			booking:
+			  "Impressions × CTR = Clicks; Clicks × CVR = Bookings; Bookings × Show rate = Attended",
+			saas_trial:
+			  "Impressions × CTR = Clicks; Clicks × Trial rate = Trials; Trials × Activation rate = Active trials",
+			saas_demo:
+			  "Impressions × CTR = Clicks; Clicks × Form rate = Demo requests; Requests × SQO rate = SQOs",
+			app_install:
+			  "Impressions × CTR = Clicks; Clicks × Install rate = Installs; Installs × D7 retain = Retained users",
+			donation:
+			  "Impressions × CTR = Clicks; Clicks × Donate rate = Donations; Donations × Avg gift = Revenue",
+			enrolment:
+			  "Impressions × CTR = Clicks; Clicks × Enquiry rate = Enquiries; Enquiries × Enrol rate = Enrolments",
+			wholesale_inquiry:
+			  "Impressions × CTR = Clicks; Clicks × Form rate = Enquiries; Enquiries × SQL rate = SQLs",
+			partner_recruitment:
+			  "Impressions × CTR = Clicks; Clicks × Apply rate = Partner applications; Applications × Approval rate = Partners",
+		  };
+	  
+		  const kpisByMotion = {
+			ecom_checkout: [
+			  { name: "Orders", definition: "Completed purchases", reason: "Outcome" },
+			  { name: "Cost per order", definition: "Spend ÷ Orders", reason: "Efficiency" },
+			  { name: "CVR", definition: "Orders ÷ Clicks", reason: "Checkout effectiveness" },
+			  { name: "CTR", definition: "Clicks ÷ Impressions", reason: "Ad fit" },
+			],
+			saas_checkout: [
+			  { name: "Subscriptions", definition: "New paid plans started", reason: "Outcome" },
+			  { name: "Cost per subscription", definition: "Spend ÷ Subs", reason: "Efficiency" },
+			  { name: "CVR", definition: "Subs ÷ Clicks", reason: "Checkout effectiveness" },
+			  { name: "D30 churn", definition: "30-day cancels ÷ Subs", reason: "Quality" },
+			],
+			lead_capture: [
+			  { name: "Leads", definition: "Valid forms/calls", reason: "Top-funnel" },
+			  { name: "Qualified leads", definition: "Fit & intent", reason: "Sales quality" },
+			  { name: "Cost per lead", definition: "Spend ÷ Leads", reason: "Efficiency" },
+			  { name: "Lead→job rate", definition: "Jobs ÷ QLs", reason: "Throughput" },
+			],
+			saas_demo: [
+			  { name: "Demo requests", definition: "Completed demo forms", reason: "Outcome" },
+			  { name: "SQOs", definition: "Sales-qualified opps", reason: "Pipeline" },
+			  { name: "Cost per demo", definition: "Spend ÷ Requests", reason: "Efficiency" },
+			  { name: "Win rate", definition: "Closed-won ÷ Opps", reason: "Effectiveness" },
+			],
+		  };
+	  
+		  const defaultGoalByMotion = {
+			ecom_checkout: "Online orders",
+			saas_checkout: "Paid subscriptions",
+			marketplace_checkout: "Marketplace orders",
+			store_visit: "In-store sales",
+			call_now: "Bookings",
+			lead_capture: "Qualified leads",
+			booking: "Bookings",
+			saas_trial: "Qualified leads",
+			saas_demo: "Meetings booked",
+			app_install: "Installs with activation",
+			donation: "Donations",
+			enrolment: "Enrolments",
+			wholesale_inquiry: "Wholesale purchase orders",
+			partner_recruitment: "Partner sign-ups",
+			custom: "Goal aligned to custom action",
+		  };
+	  
+		  /* ─── helpers ─── */
+	  
+		  function applyMotionDefaults(report, form) {
+			/* Guard: ensure budget is an object (fixes the “band on string” crash) */
+			if (
+			  typeof report.budget !== "object" ||
+			  report.budget === null ||
+			  Array.isArray(report.budget)
+			) {
+			  report.budget = {};
+			}
+	  
+			const isCustom = form.motion === "custom";
+	  
+			if (!isCustom) {
+			  if (
+				!Array.isArray(report.channel_intent_map) ||
+				report.channel_intent_map.length === 0
+			  ) {
+				report.channel_intent_map = channelByMotion[form.motion] || [];
+			  }
+	  
+			  report.funnel_math = report.funnel_math || {};
+			  if (!report.funnel_math.equations) {
+				report.funnel_math.equations =
+				  funnelByMotion[form.motion] ||
+				  "Impressions × CTR = Clicks; Clicks × CVR = Conversions";
+			  }
+	  
+			  if (
+				!report.kpis ||
+				!Array.isArray(report.kpis.list) ||
+				report.kpis.list.length === 0
+			  ) {
+				report.kpis = report.kpis || {};
+				report.kpis.why_kpis =
+				  report.kpis.why_kpis || "Direct line from effort to outcome.";
+				report.kpis.list = kpisByMotion[form.motion] || [
+				  { name: "CTR", definition: "Clicks ÷ Impressions", reason: "Ad fit" },
+				];
+			  }
+			} else {
+			  report.funnel_math = report.funnel_math || {};
+			  report.kpis = report.kpis || { list: [] };
+			}
+	  
+			report.budget.band = form.budget_band || report.budget.band || "low";
+			return report;
+		  }
+	  
+		  function stripCurrency(report) {
+			const walk = (obj) => {
+			  if (!obj || typeof obj !== "object") return;
+			  for (const k of Object.keys(obj)) {
+				const v = obj[k];
+				if (v && typeof v === "object") walk(v);
+				if (["amount", "currency", "cost", "budget_total"].includes(k)) {
+				  delete obj[k];
+				}
+				if (typeof v === "string") {
+				  obj[k] = v.replace(/[£$€₹¥]/g, "");
+				}
+			  }
+			};
+			walk(report);
+			return report;
+		  }
+	  
+		  /* ─── build prompt ─── */
+		  const hintChannels = JSON.stringify(channelByMotion[form.motion] || []);
+		  const hintFunnel = funnelByMotion[form.motion] || "";
+		  const hintKpis = JSON.stringify(kpisByMotion[form.motion] || []);
+	  
+		  const derivedGoal =
+			form.motion === "custom" && form.action_custom
+			  ? `Goal aligned to: ${form.action_custom}`
+			  : defaultGoalByMotion[form.motion] || "Goal aligned to main action";
+	  
+		  const customLine =
+			form.motion === "custom" && form.action_custom
+			  ? `Custom main action: ${form.action_custom}\n`
+			  : "";
+	  
+		  const prompt = `You are a senior marketing strategist. Use British English. Do not use en or em dashes. Be concrete.
+	  
+	  INPUT
+	  Country: ${form.country}
+	  Sector: ${form.sector}
+	  Offering: ${form.product_type}
+	  Target segments: ${
+			Array.isArray(form.audiences) && form.audiences.length
+			  ? form.audiences.join(", ")
+			  : "General market"
+		  }
+	  Primary goal: ${derivedGoal}
+	  Main action: ${form.motion}
+	  ${customLine}Budget level: ${form.budget_band || "low"}    # none | low | medium | high
+	  Competitors: ${
+			Array.isArray(form.competitors) && form.competitors.length
+			  ? form.competitors.join(", ")
+			  : "Not specified"
+		  }
+	  
+	  HINTS
+	  - channel_intent_map: ${hintChannels}
+	  - funnel_equations:   ${hintFunnel}
+	  - kpi_suggestions:    ${hintKpis}
+	  
+	  TASK
+	  Return valid JSON only with these keys:
+	  meta, stp, mix_7ps, channel_intent_map, budget, calendar_90d, kpis,
+	  experiments, evidence_ledger, funnel_math, assumptions,
+	  strategy_pillars, personas, competitors_brief, differentiation_moves, risks.
+	  
+	  STP structure (first mention: **STP = Segmentation, Targeting, Positioning**):
+	  - stp.intro         : one sentence on why STP matters.
+	  - stp.segmentation  : { basis, segments: [{ name, needs, signals }] }
+	  - stp.targeting     : { primary, secondary, rationale }
+	  - stp.positioning   : { statement, reasons_to_believe, differentiation_notes }
+	  
+	  REQUIREMENTS
+	  - Map funnel & KPIs to Main action.
+	  - Percentages only – no currency.
+	  - Honour budget.band tiers.
+	  - Every strong claim needs an evidence_ledger row (status="required" if missing proof).
+	  
+	  OUTPUT
+	  Return ONLY valid JSON (no markdown, no commentary).`;
+	  
+		  /* ─── call OpenAI ─── */
+		  try {
+			const ai = await fetch("https://api.openai.com/v1/chat/completions", {
+			  method: "POST",
+			  headers: {
+				"Content-Type": "application/json",
+				Authorization: `Bearer ${env.OPENAI_API_KEY}`,
+			  },
+			  body: JSON.stringify({
+				model: form.model || "gpt-4o-mini",
+				messages: [{ role: "user", content: prompt }],
+				response_format: { type: "json_object" },
+				max_tokens: 1500,
+				temperature: 0.4,
+			  }),
+			});
+	  
+			const out = await ai.json();
+			if (!ai.ok) {
+			  return new Response(
+				JSON.stringify({ error: "openai_error", detail: out }),
+				cors(ai.status)
+			  );
+			}
+	  
+			let json;
+			try {
+			  const content = out.choices?.[0]?.message?.content;
+			  json = content
+				? JSON.parse(content)
+				: { error: "no_content", detail: out };
+			} catch (e) {
+			  json = { error: "bad_model_json", raw: out, parseError: String(e) };
+			}
+	  
+			if (!json.error) {
+			  json = applyMotionDefaults(json, form);
+			  json = stripCurrency(json);
+			}
+	  
+			return new Response(JSON.stringify(json), {
+			  ...cors(),
+			  headers: { ...cors().headers, "Content-Type": "application/json" },
+			});
+		  } catch (err) {
+			return new Response(
+			  JSON.stringify({ error: "worker_crash", detail: String(err) }),
+			  cors(500)
+			);
+		  }
+		},
+	  };
+	  
+	  /* ─── CORS helper ─── */
+	  function cors(status = 200) {
+		return {
+		  status,
+		  headers: {
+			"Access-Control-Allow-Origin": "*",
+			"Access-Control-Allow-Headers": "Content-Type, Authorization",
+			"Access-Control-Allow-Methods": "POST,OPTIONS",
+			"Access-Control-Max-Age": "86400",
+		  },
+		};
+	  }
+	  
