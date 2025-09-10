@@ -16,12 +16,12 @@ const Pill = ({ text, onRemove }) => (
 );
 
 const Field = ({ label, children, tooltip, required }) => (
-  <div className="space-y-2">
-    <label className="block text-sm font-medium text-white">
+  <div className="space-y-1">
+    <label className="block text-sm font-medium text-gray-700">
       {label}
-      {required && <span className="text-red-400 ml-1">*</span>}
+      {required && <span className="text-red-500 ml-1">*</span>}
       {tooltip && (
-        <span className="ml-1 text-slate-300 cursor-help text-xs">ℹ️ {tooltip}</span>
+        <span className="ml-1 text-gray-400 cursor-help" title={tooltip}>ℹ️</span>
       )}
     </label>
     {children}
@@ -30,8 +30,8 @@ const Field = ({ label, children, tooltip, required }) => (
 
 const LoadingSpinner = () => (
   <div className="inline-flex items-center">
-    <div className="animate-spin rounded-full h-5 w-5 border-2 border-white border-t-transparent mr-3"></div>
-    <span>Creating your marketing plan...</span>
+    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+    Generating your strategic marketing plan...
   </div>
 );
 
@@ -111,7 +111,7 @@ const BUDGET_BANDS = [
 ];
 
 /* main component */
-export default function App() {
+function App() {
   // state
   const [country, setCountry] = useState("Australia");
   const [customCountry, setCCountry] = useState("");
@@ -193,29 +193,28 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-indigo-900 to-purple-900">
-      <div className="min-h-screen py-12">
-        <div className="max-w-2xl mx-auto px-6">
-          {/* Header */}
-          <header className="text-center mb-12">
-            <h1 className="text-4xl font-bold text-white mb-4">
-              Tiny Marketing Plan Generator
-            </h1>
-            <p className="text-lg text-slate-300">
-              Create comprehensive go-to-market strategies with AI-powered insights
-            </p>
-          </header>
+    <div className="min-h-screen bg-gray-50">
+      <div className="max-w-4xl mx-auto py-12 px-4">
+        {/* Header */}
+        <header className="text-center mb-12">
+          <h1 className="text-4xl font-bold text-gray-900 mb-4">
+            Tiny Marketing Plan Generator
+          </h1>
+          <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+            Create comprehensive go-to-market strategies with AI-powered insights
+          </p>
+        </header>
 
-          {/* Glass Form Container */}
-          <div className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl shadow-xl p-8">
+        {/* Form Container */}
+        <div className="bg-white rounded-lg shadow-md p-8 max-w-2xl mx-auto">
 
             {error && (
-              <div className="bg-red-500/20 border border-red-300/50 text-red-100 px-4 py-3 rounded-lg mb-6">
+              <div className="bg-red-50 border border-red-200 text-red-800 px-4 py-3 rounded-md mb-6">
                 {error}
               </div>
             )}
 
-            <form onSubmit={handleSubmit} className="space-y-8">
+            <form onSubmit={handleSubmit} className="space-y-6">
           <Field 
             label="Which country are you targeting?" 
             required 
@@ -224,7 +223,7 @@ export default function App() {
             <select
               value={country}
               onChange={(e) => setCountry(e.target.value)}
-              className="w-full px-4 py-3 rounded-xl border border-white/20 bg-white/10 backdrop-blur-md text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-white/40 focus:border-white/30 transition-all duration-200 shadow-lg hover:shadow-xl hover:bg-white/15"
+              className="w-full mt-1 mb-2 px-4 py-2 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:border-transparent"
             >
               {COUNTRIES.map((c) => (
                 <option key={c.code} value={c.code}>
@@ -237,7 +236,7 @@ export default function App() {
                 ref={ccRef}
                 value={customCountry}
                 onChange={(e) => setCCountry(e.target.value)}
-                className="w-full px-4 py-3 rounded-xl border border-white/20 bg-white/10 backdrop-blur-md text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-white/40 focus:border-white/30 transition-all duration-200 shadow-lg hover:shadow-xl hover:bg-white/15"
+                className="w-full mt-1 mb-2 px-4 py-2 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:border-transparent"
                 placeholder="Type your country"
               />
             )}
@@ -250,7 +249,7 @@ export default function App() {
             <select
               value={sector}
               onChange={(e) => setSector(e.target.value)}
-              className="w-full px-4 py-3 rounded-xl border border-white/20 bg-white/10 backdrop-blur-md text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-white/40 focus:border-white/30 transition-all duration-200 shadow-lg hover:shadow-xl hover:bg-white/15"
+              className="w-full mt-1 mb-2 px-4 py-2 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:border-transparent"
             >
               <option value="" disabled>Choose your industry (optional)</option>
               {[
@@ -267,7 +266,7 @@ export default function App() {
                 ref={csRef}
                 value={customSector}
                 onChange={(e) => setCSector(e.target.value)}
-                className="w-full px-4 py-3 rounded-xl border border-white/20 bg-white/10 backdrop-blur-md text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-white/40 focus:border-white/30 transition-all duration-200 shadow-lg hover:shadow-xl hover:bg-white/15"
+                className="w-full mt-1 mb-2 px-4 py-2 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:border-transparent"
                 placeholder="Type your sector"
               />
             )}
@@ -281,7 +280,7 @@ export default function App() {
             <input
               value={product}
               onChange={(e) => setProduct(e.target.value)}
-              className="w-full px-4 py-3 rounded-xl border border-white/20 bg-white/10 backdrop-blur-md text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-white/40 focus:border-white/30 transition-all duration-200 shadow-lg hover:shadow-xl hover:bg-white/15"
+              className="w-full mt-1 mb-2 px-4 py-2 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:border-transparent"
               placeholder="e.g., Organic heirloom tomato seeds, AI-powered project management software"
               required
             />
@@ -303,10 +302,10 @@ export default function App() {
               value={segInp}
               onChange={(e) => setSegInp(e.target.value)}
               onKeyDown={(e) => onComma(e, setSeg, setSegInp)}
-              className="w-full px-4 py-3 rounded-xl border border-white/20 bg-white/10 backdrop-blur-md text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-white/40 focus:border-white/30 transition-all duration-200 shadow-lg hover:shadow-xl hover:bg-white/15"
+              className="w-full mt-1 mb-2 px-4 py-2 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:border-transparent"
               placeholder="e.g., Home gardeners aged 35-55"
             />
-            <p className="text-sm text-white/60 mt-1">
+            <p className="text-sm text-gray-500 mt-1">
               Press comma or Enter to add. Up to 3 customer groups (optional).
             </p>
           </Field>
@@ -319,7 +318,7 @@ export default function App() {
             <select
               value={motion}
               onChange={(e) => setMotion(e.target.value)}
-              className="w-full px-4 py-3 rounded-xl border border-white/20 bg-white/10 backdrop-blur-md text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-white/40 focus:border-white/30 transition-all duration-200 shadow-lg hover:shadow-xl hover:bg-white/15"
+              className="w-full mt-1 mb-2 px-4 py-2 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:border-transparent"
               required
             >
               {MOTIONS.map((m) => (
@@ -333,13 +332,13 @@ export default function App() {
               <input
                 value={customMotion}
                 onChange={(e) => setCustomMotion(e.target.value)}
-                className="w-full px-4 py-3 rounded-xl border border-white/20 bg-white/10 backdrop-blur-md text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-white/40 focus:border-white/30 transition-all duration-200 shadow-lg hover:shadow-xl hover:bg-white/15"
+                className="w-full mt-1 mb-2 px-4 py-2 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:border-transparent"
                 placeholder="Describe the action, e.g., ‘Call to book’, ‘Visit store’, ‘Request sample kit’"
                 required
               />
             )}
 
-            <p className="text-sm text-slate-300 mt-2">
+            <p className="text-sm text-gray-500 mt-2">
               💡 This determines your marketing funnel and KPIs - can be online or offline actions.
             </p>
           </Field>
@@ -359,7 +358,7 @@ export default function App() {
                 </option>
               ))}
             </select>
-            <p className="text-sm text-slate-300 mt-2">
+            <p className="text-sm text-gray-500 mt-2">
               💰 We'll provide percentage allocations rather than specific dollar amounts.
             </p>
           </Field>
@@ -383,21 +382,21 @@ export default function App() {
               value={compInp}
               onChange={(e) => setCompInp(e.target.value)}
               onKeyDown={(e) => onComma(e, setComp, setCompInp, 3)}
-              className="w-full px-4 py-3 rounded-xl border border-white/20 bg-white/10 backdrop-blur-md text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-white/40 focus:border-white/30 transition-all duration-200 shadow-lg hover:shadow-xl hover:bg-white/15"
+              className="w-full mt-1 mb-2 px-4 py-2 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:border-transparent"
               placeholder="e.g., Amazon, Local garden center, Seeds4Life"
             />
-            <p className="text-sm text-white/60 mt-1">
+            <p className="text-sm text-gray-500 mt-1">
               Press comma or Enter to add. Up to 3 competitors.
             </p>
           </Field>
               
-              <button
-                disabled={loading}
-                className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white font-semibold py-4 px-6 rounded-xl transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                {loading ? <LoadingSpinner /> : "🚀 Generate Marketing Plan"}
-              </button>
-            </form>
+          <button
+            disabled={loading}
+            className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-4 rounded-md transition-colors disabled:opacity-50"
+          >
+            {loading ? <LoadingSpinner /> : "Generate Marketing Plan"}
+          </button>
+        </form>
           </div>
 
           {/* Report */}
@@ -407,3 +406,5 @@ export default function App() {
     </div>
   );
 }
+
+export default App;
