@@ -242,27 +242,29 @@ function App() {
 
   return (
     <div>
-      {/* Hero Section with Gradient Background */}
-      <div className="min-h-screen bg-gradient-to-br from-blue-600 via-purple-600 to-pink-600 py-16 px-4">
-        {/* Header - Outside Form */}
-        <div className="text-center mb-16">
-          <h1 className="text-5xl font-bold text-white mb-6 tracking-tight">
-            Marketing Plan Generator
-          </h1>
-          <p className="text-xl text-white/90 max-w-3xl mx-auto leading-relaxed">
-            Create comprehensive go-to-market strategies with AI-powered insights
-          </p>
-        </div>
+      {/* Hero Section with Photo + Gradient Tinted Background */}
+      <div 
+        className="min-h-screen relative"
+        style={{
+          backgroundImage: `linear-gradient(to bottom right, rgba(37, 99, 235, 0.85), rgba(147, 51, 234, 0.85), rgba(219, 39, 119, 0.85)), url('/attached_assets/birmingham-museums-trust-YvNiIyGdMfs-unsplash_1757466351093.jpg')`,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          backgroundAttachment: 'fixed'
+        }}
+      >
+        <div className="py-16 px-4">
+          {/* Header - Outside Form */}
+          <div className="text-center mb-16">
+            <h1 className="text-5xl font-bold text-white mb-6 tracking-tight">
+              Marketing Plan Generator
+            </h1>
+            <p className="text-xl text-white/90 max-w-3xl mx-auto leading-relaxed">
+              Create comprehensive go-to-market strategies with AI-powered insights
+            </p>
+          </div>
 
-        {/* Form Container with Photo Background */}
-        <div 
-          className="rounded-3xl shadow-xl p-10 max-w-lg mx-auto border border-white/20 mb-20 relative"
-          style={{
-            backgroundImage: `linear-gradient(rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.9)), url('/attached_assets/birmingham-museums-trust-YvNiIyGdMfs-unsplash_1757466351093.jpg')`,
-            backgroundSize: 'cover',
-            backgroundPosition: 'center'
-          }}
-        >
+          {/* Form Container - Clean White */}
+          <div className="bg-white rounded-3xl shadow-xl p-10 max-w-lg mx-auto border border-gray-100 mb-20">
 
             {error && (
               <div className="bg-red-50 border border-red-200 text-red-800 px-4 py-3 rounded-lg mb-6">
