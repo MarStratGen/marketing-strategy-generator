@@ -286,19 +286,48 @@ function OptimizedContent({ data }) {
 
   if (typeof data === "object") {
     const entries = Object.entries(data);
+    
+    // Check if this looks like a grouped structure (Channel, Intent, Role pattern)
+    const isChannelGroup = entries.some(([k]) => k.toLowerCase().includes('channel'));
+    
+    if (isChannelGroup) {
+      // Group every 3 items (Channel, Intent, Role)
+      const groups = [];
+      for (let i = 0; i < entries.length; i += 3) {
+        groups.push(entries.slice(i, i + 3));
+      }
+      
+      return (
+        <div className="space-y-6">
+          {groups.map((group, groupIndex) => (
+            <div key={groupIndex} className="border border-slate-200 rounded-lg p-4 bg-slate-50">
+              {group.map(([k, v], index) => (
+                <div key={k} className={index === 0 ? "mb-3" : "ml-4 mb-2"}>
+                  <span className={`${index === 0 ? 'font-bold text-slate-900 text-base' : 'font-medium text-slate-700 text-sm'}`}>
+                    {formatSubheading(k)}:{" "}
+                  </span>
+                  <span className="text-slate-700">
+                    {typeof v === "string" ? v : <OptimizedContent data={v} />}
+                  </span>
+                </div>
+              ))}
+            </div>
+          ))}
+        </div>
+      );
+    }
+    
+    // Fallback for other structures
     return (
-      <div>
-        {entries.map(([k, v], index) => (
+      <div className="space-y-4">
+        {entries.map(([k, v]) => (
           <div key={k}>
-            <h5 className="font-semibold text-slate-900 text-base mb-2 mt-6 first:mt-0">
+            <h5 className="font-semibold text-slate-900 text-base mb-2">
               {formatSubheading(k)}
             </h5>
             <div className="ml-4 text-slate-700">
               <OptimizedContent data={v} />
             </div>
-            {index < entries.length - 1 && (
-              <hr className="border-slate-300 my-4" />
-            )}
           </div>
         ))}
       </div>
