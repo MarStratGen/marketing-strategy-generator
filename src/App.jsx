@@ -242,16 +242,20 @@ function App() {
 
   return (
     <div>
-      {/* Hero Section with Gradient and Background Image */}
+      {/* Hero Section with Photo and Gradient Overlay */}
       <div 
-        className="min-h-screen bg-gradient-to-br from-blue-600 via-purple-600 to-pink-600"
+        className="min-h-screen relative"
         style={{
-          backgroundImage: `linear-gradient(to bottom right, rgba(37, 99, 235, 0.85), rgba(147, 51, 234, 0.85), rgba(219, 39, 119, 0.85)), url('/attached_assets/birmingham-museums-trust-YvNiIyGdMfs-unsplash_1757466351093.jpg')`,
+          backgroundImage: `url('/attached_assets/birmingham-museums-trust-YvNiIyGdMfs-unsplash_1757466351093.jpg')`,
           backgroundSize: 'cover',
           backgroundPosition: 'center'
         }}
       >
-        <div className="py-16 px-4">
+        {/* Gradient Overlay */}
+        <div className="absolute inset-0 bg-gradient-to-br from-blue-600/85 via-purple-600/85 to-pink-600/85"></div>
+        
+        {/* Content */}
+        <div className="relative z-10 py-16 px-4">
           {/* Header - Outside Form */}
           <div className="text-center mb-16">
             <h1 className="text-5xl font-bold text-white mb-6 tracking-tight">
@@ -456,8 +460,8 @@ function App() {
         </form>
         </div>
 
-          {/* Report */}
-          <Report plan={result} loading={loading} />
+        {/* Report */}
+        <Report plan={result} loading={loading} />
         </div>
       </div>
       
