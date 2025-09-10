@@ -411,8 +411,8 @@ function FormattedText({ text }) {
             {lines.map((line, lineIndex) => {
               const cleanLine = line.trim();
               
-              // Skip Executive Summary entirely
-              if (cleanLine === "Executive Summary") {
+              // Skip Executive Summary and redundant standalone "Allocation" 
+              if (cleanLine === "Executive Summary" || cleanLine === "Allocation") {
                 return null;
               }
               
