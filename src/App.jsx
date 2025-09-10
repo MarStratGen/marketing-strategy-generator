@@ -165,10 +165,32 @@ export default function App() {
     setResult(null);
     setLoading(true);
 
+    // Basic validation
+    const finalCountry = country === "__custom_country" ? customCountry : country;
+    const finalSector = sector === "__custom_sector" ? customSector : sector;
+    
+    if (!finalCountry.trim()) {
+      setErr("Please select a country.");
+      setLoading(false);
+      return;
+    }
+    
+    if (!finalSector.trim()) {
+      setErr("Please select a sector.");
+      setLoading(false);
+      return;
+    }
+    
+    if (!offering.trim()) {
+      setErr("Please describe what you're selling.");
+      setLoading(false);
+      return;
+    }
+
     try {
       const body = {
-        country: country === "__custom_country" ? customCountry : country,
-        sector: sector === "__custom_sector" ? customSector : sector,
+        country: finalCountry,
+        sector: finalSector,
         product_type: offering,
         audiences: segments,
         competitors,
@@ -180,12 +202,24 @@ export default function App() {
         budget_band: budgetBand,
       };
 
+      console.log("Submitting with body:", body);
+      
       const r = await fetch(WORKER_URL, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(body),
       });
+
+      console.log("Response status:", r.status);
+      
+      if (!r.ok) {
+        const errorText = await r.text();
+        console.error("API Error:", errorText);
+        throw new Error(`API returned ${r.status}: ${errorText}`);
+      }
+
       const data = await r.json();
+      console.log("Response data:", data);
       setResult(data);
     } catch (err) {
       console.error(err);
@@ -218,7 +252,7 @@ export default function App() {
         ></div>
 
         <div className="relative z-10 py-16 px-4">
-          <div className="text-centre mb-16">
+          <div className="text-center mb-16">
             <h1 className="text-5xl font-bold text-white mb-6 tracking-tight">
               Marketing Strategy Generator
             </h1>
