@@ -175,11 +175,7 @@ export default function App() {
       return;
     }
     
-    if (!finalSector.trim()) {
-      setErr("Please select a sector.");
-      setLoading(false);
-      return;
-    }
+    // Sector is optional, so we don't validate it
     
     if (!offering.trim()) {
       setErr("Please describe what you're selling.");
