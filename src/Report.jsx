@@ -394,76 +394,16 @@ function OptimizedContent({ data }) {
   );
 }
 
-/* text splitter with intelligent subheading detection */
+/* text splitter */
 function FormattedText({ text }) {
   const paras = text.split("\n\n").filter((p) => p.trim());
-  
   return (
-    <div className="space-y-4">
-      {paras.map((p, i) => {
-        const trimmed = p.trim();
-        
-        // Comprehensive subheading patterns for marketing content
-        const subheadingPatterns = [
-          // Marketing Mix (7 Ps)
-          /^(Product|Price|Place|Promotion|People|Process|Physical Evidence|Physical Environment)$/i,
-          
-          // Market Foundation sections
-          /^(Market Overview|Customer Behaviour|Customer Behavior|Market Opportunities|Key Market Trends|Market Analysis|Industry Analysis)$/i,
-          /^(Executive Summary|Strategic Overview|Implementation Plan|Strategic Direction|Market Context)$/i,
-          
-          // Strategy sections
-          /^(Core Strategy|Brand Strategy|Positioning Strategy|Messaging Framework|Value Proposition|Competitive Positioning)$/i,
-          /^(Target Audience|Customer Segments|Market Positioning|Audience Analysis|Persona Analysis)$/i,
-          
-          // Numbered/Ordered sections
-          /^(Primary [A-Za-z\s]+|Secondary [A-Za-z\s]+|Tertiary [A-Za-z\s]+|Main [A-Za-z\s]+|Key [A-Za-z\s]+)$/i,
-          /^(Pillar \d+|Phase \d+|Step \d+|Stage \d+|Week \d+|Month \d+|Quarter \d+)[:.]?/i,
-          
-          // Risk and Planning
-          /^(High-Risk|Medium-Risk|Low-Risk|Primary KPIs|Secondary KPIs|Leading Indicators|Success Metrics)$/i,
-          /^(Budget Allocation|Resource Planning|Timeline|Implementation|Resource Requirements)$/i,
-          
-          // Analysis sections
-          /^(Competitive Analysis|SWOT Analysis|Market Analysis|Customer Analysis|Performance Analysis)$/i,
-          /^(Strengths|Weaknesses|Opportunities|Threats|Challenges|Solutions)$/i,
-          
-          // Guidance sections
-          /^(Why this matters|How to execute|Key Benefits|Success Factors|Critical Success Factors|Next Steps)$/i,
-          /^(Recommendations|Action Items|Best Practices|Key Takeaways|Implementation Steps)$/i,
-          
-          // Channel and Campaign sections
-          /^(Channel Strategy|Campaign Strategy|Media Strategy|Content Strategy|Social Media Strategy)$/i,
-          /^(Organic|Paid|Email|Social|Search|Display|Video|Mobile|Digital|Traditional)$/i,
-          
-          // Business sections
-          /^(Business Model|Revenue Model|Go-to-Market|Market Entry|Expansion Strategy)$/i,
-          /^(Customer Journey|Sales Funnel|Conversion Funnel|User Experience|Customer Experience)$/i
-        ];
-        
-        // Check if text matches subheading patterns
-        const isSubheading = subheadingPatterns.some(pattern => pattern.test(trimmed)) ||
-                           (trimmed.length < 60 && trimmed.endsWith(':') && !trimmed.includes('http')) ||
-                           (/^[A-Z][a-z\s&-]+$/.test(trimmed) && trimmed.length < 40 && !trimmed.includes('.'));
-        
-        if (isSubheading) {
-          return (
-            <div key={i} className="mt-8 mb-4 first:mt-0">
-              <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border-l-4 border-blue-500 px-5 py-4 rounded-r-lg shadow-sm">
-                <h6 className="font-bold text-blue-900 text-lg tracking-wide leading-tight">
-                  {trimmed.replace(/:$/, '')}
-                </h6>
-              </div>
-            </div>
-          );
-        }
-        
-        return (
-          <p key={i} className="leading-relaxed text-slate-700 text-base mb-4">
-            {trimmed}
-          </p>
-        );
-      })}
+    <div className="space-y-2">
+      {paras.map((p, i) => (
+        <p key={i} className="leading-snug text-slate-700">
+          {p.trim()}
+        </p>
+      ))}
     </div>
   );
 }
