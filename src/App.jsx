@@ -507,49 +507,37 @@ export default function App() {
           <div className="space-y-2">
             <div>
               <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                How detailed are the marketing strategies?
+                How does the Marketing Strategy Generator work?
               </h3>
               <p className="text-gray-700 leading-relaxed">
-                Each strategy includes comprehensive analysis across all key
-                areas: market foundation, competitor analysis, customer
-                personas, 7 Ps marketing mix, budget allocation, 90-day action
-                plan, KPIs, and risk mitigation. Reports are typically 15-20
-                pages when exported.
+                This page turns your inputs into a clear brief and sends it to the OpenAI API to draft a marketing strategy and plan. The draft is mapped to classic frameworks like STP and the 7 Ps, with budgets shown as percentages and a 90-day calendar, KPIs, and experiments. You get the result on screen with options to download or print.
               </p>
             </div>
 
             <div>
               <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                Can I export the strategy to share with my team?
+                Who is the Marketing Strategy Generator for?
               </h3>
               <p className="text-gray-700 leading-relaxed">
-                Yes! You can export your strategy as a Word document or Excel
-                spreadsheet using the download buttons at the top of each
-                report. Perfect for presentations and team collaboration.
+                Founders, small teams, and marketers who want a structured plan they can act on. It works for product and service businesses, online and offline, B2C and B2B. Treat it as guidance, not professional advice. AI can draft quickly, but a real marketer will still make better calls where context, trade offs, and judgement matter.
               </p>
             </div>
 
             <div>
               <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                Are the competitor analyses based on real data?
+                Is this enough on its own?
               </h3>
               <p className="text-gray-700 leading-relaxed">
-                The strategies include analysis frameworks and strategic
-                approaches for competitive positioning. For the most current
-                competitive data, we recommend supplementing with your own
-                market research and competitive intelligence.
+                Use it as version one. Validate the ideas with customers, run small tests, measure results, and iterate. When stakes are high, ask a real marketer to sanity check the plan and tailor it to your budget, brand, and operations.
               </p>
             </div>
 
             <div>
               <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                How are the budget allocations calculated?
+                Is my business information kept private?
               </h3>
               <p className="text-gray-700 leading-relaxed">
-                Budget allocations are provided as percentages based on proven
-                marketing frameworks and best practices for your selected
-                business model and goals. This allows you to scale the
-                recommendations to any budget size.
+                This page keeps data use minimal. Plan inputs are processed in memory to generate your draft and are not stored by this page after the response is returned. Inputs are sent to the OpenAI API solely to create the draft and may be briefly retained by that provider for security or operations. This page does not run analytics or set cookies. Please do not submit sensitive or personal information.
               </p>
             </div>
           </div>
