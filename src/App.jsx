@@ -3,11 +3,11 @@ import Report from "./Report.jsx";
 
 /* Modern UI components */
 const Pill = ({ text, onRemove }) => (
-  <span className="inline-flex items-center bg-gray-100 hover:bg-gray-200 text-gray-800 text-sm px-3 py-1 rounded-full mr-2 mb-2 transition-all duration-200">
+  <span className="inline-flex items-center bg-indigo-100 hover:bg-indigo-200 text-indigo-800 text-sm px-4 py-2 rounded-full mr-3 mb-3 transition-all duration-200 border border-indigo-200 shadow-sm">
     {text}
     <button 
       onClick={onRemove} 
-      className="ml-2 w-4 h-4 flex items-center justify-center text-gray-500 hover:text-gray-700 hover:bg-gray-300 rounded-full text-xs transition-all"
+      className="ml-2 w-5 h-5 flex items-center justify-center text-indigo-600 hover:text-indigo-800 hover:bg-indigo-300 rounded-full text-sm transition-all duration-200"
       title="Remove"
     >
       ×
@@ -16,12 +16,12 @@ const Pill = ({ text, onRemove }) => (
 );
 
 const Field = ({ label, children, tooltip, required }) => (
-  <div className="space-y-1">
-    <label className="block text-sm font-medium text-gray-700">
+  <div className="space-y-3">
+    <label className="block text-base font-semibold text-gray-900">
       {label}
       {required && <span className="text-red-500 ml-1">*</span>}
       {tooltip && (
-        <span className="ml-1 text-gray-400 cursor-help" title={tooltip}>ℹ️</span>
+        <div className="text-sm text-gray-600 mt-1 font-normal">{tooltip}</div>
       )}
     </label>
     {children}
@@ -193,28 +193,31 @@ function App() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="max-w-4xl mx-auto py-12 px-4">
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-indigo-900 to-purple-900">
+      <div className="min-h-screen py-16 px-4">
         {/* Header */}
-        <header className="text-center mb-12">
-          <h1 className="text-4xl font-bold text-gray-900 mb-4">
-            Tiny Marketing Plan Generator
+        <header className="text-center mb-16">
+          <h1 className="text-5xl font-bold text-white mb-6 tracking-tight">
+            Marketing Plan Generator
           </h1>
-          <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+          <p className="text-xl text-slate-300 max-w-2xl mx-auto leading-relaxed">
             Create comprehensive go-to-market strategies with AI-powered insights
           </p>
         </header>
 
         {/* Form Container */}
-        <div className="bg-white rounded-lg shadow-md p-8 max-w-2xl mx-auto">
+        <div className="bg-white/95 backdrop-blur-sm rounded-3xl shadow-2xl p-10 max-w-2xl mx-auto border border-white/10">
 
             {error && (
-              <div className="bg-red-50 border border-red-200 text-red-800 px-4 py-3 rounded-md mb-6">
-                {error}
+              <div className="bg-red-50 border-l-4 border-red-400 text-red-800 px-6 py-4 rounded-r-xl mb-8 shadow-sm">
+                <div className="flex items-center">
+                  <div className="text-red-400 mr-3">⚠️</div>
+                  <div>{error}</div>
+                </div>
               </div>
             )}
 
-            <form onSubmit={handleSubmit} className="space-y-6">
+            <form onSubmit={handleSubmit} className="space-y-8">
           <Field 
             label="Which country are you targeting?" 
             required 
@@ -223,7 +226,7 @@ function App() {
             <select
               value={country}
               onChange={(e) => setCountry(e.target.value)}
-              className="w-full mt-1 mb-2 px-4 py-2 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:border-transparent"
+              className="w-full px-4 py-4 text-lg rounded-2xl border-2 border-gray-200 bg-gray-50/50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 focus:bg-white transition-all duration-300 hover:border-gray-300"
             >
               {COUNTRIES.map((c) => (
                 <option key={c.code} value={c.code}>
@@ -236,7 +239,7 @@ function App() {
                 ref={ccRef}
                 value={customCountry}
                 onChange={(e) => setCCountry(e.target.value)}
-                className="w-full mt-1 mb-2 px-4 py-2 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:border-transparent"
+                className="w-full px-4 py-4 text-lg rounded-2xl border-2 border-gray-200 bg-gray-50/50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 focus:bg-white transition-all duration-300 hover:border-gray-300"
                 placeholder="Type your country"
               />
             )}
@@ -249,7 +252,7 @@ function App() {
             <select
               value={sector}
               onChange={(e) => setSector(e.target.value)}
-              className="w-full mt-1 mb-2 px-4 py-2 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:border-transparent"
+              className="w-full px-4 py-4 text-lg rounded-2xl border-2 border-gray-200 bg-gray-50/50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 focus:bg-white transition-all duration-300 hover:border-gray-300"
             >
               <option value="" disabled>Choose your industry (optional)</option>
               {[
@@ -266,7 +269,7 @@ function App() {
                 ref={csRef}
                 value={customSector}
                 onChange={(e) => setCSector(e.target.value)}
-                className="w-full mt-1 mb-2 px-4 py-2 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:border-transparent"
+                className="w-full px-4 py-4 text-lg rounded-2xl border-2 border-gray-200 bg-gray-50/50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 focus:bg-white transition-all duration-300 hover:border-gray-300"
                 placeholder="Type your sector"
               />
             )}
@@ -280,7 +283,7 @@ function App() {
             <input
               value={product}
               onChange={(e) => setProduct(e.target.value)}
-              className="w-full mt-1 mb-2 px-4 py-2 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:border-transparent"
+              className="w-full px-4 py-4 text-lg rounded-2xl border-2 border-gray-200 bg-gray-50/50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 focus:bg-white transition-all duration-300 hover:border-gray-300"
               placeholder="e.g., Organic heirloom tomato seeds, AI-powered project management software"
               required
             />
@@ -302,7 +305,7 @@ function App() {
               value={segInp}
               onChange={(e) => setSegInp(e.target.value)}
               onKeyDown={(e) => onComma(e, setSeg, setSegInp)}
-              className="w-full mt-1 mb-2 px-4 py-2 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:border-transparent"
+              className="w-full px-4 py-4 text-lg rounded-2xl border-2 border-gray-200 bg-gray-50/50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 focus:bg-white transition-all duration-300 hover:border-gray-300"
               placeholder="e.g., Home gardeners aged 35-55"
             />
             <p className="text-sm text-gray-500 mt-1">
@@ -318,7 +321,7 @@ function App() {
             <select
               value={motion}
               onChange={(e) => setMotion(e.target.value)}
-              className="w-full mt-1 mb-2 px-4 py-2 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:border-transparent"
+              className="w-full px-4 py-4 text-lg rounded-2xl border-2 border-gray-200 bg-gray-50/50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 focus:bg-white transition-all duration-300 hover:border-gray-300"
               required
             >
               {MOTIONS.map((m) => (
@@ -332,7 +335,7 @@ function App() {
               <input
                 value={customMotion}
                 onChange={(e) => setCustomMotion(e.target.value)}
-                className="w-full mt-1 mb-2 px-4 py-2 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:border-transparent"
+                className="w-full px-4 py-4 text-lg rounded-2xl border-2 border-gray-200 bg-gray-50/50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 focus:bg-white transition-all duration-300 hover:border-gray-300"
                 placeholder="Describe the action, e.g., ‘Call to book’, ‘Visit store’, ‘Request sample kit’"
                 required
               />
@@ -382,7 +385,7 @@ function App() {
               value={compInp}
               onChange={(e) => setCompInp(e.target.value)}
               onKeyDown={(e) => onComma(e, setComp, setCompInp, 3)}
-              className="w-full mt-1 mb-2 px-4 py-2 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:border-transparent"
+              className="w-full px-4 py-4 text-lg rounded-2xl border-2 border-gray-200 bg-gray-50/50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 focus:bg-white transition-all duration-300 hover:border-gray-300"
               placeholder="e.g., Amazon, Local garden center, Seeds4Life"
             />
             <p className="text-sm text-gray-500 mt-1">
