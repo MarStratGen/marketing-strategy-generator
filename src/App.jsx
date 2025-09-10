@@ -60,6 +60,29 @@ const FAQItem = ({ question, answer }) => {
   );
 };
 
+const FAQItemDark = ({ question, answer }) => {
+  const [isOpen, setIsOpen] = useState(false);
+  
+  return (
+    <div className="bg-white rounded-2xl border border-gray-200 overflow-hidden shadow-sm">
+      <button
+        onClick={() => setIsOpen(!isOpen)}
+        className="w-full px-6 py-4 text-left flex justify-between items-center hover:bg-gray-50 transition-colors"
+      >
+        <span className="font-semibold text-gray-900">{question}</span>
+        <span className={`text-gray-500 transition-transform ${isOpen ? 'rotate-180' : ''}`}>
+          ▼
+        </span>
+      </button>
+      {isOpen && (
+        <div className="px-6 pb-4">
+          <p className="text-gray-700 leading-relaxed">{answer}</p>
+        </div>
+      )}
+    </div>
+  );
+};
+
 const WORKER_URL =
   "https://glow-api-lingering-queen-74b7.cloudflare-4up2f.workers.dev/generate";
 
@@ -218,20 +241,30 @@ function App() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-600 via-purple-600 to-pink-600">
-      <div className="min-h-screen py-16 px-4">
-        {/* Header - Outside Form */}
-        <div className="text-center mb-16">
-          <h1 className="text-5xl font-bold text-white mb-6 tracking-tight">
-            Marketing Plan Generator
-          </h1>
-          <p className="text-xl text-white/90 max-w-3xl mx-auto leading-relaxed">
-            Create comprehensive go-to-market strategies with AI-powered insights
-          </p>
-        </div>
+    <div>
+      {/* Hero Section with Gradient and Background Image */}
+      <div 
+        className="min-h-screen bg-gradient-to-br from-blue-600 via-purple-600 to-pink-600 relative"
+        style={{
+          backgroundImage: `linear-gradient(to bottom right, rgba(37, 99, 235, 0.85), rgba(147, 51, 234, 0.85), rgba(219, 39, 119, 0.85)), url('/attached_assets/birmingham-museums-trust-YvNiIyGdMfs-unsplash_1757466351093.jpg')`,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          backgroundAttachment: 'fixed'
+        }}
+      >
+        <div className="py-16 px-4">
+          {/* Header - Outside Form */}
+          <div className="text-center mb-16">
+            <h1 className="text-5xl font-bold text-white mb-6 tracking-tight">
+              Marketing Plan Generator
+            </h1>
+            <p className="text-xl text-white/90 max-w-3xl mx-auto leading-relaxed">
+              Create comprehensive go-to-market strategies with AI-powered insights
+            </p>
+          </div>
 
-        {/* Form Container */}
-        <div className="bg-white/95 backdrop-blur-sm rounded-3xl shadow-xl p-10 max-w-lg mx-auto border border-white/20 mb-20">
+          {/* Form Container */}
+          <div className="bg-white/95 backdrop-blur-sm rounded-3xl shadow-xl p-10 max-w-lg mx-auto border border-white/20 mb-20">
 
             {error && (
               <div className="bg-red-50 border border-red-200 text-red-800 px-4 py-3 rounded-lg mb-6">
@@ -424,52 +457,57 @@ function App() {
         </form>
         </div>
 
-        {/* Report */}
-        <Report plan={result} loading={loading} />
-        
-        {/* FAQ Section */}
-        <div className="max-w-3xl mx-auto mt-20">
-          <h2 className="text-3xl font-bold text-white text-center mb-12">
+          {/* Report */}
+          <Report plan={result} loading={loading} />
+        </div>
+      </div>
+      
+      {/* FAQ Section - Solid Background */}
+      <div className="bg-gray-100 py-20">
+        <div className="max-w-3xl mx-auto px-4">
+          <h2 className="text-3xl font-bold text-gray-900 text-center mb-12">
             Frequently Asked Questions
           </h2>
           <div className="space-y-4">
-            <FAQItem 
+            <FAQItemDark 
               question="How does the marketing plan generator work?"
               answer="Our AI analyzes your business inputs and creates comprehensive marketing strategies tailored to your specific industry, target market, and budget constraints."
             />
-            <FAQItem 
+            <FAQItemDark 
               question="How accurate are the marketing recommendations?"
               answer="The recommendations are based on proven marketing frameworks and industry best practices, customized to your specific business context and market conditions."
             />
-            <FAQItem 
+            <FAQItemDark 
               question="Can I use this for any type of business?"
               answer="Yes, our generator works for businesses across all industries, from startups to established companies, both B2B and B2C markets."
             />
-            <FAQItem 
+            <FAQItemDark 
               question="What's included in the marketing plan?"
               answer="Each plan includes STP analysis, marketing mix (7 Ps), budget allocation, tactical calendar, KPIs, and strategic recommendations."
             />
-            <FAQItem 
+            <FAQItemDark 
               question="How long does it take to generate a plan?"
               answer="Most plans are generated within 30-60 seconds, depending on the complexity of your requirements and current system load."
             />
-            <FAQItem 
+            <FAQItemDark 
               question="Is my business information kept private?"
               answer="Yes, we prioritize your privacy. Your business information is used only to generate your marketing plan and is not stored or shared."
             />
           </div>
         </div>
-        
-        {/* Footer */}
-        <footer className="mt-20 py-8 text-center">
-          <p className="text-xs text-white/60 max-w-2xl mx-auto leading-relaxed">
+      </div>
+      
+      {/* Footer */}
+      <footer className="bg-gray-800 py-8">
+        <div className="max-w-2xl mx-auto px-4 text-center">
+          <p className="text-xs text-gray-400 leading-relaxed">
             [Disclaimer text will be added here - please provide the copy you'd like to include]
           </p>
-          <p className="text-xs text-white/40 mt-4">
+          <p className="text-xs text-gray-500 mt-4">
             © 2024 Marketing Plan Generator. All rights reserved.
           </p>
-        </footer>
-      </div>
+        </div>
+      </footer>
     </div>
   );
 }
