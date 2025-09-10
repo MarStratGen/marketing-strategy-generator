@@ -12,6 +12,13 @@ const formatSubheading = (k) =>
     .trim()
     .replace(/^\w/, (c) => c.toUpperCase());
 
+/* prettier headings for intent / role */
+const friendlyLabel = (k) => {
+  if (k === "intent") return "Purchase intent level";
+  if (k === "role")   return "Funnel job";
+  return formatSubheading(k);
+};
+
 /* ── main ───────────────────────────────────────────────── */
 export default function Report({ plan, loading }) {
   if (loading) return <SkeletonTimeline />;
@@ -300,13 +307,76 @@ function OptimizedContent({ data }) {
   }
 
   if (typeof data === "object") {
+    /* ----------------------------------------------------------
+       SPECIAL RENDERER for channel_playbook objects
+       ---------------------------------------------------------- */
+    if (
+      Array.isArray(data) &&
+      data[0] &&
+      typeof data[0] === "object" &&
+      data[0].channel &&
+      data[0].intent &&
+      data[0].role
+    ) {
+      return (
+        <ul className="space-y-10 list-none">
+          {data.map((row, idx) => (
+            <li key={idx} className="space-y-3">
+              <p className="font-bold text-lg text-slate-900">
+                {idx + 1}. {row.channel}
+              </p>
+
+              {row.summary && (
+                <p className="text-slate-700 leading-relaxed">{row.summary}</p>
+              )}
+
+              <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                <InfoBox label="Purchase intent level" value={row.intent} />
+                <InfoBox label="Funnel job" value={row.role} />
+                {row.budget_percent !== undefined && (
+                  <InfoBox
+                    label="Budget share"
+                    value={`${row.budget_percent}%`}
+                  />
+                )}
+              </div>
+
+              {row.key_actions?.length && (
+                <div>
+                  <h6 className="font-semibold mt-3 mb-1">Key actions</h6>
+                  <ul className="list-disc ml-6 space-y-1">
+                    {row.key_actions.map((a, i) => (
+                      <li key={i}>{a}</li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+
+              {row.success_metric && (
+                <p className="text-sm text-slate-600 italic mt-2">
+                  Success metric · {row.success_metric}
+                </p>
+              )}
+
+              {row.why_it_works && (
+                <p className="text-sm text-blue-600 mt-1 italic">
+                  Why it works: {row.why_it_works}
+                </p>
+              )}
+            </li>
+          ))}
+        </ul>
+      );
+    }
+    /* ----- keep existing object-renderer below this line ----- */
+
     const entries = Object.entries(data);
     return (
       <div className="space-y-3">
         {entries.map(([k, v]) => (
           <div key={k}>
             <h5 className="font-semibold text-slate-900 text-base mb-1">
-              {formatSubheading(k)}
+              {friendlyLabel(k)}
             </h5>
             <div className="text-slate-700">
               <OptimizedContent data={v} />
@@ -539,6 +609,16 @@ const downloadWord = async (data) => {
     alert("Word download failed. Please try again.");
   }
 };
+
+/* small two-line stat box */
+const InfoBox = ({ label, value }) => (
+  <div className="bg-white rounded-lg border border-slate-200 p-3">
+    <div className="text-xs uppercase font-semibold text-slate-500 mb-1">
+      {label}
+    </div>
+    <div className="text-slate-800 font-medium">{value}</div>
+  </div>
+);
 
 /* skeleton loader */
 function SkeletonTimeline() {

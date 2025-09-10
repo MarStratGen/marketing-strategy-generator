@@ -1,0 +1,117 @@
+1 ▪ Add a friendlier-label helper (just after formatSubheading)
+
+Search for the existing helper:
+
+const formatSubheading = (k) =>
+
+
+Immediately below its closing ; paste:
+
+/* prettier headings for intent / role */
+const friendlyLabel = (k) => {
+  if (k === "intent") return "Purchase intent level";
+  if (k === "role")   return "Funnel job";
+  return formatSubheading(k);
+};
+
+2 ▪ Swap the heading label call
+
+Still inside the same file, find the single place where headings for object keys are rendered (it’s ~¾ down, inside the generic object case of OptimizedContent):
+
+<h5 className="font-semibold text-slate-900 text-base mb-1">
+  {formatSubheading(k)}
+</h5>
+
+
+Replace only the call:
+
+- {formatSubheading(k)}
++ {friendlyLabel(k)}
+
+3 ▪ Insert the richer “Channel Playbook” renderer
+
+Locate the start of OptimizedContent (search: function OptimizedContent).
+Inside that function you’ll see the first if (Array.isArray(data)) { … } block, then the if (typeof data === "object") { … } block.
+
+Just inside the object-case but before its existing code, paste the new special-case:
+
+  if (typeof data === "object") {
+    /* ----------------------------------------------------------
+       SPECIAL RENDERER for channel_playbook objects
+       ---------------------------------------------------------- */
+    if (
+      Array.isArray(data) &&
+      data[0] &&
+      typeof data[0] === "object" &&
+      data[0].channel &&
+      data[0].intent &&
+      data[0].role
+    ) {
+      return (
+        <ul className="space-y-10 list-none">
+          {data.map((row, idx) => (
+            <li key={idx} className="space-y-3">
+              <p className="font-bold text-lg text-slate-900">
+                {idx + 1}. {row.channel}
+              </p>
+
+              {row.summary && (
+                <p className="text-slate-700 leading-relaxed">{row.summary}</p>
+              )}
+
+              <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                <InfoBox label="Purchase intent level" value={row.intent} />
+                <InfoBox label="Funnel job" value={row.role} />
+                {row.budget_percent !== undefined && (
+                  <InfoBox
+                    label="Budget share"
+                    value={`${row.budget_percent}%`}
+                  />
+                )}
+              </div>
+
+              {row.key_actions?.length && (
+                <div>
+                  <h6 className="font-semibold mt-3 mb-1">Key actions</h6>
+                  <ul className="list-disc ml-6 space-y-1">
+                    {row.key_actions.map((a, i) => (
+                      <li key={i}>{a}</li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+
+              {row.success_metric && (
+                <p className="text-sm text-slate-600 italic mt-2">
+                  Success metric · {row.success_metric}
+                </p>
+              )}
+
+              {row.why_it_works && (
+                <p className="text-sm text-blue-600 mt-1 italic">
+                  Why it works: {row.why_it_works}
+                </p>
+              )}
+            </li>
+          ))}
+        </ul>
+      );
+    }
+    /* ----- keep existing object-renderer below this line ----- */
+
+
+Tip: you’re not deleting the rest of the object renderer—just inserting this early-return block at the top of it.
+
+4 ▪ Drop in the tiny InfoBox component
+
+Anywhere below FormattedText (or at the very end of the file – it’s independent), paste:
+
+/* small two-line stat box */
+const InfoBox = ({ label, value }) => (
+  <div className="bg-white rounded-lg border border-slate-200 p-3">
+    <div className="text-xs uppercase font-semibold text-slate-500 mb-1">
+      {label}
+    </div>
+    <div className="text-slate-800 font-medium">{value}</div>
+  </div>
+);
