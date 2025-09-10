@@ -420,10 +420,11 @@ function FormattedText({ text }) {
               const isSubheading = (
                 cleanLine.length < 60 && // Not too long
                 cleanLine.length > 3 && // Not too short
-                /^[A-Z][a-zA-Z\s&:-]+$/.test(cleanLine) && // Starts with capital, contains letters/spaces/basic punctuation
+                (/^[A-Z][a-zA-Z\s&:-]+$/.test(cleanLine) && // Starts with capital, contains letters/spaces/basic punctuation
                 !cleanLine.includes('.') && // No periods (usually not in headings)
                 !cleanLine.includes('http') && // Not a URL
-                !cleanLine.match(/\d{2,}/) // No long numbers
+                !cleanLine.match(/\d{2,}/)) || // No long numbers
+                /^Month \d+:/.test(cleanLine) // OR month headers like "Month 1: Foundation"
               );
               
               if (isSubheading) {
