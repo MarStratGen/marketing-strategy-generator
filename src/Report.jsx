@@ -428,14 +428,14 @@ function FormattedText({ text }) {
               
               if (isSubheading) {
                 return (
-                  <h6 key={lineIndex} className="font-bold text-red-500 text-2xl" style={{marginTop: '32px', marginBottom: '0px', lineHeight: '1.2', backgroundColor: 'yellow', padding: '10px', border: '3px solid red'}}>
-                    🔥 SUBHEADING: {cleanLine}
+                  <h6 key={lineIndex} className="font-bold text-slate-900 text-base" style={{marginTop: '32px', marginBottom: '0px', marginLeft: '0px', marginRight: '0px', paddingTop: '0px', paddingBottom: '0px'}}>
+                    {cleanLine}
                   </h6>
                 );
               }
               
               return (
-                <p key={lineIndex} className="leading-relaxed text-slate-700" style={{marginTop: '0px', marginBottom: '16px', lineHeight: '1.6'}}>
+                <p key={lineIndex} className="text-slate-700" style={{marginTop: '0px', marginBottom: '12px', paddingTop: '0px', paddingBottom: '0px', lineHeight: '1.6'}}>
                   {cleanLine}
                 </p>
               );
