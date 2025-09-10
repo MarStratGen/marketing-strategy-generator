@@ -434,6 +434,22 @@ function FormattedText({ text }) {
                 );
               }
               
+              // Check if this looks like glossary terms (multiple "term: definition" separated by commas)
+              if (cleanLine.includes(':') && cleanLine.includes(',') && 
+                  cleanLine.match(/[A-Z][A-Z]+:\s*[^,]+,\s*[A-Z][A-Z]+:/)) {
+                // Split on commas but keep the term definitions together
+                const terms = cleanLine.split(/,\s*(?=[A-Z][A-Z]+:)/).map(term => term.trim());
+                return (
+                  <div key={lineIndex} style={{marginTop: '0px', marginBottom: '12px'}}>
+                    {terms.map((term, termIndex) => (
+                      <p key={termIndex} className="text-slate-700" style={{marginTop: '0px', marginBottom: '4px', paddingTop: '0px', paddingBottom: '0px', lineHeight: '1.6'}}>
+                        {term}
+                      </p>
+                    ))}
+                  </div>
+                );
+              }
+              
               return (
                 <p key={lineIndex} className="text-slate-700" style={{marginTop: '0px', marginBottom: '12px', paddingTop: '0px', paddingBottom: '0px', lineHeight: '1.6'}}>
                   {cleanLine}
