@@ -3,11 +3,11 @@ import Report from "./Report.jsx";
 
 /* Modern UI components */
 const Pill = ({ text, onRemove }) => (
-  <span className="inline-flex items-center bg-blue-100 text-blue-800 text-sm px-3 py-1 rounded-full mr-2 mb-2">
+  <span className="inline-flex items-center bg-gray-100 text-gray-700 text-sm px-3 py-1.5 rounded-full mr-2 mb-2 border border-gray-200">
     {text}
     <button 
       onClick={onRemove} 
-      className="ml-1 text-blue-600 hover:text-blue-800"
+      className="ml-2 w-4 h-4 flex items-center justify-center text-gray-400 hover:text-gray-600 hover:bg-gray-200 rounded-full text-xs transition-colors"
       title="Remove"
     >
       ×
@@ -16,14 +16,16 @@ const Pill = ({ text, onRemove }) => (
 );
 
 const Field = ({ label, children, tooltip, required }) => (
-  <div className="space-y-2">
-    <label className="block text-sm font-medium text-gray-700">
-      {label}
-      {required && <span className="text-red-500 ml-1">*</span>}
+  <div className="space-y-3">
+    <div>
+      <label className="block text-sm font-semibold text-gray-800">
+        {label}
+        {required && <span className="text-red-400 ml-1">*</span>}
+      </label>
       {tooltip && (
-        <span className="ml-1 text-gray-400 cursor-help text-xs" title={tooltip}>ℹ️</span>
+        <p className="text-xs text-gray-500 mt-1 leading-relaxed">{tooltip}</p>
       )}
-    </label>
+    </div>
     {children}
   </div>
 );
@@ -206,7 +208,7 @@ function App() {
         </header>
 
         {/* Form Container */}
-        <div className="bg-white/90 backdrop-blur-sm rounded-2xl shadow-lg p-8 max-w-xl mx-auto">
+        <div className="bg-white/95 backdrop-blur-sm rounded-3xl shadow-xl p-10 max-w-lg mx-auto border border-white/20">
 
             {error && (
               <div className="bg-red-50 border border-red-200 text-red-800 px-4 py-3 rounded-lg mb-6">
@@ -214,7 +216,7 @@ function App() {
               </div>
             )}
 
-            <form onSubmit={handleSubmit} className="space-y-6">
+            <form onSubmit={handleSubmit} className="space-y-7">
           <Field 
             label="Which country are you targeting?" 
             required 
@@ -223,7 +225,7 @@ function App() {
             <select
               value={country}
               onChange={(e) => setCountry(e.target.value)}
-              className="w-full px-3 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-white/80 focus:outline-none focus:ring-2 focus:ring-blue-400/50 focus:border-blue-300 focus:bg-white transition-all duration-200 text-gray-700 placeholder-gray-400"
             >
               {COUNTRIES.map((c) => (
                 <option key={c.code} value={c.code}>
@@ -236,7 +238,7 @@ function App() {
                 ref={ccRef}
                 value={customCountry}
                 onChange={(e) => setCCountry(e.target.value)}
-                className="w-full px-3 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-white/80 focus:outline-none focus:ring-2 focus:ring-blue-400/50 focus:border-blue-300 focus:bg-white transition-all duration-200 text-gray-700 placeholder-gray-400"
                 placeholder="Type your country"
               />
             )}
@@ -249,7 +251,7 @@ function App() {
             <select
               value={sector}
               onChange={(e) => setSector(e.target.value)}
-              className="w-full px-3 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-white/80 focus:outline-none focus:ring-2 focus:ring-blue-400/50 focus:border-blue-300 focus:bg-white transition-all duration-200 text-gray-700 placeholder-gray-400"
             >
               <option value="" disabled>Choose your industry (optional)</option>
               {[
@@ -266,7 +268,7 @@ function App() {
                 ref={csRef}
                 value={customSector}
                 onChange={(e) => setCSector(e.target.value)}
-                className="w-full px-3 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-white/80 focus:outline-none focus:ring-2 focus:ring-blue-400/50 focus:border-blue-300 focus:bg-white transition-all duration-200 text-gray-700 placeholder-gray-400"
                 placeholder="Type your sector"
               />
             )}
@@ -280,7 +282,7 @@ function App() {
             <input
               value={product}
               onChange={(e) => setProduct(e.target.value)}
-              className="w-full px-3 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-white/80 focus:outline-none focus:ring-2 focus:ring-blue-400/50 focus:border-blue-300 focus:bg-white transition-all duration-200 text-gray-700 placeholder-gray-400"
               placeholder="e.g., Organic heirloom tomato seeds, AI-powered project management software"
               required
             />
@@ -302,11 +304,11 @@ function App() {
               value={segInp}
               onChange={(e) => setSegInp(e.target.value)}
               onKeyDown={(e) => onComma(e, setSeg, setSegInp)}
-              className="w-full px-3 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-white/80 focus:outline-none focus:ring-2 focus:ring-blue-400/50 focus:border-blue-300 focus:bg-white transition-all duration-200 text-gray-700 placeholder-gray-400"
               placeholder="e.g., Home gardeners aged 35-55"
             />
-            <p className="text-sm text-gray-500 mt-1">
-              Press comma or Enter to add. Up to 3 customer groups (optional).
+            <p className="text-xs text-gray-400 mt-2">
+              Press comma or Enter to add. Up to 3 groups.
             </p>
           </Field>
 
@@ -318,7 +320,7 @@ function App() {
             <select
               value={motion}
               onChange={(e) => setMotion(e.target.value)}
-              className="w-full px-3 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-white/80 focus:outline-none focus:ring-2 focus:ring-blue-400/50 focus:border-blue-300 focus:bg-white transition-all duration-200 text-gray-700 placeholder-gray-400"
               required
             >
               {MOTIONS.map((m) => (
@@ -332,14 +334,14 @@ function App() {
               <input
                 value={customMotion}
                 onChange={(e) => setCustomMotion(e.target.value)}
-                className="w-full px-3 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-white/80 focus:outline-none focus:ring-2 focus:ring-blue-400/50 focus:border-blue-300 focus:bg-white transition-all duration-200 text-gray-700 placeholder-gray-400"
                 placeholder="Describe the action, e.g., ‘Call to book’, ‘Visit store’, ‘Request sample kit’"
                 required
               />
             )}
 
-            <p className="text-sm text-gray-500 mt-1">
-              💡 This determines your marketing funnel and KPIs.
+            <p className="text-xs text-gray-400 mt-2">
+              This shapes your marketing strategy and KPIs.
             </p>
           </Field>
           <Field 
@@ -358,8 +360,8 @@ function App() {
                 </option>
               ))}
             </select>
-            <p className="text-sm text-gray-500 mt-1">
-              💰 We'll provide percentage allocations.
+            <p className="text-xs text-gray-400 mt-2">
+              Budget allocations will be shown as percentages.
             </p>
           </Field>
 
@@ -382,17 +384,17 @@ function App() {
               value={compInp}
               onChange={(e) => setCompInp(e.target.value)}
               onKeyDown={(e) => onComma(e, setComp, setCompInp, 3)}
-              className="w-full px-3 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-white/80 focus:outline-none focus:ring-2 focus:ring-blue-400/50 focus:border-blue-300 focus:bg-white transition-all duration-200 text-gray-700 placeholder-gray-400"
               placeholder="e.g., Amazon, Local garden center, Seeds4Life"
             />
-            <p className="text-sm text-gray-500 mt-1">
+            <p className="text-xs text-gray-400 mt-2">
               Press comma or Enter to add. Up to 3 competitors.
             </p>
           </Field>
               
           <button
             disabled={loading}
-            className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-4 rounded-lg transition-colors disabled:opacity-50"
+            className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-semibold py-4 px-6 rounded-xl transition-all duration-200 disabled:opacity-60 shadow-lg hover:shadow-xl mt-8"
           >
             {loading ? <LoadingSpinner /> : "Generate Marketing Plan"}
           </button>
