@@ -299,10 +299,10 @@ export default function App() {
               onChange={(e) => setSegInp(e.target.value)}
               onKeyDown={(e) => onComma(e, setSeg, setSegInp)}
               className="w-full mt-1 mb-2 px-4 py-2 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-400"
-              placeholder="Type segment, comma or Enter to add (max 3)"
+              placeholder="e.g., Home gardeners aged 35-55"
             />
-            <p className="text-xs text-gray-500">
-              Add up to 3 specific segments.
+            <p className="text-xs text-gray-500 mt-1">
+              Press comma or Enter to add. Maximum 3 segments.
             </p>
           </Field>
 
@@ -374,7 +374,7 @@ export default function App() {
               onChange={(e) => setCompInp(e.target.value)}
               onKeyDown={(e) => onComma(e, setComp, setCompInp, 3)}
               className="w-full mt-1 mb-2 px-4 py-2 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-400"
-              placeholder="Type name, comma or Enter to add"
+              placeholder="e.g., Amazon, Local garden center, Seeds4Life"
             />
           </Field>
 
