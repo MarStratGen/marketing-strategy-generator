@@ -47,10 +47,10 @@ export default function Report({ plan, loading }) {
     <div className="mt-12 w-full max-w-5xl mx-auto px-4">
       {/* header */}
       <div className="text-center mb-16">
-        <h2 className="text-4xl font-bold text-slate-900 mb-4 tracking-tight">
+        <h2 className="text-4xl font-bold text-white mb-4 tracking-tight">
           Your Marketing Strategy
         </h2>
-        <p className="text-xl text-slate-900 max-w-3xl mx-auto leading-relaxed font-medium">
+        <p className="text-xl text-white max-w-3xl mx-auto leading-relaxed font-medium">
           A comprehensive plan organised into actionable sections for immediate implementation
         </p>
       </div>
