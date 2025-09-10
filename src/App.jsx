@@ -30,8 +30,8 @@ const Field = ({ label, children, tooltip, required }) => (
 
 const LoadingSpinner = () => (
   <div className="inline-flex items-center">
-    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-    Generating your strategic marketing plan...
+    <div className="animate-spin rounded-full h-5 w-5 border-2 border-white/30 border-t-white mr-3"></div>
+    <span>Creating your marketing strategy...</span>
   </div>
 );
 
@@ -308,7 +308,7 @@ function App() {
               className="w-full px-4 py-4 text-lg rounded-2xl border-2 border-gray-200 bg-gray-50/50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 focus:bg-white transition-all duration-300 hover:border-gray-300"
               placeholder="e.g., Home gardeners aged 35-55"
             />
-            <p className="text-sm text-gray-500 mt-1">
+            <p className="text-sm text-gray-600 mt-2 bg-gray-50 px-3 py-2 rounded-lg border border-gray-200">
               Press comma or Enter to add. Up to 3 customer groups (optional).
             </p>
           </Field>
@@ -341,8 +341,8 @@ function App() {
               />
             )}
 
-            <p className="text-sm text-gray-500 mt-2">
-              💡 This determines your marketing funnel and KPIs - can be online or offline actions.
+            <p className="text-sm text-gray-600 mt-2 bg-blue-50 px-3 py-2 rounded-lg border border-blue-200">
+              💡 This shapes your entire marketing strategy and the metrics we'll track.
             </p>
           </Field>
           <Field 
@@ -361,8 +361,8 @@ function App() {
                 </option>
               ))}
             </select>
-            <p className="text-sm text-gray-500 mt-2">
-              💰 We'll provide percentage allocations rather than specific dollar amounts.
+            <p className="text-sm text-gray-600 mt-2 bg-green-50 px-3 py-2 rounded-lg border border-green-200">
+              💰 We'll suggest budget allocations as percentages, not specific dollar amounts.
             </p>
           </Field>
 
@@ -388,16 +388,16 @@ function App() {
               className="w-full px-4 py-4 text-lg rounded-2xl border-2 border-gray-200 bg-gray-50/50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 focus:bg-white transition-all duration-300 hover:border-gray-300"
               placeholder="e.g., Amazon, Local garden center, Seeds4Life"
             />
-            <p className="text-sm text-gray-500 mt-1">
+            <p className="text-sm text-gray-600 mt-2 bg-purple-50 px-3 py-2 rounded-lg border border-purple-200">
               Press comma or Enter to add. Up to 3 competitors.
             </p>
           </Field>
               
           <button
             disabled={loading}
-            className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-4 rounded-md transition-colors disabled:opacity-50"
+            className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-bold py-5 px-8 rounded-2xl transition-all duration-300 disabled:opacity-50 shadow-xl hover:shadow-2xl transform hover:-translate-y-1 text-lg"
           >
-            {loading ? <LoadingSpinner /> : "Generate Marketing Plan"}
+            {loading ? <LoadingSpinner /> : "✨ Generate My Marketing Plan"}
           </button>
         </form>
         </div>
