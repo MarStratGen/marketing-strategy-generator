@@ -399,7 +399,7 @@ function FormattedText({ text }) {
   const paras = text.split("\n\n").filter((p) => p.trim());
   
   return (
-    <div className="space-y-3">
+    <div className="space-y-6">
       {paras.map((p, i) => {
         const trimmed = p.trim();
         
@@ -407,17 +407,13 @@ function FormattedText({ text }) {
         const lines = trimmed.split("\n").filter(line => line.trim());
         
         return (
-          <div key={i} className="space-y-2">
+          <div key={i} className="space-y-1">
             {lines.map((line, lineIndex) => {
               const cleanLine = line.trim();
               
-              // Skip Executive Summary
+              // Skip Executive Summary entirely
               if (cleanLine === "Executive Summary") {
-                return (
-                  <p key={lineIndex} className="leading-relaxed text-slate-700">
-                    {cleanLine}
-                  </p>
-                );
+                return null;
               }
               
               // Detect subheadings (short lines that look like headers)
@@ -432,7 +428,7 @@ function FormattedText({ text }) {
               
               if (isSubheading) {
                 return (
-                  <h6 key={lineIndex} className="font-bold text-slate-900 text-base mt-4 mb-2 first:mt-0">
+                  <h6 key={lineIndex} className="font-bold text-slate-900 text-base mt-6 mb-1 first:mt-0">
                     {cleanLine}
                   </h6>
                 );
