@@ -300,15 +300,26 @@ function OptimizedContent({ data }) {
       return (
         <div className="space-y-6">
           {groups.map((group, groupIndex) => (
-            <div key={groupIndex} className="border border-slate-200 rounded-lg p-4 bg-slate-50">
+            <div key={groupIndex} className="border border-slate-200 rounded-lg p-5 bg-slate-50">
               {group.map(([k, v], index) => (
-                <div key={k} className={index === 0 ? "mb-3" : "ml-4 mb-2"}>
-                  <span className={`${index === 0 ? 'font-bold text-slate-900 text-base' : 'font-medium text-slate-700 text-sm'}`}>
-                    {formatSubheading(k)}:{" "}
-                  </span>
-                  <span className="text-slate-700">
-                    {typeof v === "string" ? v : <OptimizedContent data={v} />}
-                  </span>
+                <div key={k} className={index === 0 ? "mb-4" : "mb-2"}>
+                  {index === 0 ? (
+                    <div>
+                      <h6 className="font-bold text-slate-900 text-lg mb-1">
+                        {typeof v === "string" ? v : <OptimizedContent data={v} />}
+                      </h6>
+                      <div className="text-xs text-slate-500 uppercase tracking-wide">{formatSubheading(k)}</div>
+                    </div>
+                  ) : (
+                    <div className="flex items-center gap-2">
+                      <span className="font-medium text-slate-600 text-sm min-w-12">
+                        {formatSubheading(k)}:
+                      </span>
+                      <span className="text-slate-700 text-sm">
+                        {typeof v === "string" ? v : <OptimizedContent data={v} />}
+                      </span>
+                    </div>
+                  )}
                 </div>
               ))}
             </div>
