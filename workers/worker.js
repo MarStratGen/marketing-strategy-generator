@@ -253,7 +253,38 @@ REQUIRED JSON STRUCTURE WITH EXACT FIELD NAMES:
   
   "marketing_mix_7ps": "Product\\nProduct strategy, features and benefits, product development priorities.\\n\\nPrice\\nPricing strategy, competitive pricing analysis, value communication.\\n\\nPlace\\nDistribution channels, channel strategy, market access approach.\\n\\nPromotion\\nPromotional strategy, communication channels, campaign approach.\\n\\nPeople\\nTarget audiences, customer service strategy, team requirements.\\n\\nProcess\\nCustomer journey, service delivery, operational excellence.\\n\\nPhysical Evidence\\nBrand assets, customer touchpoints, credibility factors.",
   
-  "channel_playbook": "Primary Channels\\nChannel strategy for main channels including role, audience, and tactics for each.\\n\\nSecondary Channels\\nSupporting channels with specific roles and integration approach.\\n\\nChannel Integration Strategy\\nCross-channel approach, customer journey mapping, and attribution strategy.\\n\\nWhy this matters: Channel importance in reaching target audiences.\\nHow to execute: Channel activation plan and integration tactics.",
+  "channel_playbook": [
+    {
+      "channel": "Primary Channel Name",
+      "intent": "High|Mid|Low",
+      "role": "Channel function (e.g., Capture, Assist, Scale)",
+      "summary": "Detailed explanation of this channel's strategic role and approach (2-3 sentences)",
+      "key_actions": ["Specific action 1", "Specific action 2", "Specific action 3"],
+      "success_metric": "Primary success measurement for this channel",
+      "budget_percent": 45,
+      "why_it_works": "Strategic rationale for why this channel is effective for this business"
+    },
+    {
+      "channel": "Secondary Channel Name", 
+      "intent": "High|Mid|Low",
+      "role": "Channel function",
+      "summary": "Detailed strategic explanation for this channel (2-3 sentences)",
+      "key_actions": ["Specific action 1", "Specific action 2", "Specific action 3"],
+      "success_metric": "Primary success measurement for this channel",
+      "budget_percent": 30,
+      "why_it_works": "Strategic rationale for effectiveness"
+    },
+    {
+      "channel": "Tertiary Channel Name",
+      "intent": "High|Mid|Low", 
+      "role": "Channel function",
+      "summary": "Detailed strategic explanation for this channel (2-3 sentences)",
+      "key_actions": ["Specific action 1", "Specific action 2"],
+      "success_metric": "Primary success measurement for this channel", 
+      "budget_percent": 25,
+      "why_it_works": "Strategic rationale for effectiveness"
+    }
+  ],
   
   "budget": {
     "band": "${form.budget_band || "Low"}",
