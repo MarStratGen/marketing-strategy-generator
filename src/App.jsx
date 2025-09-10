@@ -259,9 +259,9 @@ function App() {
             background: 'linear-gradient(to bottom right, rgba(37, 99, 235, 0.85), rgba(147, 51, 234, 0.85), rgba(219, 39, 119, 0.85))'
           }}
         ></div>
-        <div className="relative z-10 py-16">
+        <div className="relative z-10 py-16 px-4">
           {/* Header - Outside Form */}
-          <div className="text-center mb-16 px-4">
+          <div className="text-center mb-16">
             <h1 className="text-5xl font-bold text-white mb-6 tracking-tight">
               Marketing Plan Generator
             </h1>
