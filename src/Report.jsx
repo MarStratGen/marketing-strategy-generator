@@ -261,23 +261,23 @@ function ContentCard({ title, data, color }) {
   );
 }
 
-/* Clean content renderer (UX EXPERT REDESIGN) */
+/* Clean content renderer (NO DOUBLE BULLETS) */
 function OptimizedContent({ data }) {
   if (!data) return <p className="text-slate-500 italic">No data available</p>;
 
   if (Array.isArray(data)) {
     return (
-      <div className="space-y-2">
+      <div className="space-y-3">
         {data.map((item, i) => (
-          <div key={i} className="flex items-start gap-3">
-            <span className="text-blue-600 mt-1 text-sm font-bold">•</span>
-            <div className="flex-1 text-slate-700 leading-relaxed">
-              {typeof item === "object" ? (
-                <OptimizedContent data={item} />
-              ) : (
+          <div key={i} className="text-slate-700 leading-relaxed">
+            {typeof item === "object" ? (
+              <OptimizedContent data={item} />
+            ) : (
+              <div className="flex items-start gap-3">
+                <span className="text-blue-600 mt-1 text-sm">▸</span>
                 <FormattedText text={String(item)} />
-              )}
-            </div>
+              </div>
+            )}
           </div>
         ))}
       </div>
@@ -286,14 +286,18 @@ function OptimizedContent({ data }) {
 
   if (typeof data === "object") {
     return (
-      <div className="space-y-6">
-        {Object.entries(data).map(([k, v]) => (
-          <div key={k} className="bg-slate-50 rounded-lg p-4">
-            <h5 className="font-bold text-slate-900 mb-3 text-base tracking-tight flex items-center gap-2">
-              <span className="w-2 h-2 bg-blue-600 rounded-full"></span>
-              {formatSubheading(k)}
-            </h5>
-            <div className="ml-4 text-slate-700">
+      <div className="space-y-5">
+        {Object.entries(data).map(([k, v], index) => (
+          <div key={k} className="bg-white border border-slate-200 rounded-lg p-5">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="w-6 h-6 bg-blue-600 text-white rounded-full flex items-center justify-center text-xs font-bold">
+                {index + 1}
+              </div>
+              <h5 className="font-bold text-slate-900 text-base tracking-tight">
+                {formatSubheading(k)}
+              </h5>
+            </div>
+            <div className="text-slate-700 pl-9">
               <OptimizedContent data={v} />
             </div>
           </div>
