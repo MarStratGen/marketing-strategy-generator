@@ -428,7 +428,7 @@ function FormattedText({ text }) {
               
               if (isSubheading) {
                 return (
-                  <h6 key={lineIndex} className="font-bold text-slate-900 text-base mt-6 mb-1 first:mt-0">
+                  <h6 key={lineIndex} className="font-bold text-slate-900 text-base mt-8 mb-0 first:mt-0">
                     {cleanLine}
                   </h6>
                 );
