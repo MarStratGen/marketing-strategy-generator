@@ -261,43 +261,38 @@ function ContentCard({ title, data, color }) {
   );
 }
 
-/* Clean content renderer (NO DOUBLE BULLETS) */
+/* SUPER SIMPLE content renderer (NO CONFUSION) */
 function OptimizedContent({ data }) {
   if (!data) return <p className="text-slate-500 italic">No data available</p>;
 
   if (Array.isArray(data)) {
     return (
-      <div className="space-y-3">
+      <ul className="space-y-2 list-none">
         {data.map((item, i) => (
-          <div key={i} className="text-slate-700 leading-relaxed">
-            {typeof item === "object" ? (
-              <OptimizedContent data={item} />
-            ) : (
-              <div className="flex items-start gap-3">
-                <span className="text-blue-600 mt-1 text-sm">▸</span>
+          <li key={i} className="flex items-start gap-3 text-slate-700 leading-relaxed">
+            <span className="text-blue-600 font-bold mt-0.5">•</span>
+            <div className="flex-1">
+              {typeof item === "object" ? (
+                <OptimizedContent data={item} />
+              ) : (
                 <FormattedText text={String(item)} />
-              </div>
-            )}
-          </div>
+              )}
+            </div>
+          </li>
         ))}
-      </div>
+      </ul>
     );
   }
 
   if (typeof data === "object") {
     return (
-      <div className="space-y-5">
-        {Object.entries(data).map(([k, v], index) => (
-          <div key={k} className="bg-white border border-slate-200 rounded-lg p-5">
-            <div className="flex items-center gap-3 mb-4">
-              <div className="w-6 h-6 bg-blue-600 text-white rounded-full flex items-center justify-center text-xs font-bold">
-                {index + 1}
-              </div>
-              <h5 className="font-bold text-slate-900 text-base tracking-tight">
-                {formatSubheading(k)}
-              </h5>
-            </div>
-            <div className="text-slate-700 pl-9">
+      <div className="space-y-6">
+        {Object.entries(data).map(([k, v]) => (
+          <div key={k}>
+            <h5 className="font-bold text-slate-900 text-lg mb-3 pb-2 border-b border-slate-200">
+              {formatSubheading(k)}
+            </h5>
+            <div className="ml-0 text-slate-700">
               <OptimizedContent data={v} />
             </div>
           </div>
