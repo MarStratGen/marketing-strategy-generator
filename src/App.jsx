@@ -242,19 +242,20 @@ function App() {
 
   return (
     <div>
-      {/* Hero Section with Photo and Gradient Overlay */}
+      {/* Hero Section with Photo Background */}
       <div 
         className="min-h-screen relative"
         style={{
           backgroundImage: `url('/attached_assets/birmingham-museums-trust-YvNiIyGdMfs-unsplash_1757466351093.jpg')`,
           backgroundSize: 'cover',
-          backgroundPosition: 'center'
+          backgroundPosition: 'center',
+          backgroundAttachment: 'fixed'
         }}
       >
-        {/* Gradient Overlay */}
+        {/* Color Gradient Overlay */}
         <div className="absolute inset-0 bg-gradient-to-br from-blue-600/85 via-purple-600/85 to-pink-600/85"></div>
         
-        {/* Content */}
+        {/* Content Layer */}
         <div className="relative z-10 py-16 px-4">
           {/* Header - Outside Form */}
           <div className="text-center mb-16">
@@ -266,8 +267,8 @@ function App() {
             </p>
           </div>
 
-          {/* Form Container */}
-          <div className="bg-white/95 backdrop-blur-sm rounded-3xl shadow-xl p-10 max-w-lg mx-auto border border-white/20 mb-20">
+          {/* Form Container - Pure White */}
+          <div className="bg-white rounded-3xl shadow-xl p-10 max-w-lg mx-auto border border-gray-100 mb-20">
 
             {error && (
               <div className="bg-red-50 border border-red-200 text-red-800 px-4 py-3 rounded-lg mb-6">
