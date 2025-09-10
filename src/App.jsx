@@ -193,21 +193,44 @@ export default function App() {
   };
 
   return (
-    <div className="w-full min-h-screen">
-      {/* Form Container */}
-      <div className="w-full max-w-md mx-auto bg-white/90 backdrop-blur-sm rounded-xl shadow-2xl p-8 mb-8">
-        <h1 className="text-3xl font-bold mb-6 text-gray-800 tracking-wide">
-          Tiny Marketing-Plan Generator
-        </h1>
-
-        {error && (
-          <div className="bg-red-200 text-red-800 px-4 py-2 rounded mb-4">
-            {error}
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 py-12">
+      <div className="max-w-4xl mx-auto px-6">
+        {/* Header */}
+        <header className="text-center mb-16">
+          <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-2xl mb-6 shadow-lg">
+            <span className="text-2xl">🚀</span>
           </div>
-        )}
+          <h1 className="text-5xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent mb-4">
+            Tiny Marketing Plan Generator
+          </h1>
+          <p className="text-xl text-gray-600 max-w-2xl mx-auto leading-relaxed">
+            Create comprehensive go-to-market strategies with AI-powered insights
+          </p>
+        </header>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
-          {/* Country */}
+        {/* Form Container */}
+        <div className="bg-white/80 backdrop-blur-xl rounded-3xl shadow-2xl shadow-indigo-100/50 overflow-hidden">
+          <div className="bg-gradient-to-r from-indigo-500/10 to-purple-500/10 px-8 py-6 border-b border-indigo-100">
+            <h2 className="text-2xl font-semibold text-gray-800">Business Details</h2>
+            <p className="text-gray-600 mt-1">Tell us about your business and target market</p>
+          </div>
+          <div className="p-8">
+
+            {error && (
+              <div className="bg-red-50 border border-red-200 text-red-700 px-6 py-4 rounded-xl mb-6 flex items-center gap-3">
+                <span className="text-red-500">⚠️</span>
+                <span>{error}</span>
+              </div>
+            )}
+
+            <form onSubmit={handleSubmit} className="space-y-8">
+              {/* Business Foundation Section */}
+              <div className="bg-gradient-to-r from-indigo-50/50 to-purple-50/50 rounded-2xl p-6 border border-indigo-100/50">
+                <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
+                  <span className="w-6 h-6 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-full flex items-center justify-center text-white text-sm">1</span>
+                  Market Foundation
+                </h3>
+                <div className="space-y-6">
           <Field 
             label="Target market country" 
             required 
@@ -216,7 +239,7 @@ export default function App() {
             <select
               value={country}
               onChange={(e) => setCountry(e.target.value)}
-              className="w-full mt-1 mb-2 px-4 py-2 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-400"
+              className="w-full mt-1 mb-2 px-4 py-3 rounded-xl border border-gray-200 bg-white/80 focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:border-transparent transition-all duration-200 shadow-sm hover:shadow-md"
             >
               {COUNTRIES.map((c) => (
                 <option key={c.code} value={c.code}>
@@ -229,13 +252,12 @@ export default function App() {
                 ref={ccRef}
                 value={customCountry}
                 onChange={(e) => setCCountry(e.target.value)}
-                className="w-full mt-1 mb-4 px-4 py-2 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-400"
+                className="w-full mt-1 mb-4 px-4 py-3 rounded-xl border border-gray-200 bg-white/80 focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:border-transparent transition-all duration-200 shadow-sm hover:shadow-md"
                 placeholder="Type your country"
               />
             )}
           </Field>
 
-          {/* Sector */}
           <Field 
             label="Industry sector" 
             tooltip="Choose the industry that best describes your business"
@@ -243,7 +265,7 @@ export default function App() {
             <select
               value={sector}
               onChange={(e) => setSector(e.target.value)}
-              className="w-full mt-1 mb-2 px-4 py-2 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-400"
+              className="w-full mt-1 mb-2 px-4 py-3 rounded-xl border border-gray-200 bg-white/80 focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:border-transparent transition-all duration-200 shadow-sm hover:shadow-md"
             >
               <option value="" disabled>Choose your industry (optional)</option>
               {[
@@ -260,13 +282,12 @@ export default function App() {
                 ref={csRef}
                 value={customSector}
                 onChange={(e) => setCSector(e.target.value)}
-                className="w-full mt-1 mb-4 px-4 py-2 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-400"
+                className="w-full mt-1 mb-4 px-4 py-3 rounded-xl border border-gray-200 bg-white/80 focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:border-transparent transition-all duration-200 shadow-sm hover:shadow-md"
                 placeholder="Type your sector"
               />
             )}
           </Field>
 
-          {/* Offering */}
           <Field 
             label="Product or service" 
             required 
@@ -280,8 +301,16 @@ export default function App() {
               required
             />
           </Field>
+                </div>
+              </div>
 
-          {/* Target segment(s) */}
+              {/* Customer Strategy Section */}
+              <div className="bg-gradient-to-r from-purple-50/50 to-pink-50/50 rounded-2xl p-6 border border-purple-100/50">
+                <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
+                  <span className="w-6 h-6 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full flex items-center justify-center text-white text-sm">2</span>
+                  Customer Strategy
+                </h3>
+                <div className="space-y-6">
           <Field 
             label="Target customer groups" 
             tooltip="Who are your ideal customers? Be specific about demographics, behaviors, or needs"
@@ -299,7 +328,7 @@ export default function App() {
               value={segInp}
               onChange={(e) => setSegInp(e.target.value)}
               onKeyDown={(e) => onComma(e, setSeg, setSegInp)}
-              className="w-full mt-1 mb-2 px-4 py-2 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-400"
+              className="w-full mt-1 mb-2 px-4 py-3 rounded-xl border border-gray-200 bg-white/80 focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:border-transparent transition-all duration-200 shadow-sm hover:shadow-md"
               placeholder="e.g., Home gardeners aged 35-55"
             />
             <p className="text-xs text-gray-500 mt-1">
@@ -307,8 +336,6 @@ export default function App() {
             </p>
           </Field>
 
-
-          {/* Primary action for the target segment */}
           <Field 
             label="Desired customer action" 
             required
@@ -317,7 +344,7 @@ export default function App() {
             <select
               value={motion}
               onChange={(e) => setMotion(e.target.value)}
-              className="w-full mt-1 mb-2 px-4 py-2 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-400"
+              className="w-full mt-1 mb-2 px-4 py-3 rounded-xl border border-gray-200 bg-white/80 focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:border-transparent transition-all duration-200 shadow-sm hover:shadow-md"
               required
             >
               {MOTIONS.map((m) => (
@@ -331,7 +358,7 @@ export default function App() {
               <input
                 value={customMotion}
                 onChange={(e) => setCustomMotion(e.target.value)}
-                className="w-full mt-1 mb-2 px-4 py-2 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-400"
+                className="w-full mt-1 mb-2 px-4 py-3 rounded-xl border border-gray-200 bg-white/80 focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:border-transparent transition-all duration-200 shadow-sm hover:shadow-md"
                 placeholder="Describe the action, e.g., ‘Call to book’, ‘Visit store’, ‘Request sample kit’"
                 required
               />
@@ -342,8 +369,16 @@ export default function App() {
               offline.
             </p>
           </Field>
+                </div>
+              </div>
 
-          {/* Budget level (bands only) */}
+              {/* Business Intelligence Section */}
+              <div className="bg-gradient-to-r from-green-50/50 to-teal-50/50 rounded-2xl p-6 border border-green-100/50">
+                <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
+                  <span className="w-6 h-6 bg-gradient-to-r from-green-500 to-teal-500 rounded-full flex items-center justify-center text-white text-sm">3</span>
+                  Business Intelligence
+                </h3>
+                <div className="space-y-6">
           <Field 
             label="Marketing budget level" 
             required
@@ -352,7 +387,7 @@ export default function App() {
             <select
               value={budgetBand}
               onChange={(e) => setBudgetBand(e.target.value)}
-              className="w-full mt-1 mb-1 px-4 py-2 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-400"
+              className="w-full mt-1 mb-1 px-4 py-3 rounded-xl border border-gray-200 bg-white/80 focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:border-transparent transition-all duration-200 shadow-sm hover:shadow-md"
             >
               {BUDGET_BANDS.map((b) => (
                 <option key={b.value} value={b.value}>
@@ -365,7 +400,6 @@ export default function App() {
             </p>
           </Field>
 
-          {/* Competitors */}
           <Field 
             label="Key competitors (optional)" 
             tooltip="Who else is competing for your customers? List up to 3 main competitors"
@@ -385,25 +419,29 @@ export default function App() {
               value={compInp}
               onChange={(e) => setCompInp(e.target.value)}
               onKeyDown={(e) => onComma(e, setComp, setCompInp, 3)}
-              className="w-full mt-1 mb-2 px-4 py-2 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-400"
+              className="w-full mt-1 mb-2 px-4 py-3 rounded-xl border border-gray-200 bg-white/80 focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:border-transparent transition-all duration-200 shadow-sm hover:shadow-md"
               placeholder="e.g., Amazon, Local garden center, Seeds4Life"
             />
             <p className="text-xs text-gray-500 mt-1">
               Press comma or Enter to add. Up to 3 competitors.
             </p>
           </Field>
+                </div>
+              </div>
 
-          <button
+              <button
             disabled={loading}
-            className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-medium py-3 px-6 rounded-md transition-all transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none shadow-lg"
+            className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-semibold py-4 px-8 rounded-2xl transition-all transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none shadow-xl shadow-indigo-200/50 hover:shadow-2xl hover:shadow-indigo-300/50"
           >
             {loading ? <LoadingSpinner /> : "🚀 Generate Marketing Plan"}
-          </button>
-        </form>
-      </div>
+              </button>
+            </form>
+          </div>
+        </div>
 
-      {/* Report */}
-      <Report plan={result} loading={loading} />
+        {/* Report */}
+        <Report plan={result} loading={loading} />
+      </div>
     </div>
   );
 }
