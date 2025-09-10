@@ -246,13 +246,20 @@ function App() {
       <div 
         className="min-h-screen relative"
         style={{
-          backgroundImage: `linear-gradient(to bottom right, rgba(37, 99, 235, 0.85), rgba(147, 51, 234, 0.85), rgba(219, 39, 119, 0.85)), url('/birmingham-museums-trust-YvNiIyGdMfs-unsplash_1757466351093.jpg')`,
+          backgroundImage: `url('/birmingham-museums-trust-YvNiIyGdMfs-unsplash_1757466351093.jpg')`,
           backgroundSize: 'cover',
           backgroundPosition: 'center',
           backgroundAttachment: 'fixed'
         }}
       >
-        <div className="py-16 px-4">
+        {/* Gradient Tint Overlay */}
+        <div 
+          className="absolute inset-0"
+          style={{
+            background: 'linear-gradient(to bottom right, rgba(37, 99, 235, 0.85), rgba(147, 51, 234, 0.85), rgba(219, 39, 119, 0.85))'
+          }}
+        ></div>
+        <div className="relative z-10 py-16 px-4">
           {/* Header - Outside Form */}
           <div className="text-center mb-16">
             <h1 className="text-5xl font-bold text-white mb-6 tracking-tight">
