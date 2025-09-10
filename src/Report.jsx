@@ -1,8 +1,8 @@
 import { useState } from "react";
 import { ChevronDownIcon, ChevronRightIcon } from "@heroicons/react/24/outline";
-import * as XLSX from 'xlsx';
-import { Document, Packer, Paragraph, HeadingLevel, TextRun } from 'docx';
-import { saveAs } from 'file-saver';
+import * as XLSX from "xlsx";
+import { Document, Packer, Paragraph, HeadingLevel, TextRun } from "docx";
+import { saveAs } from "file-saver";
 
 /* ── helpers ────────────────────────────────────────────── */
 const formatSubheading = (k) =>
@@ -51,7 +51,8 @@ export default function Report({ plan, loading }) {
           Your Marketing Strategy
         </h2>
         <p className="text-xl text-white max-w-3xl mx-auto leading-relaxed font-medium">
-          A comprehensive plan organised into actionable sections for immediate implementation
+          A comprehensive plan organised into actionable sections for immediate
+          implementation
         </p>
       </div>
 
@@ -60,8 +61,12 @@ export default function Report({ plan, loading }) {
       {/* actions */}
       <div className="mt-16 bg-gradient-to-r from-slate-50 to-blue-50 border border-slate-200 rounded-2xl p-8">
         <div className="text-center mb-6">
-          <h3 className="text-xl font-bold text-slate-900 mb-2">Download Your Strategy</h3>
-          <p className="text-slate-600 text-sm">Export your marketing strategy in your preferred format</p>
+          <h3 className="text-xl font-bold text-slate-900 mb-2">
+            Download Your Strategy
+          </h3>
+          <p className="text-slate-600 text-sm">
+            Export your marketing strategy in your preferred format
+          </p>
         </div>
         <div className="flex flex-wrap gap-3 justify-center">
           <button
@@ -114,6 +119,7 @@ function ContentSections({ data }) {
       color: "purple",
       priority: "high",
       items: [
+        { title: "Competitive Landscape", data: data.competitors_brief },
         { title: "Strategy Pillars", data: data.strategy_pillars },
         { title: "Marketing Mix (7 Ps)", data: data.marketing_mix_7ps },
         { title: "Channel Playbook", data: data.channel_playbook },
@@ -160,28 +166,28 @@ function ContentSection({ section, isFirst }) {
   const [isOpen, setOpen] = useState(isFirst);
   const colors = {
     blue: {
-      gradient: "from-blue-500 to-blue-600", 
-      bg: "bg-blue-50", 
+      gradient: "from-blue-500 to-blue-600",
+      bg: "bg-blue-50",
       border: "border-blue-200",
-      text: "text-blue-700"
+      text: "text-blue-700",
     },
     purple: {
-      gradient: "from-purple-500 to-purple-600", 
-      bg: "bg-purple-50", 
+      gradient: "from-purple-500 to-purple-600",
+      bg: "bg-purple-50",
       border: "border-purple-200",
-      text: "text-purple-700"
+      text: "text-purple-700",
     },
     green: {
-      gradient: "from-green-500 to-green-600", 
-      bg: "bg-green-50", 
+      gradient: "from-green-500 to-green-600",
+      bg: "bg-green-50",
       border: "border-green-200",
-      text: "text-green-700"
+      text: "text-green-700",
     },
     indigo: {
-      gradient: "from-indigo-500 to-indigo-600", 
-      bg: "bg-indigo-50", 
+      gradient: "from-indigo-500 to-indigo-600",
+      bg: "bg-indigo-50",
       border: "border-indigo-200",
-      text: "text-indigo-700"
+      text: "text-indigo-700",
     },
   };
 
@@ -205,7 +211,9 @@ function ContentSection({ section, isFirst }) {
               <h3 className="text-2xl font-bold text-slate-900 mb-2 tracking-tight">
                 {section.title}
               </h3>
-              <p className="text-base text-slate-700 font-medium leading-relaxed">{section.description}</p>
+              <p className="text-base text-slate-700 font-medium leading-relaxed">
+                {section.description}
+              </p>
             </div>
           </div>
           <div className="flex items-center gap-3">
@@ -246,14 +254,18 @@ function ContentSection({ section, isFirst }) {
 function ContentCard({ title, data, color }) {
   const colours = {
     blue: "border-blue-100 bg-gradient-to-br from-blue-50 to-blue-100/50",
-    purple: "border-purple-100 bg-gradient-to-br from-purple-50 to-purple-100/50",
+    purple:
+      "border-purple-100 bg-gradient-to-br from-purple-50 to-purple-100/50",
     green: "border-green-100 bg-gradient-to-br from-green-50 to-green-100/50",
-    indigo: "border-indigo-100 bg-gradient-to-br from-indigo-50 to-indigo-100/50",
+    indigo:
+      "border-indigo-100 bg-gradient-to-br from-indigo-50 to-indigo-100/50",
   };
 
   return (
     <div className={`border-2 ${colours[color]} rounded-xl p-6 shadow-sm`}>
-      <h4 className="text-xl font-bold text-slate-900 mb-5 tracking-tight">{title}</h4>
+      <h4 className="text-xl font-bold text-slate-900 mb-5 tracking-tight">
+        {title}
+      </h4>
       <div className="prose prose-slate max-w-none text-slate-700 leading-relaxed">
         <OptimizedContent data={data} />
       </div>
@@ -269,7 +281,10 @@ function OptimizedContent({ data }) {
     return (
       <ul className="space-y-8 list-none">
         {data.map((item, i) => (
-          <li key={i} className="flex items-baseline gap-3 text-slate-700 leading-relaxed">
+          <li
+            key={i}
+            className="flex items-baseline gap-3 text-slate-700 leading-relaxed"
+          >
             <span className="text-blue-600 font-bold">•</span>
             <div className="flex-1">
               {typeof item === "object" ? (
@@ -327,128 +342,201 @@ function FormattedText({ text }) {
 const downloadExcel = (data) => {
   try {
     const workbook = XLSX.utils.book_new();
-    
+
     // Create summary sheet
     const summaryData = [
-      ['Marketing Strategy Report'],
-      ['Generated:', new Date().toLocaleDateString()],
-      [''],
-      ['Overview'],
-      ['Introduction', data.introduction || 'N/A'],
-      [''],
-      ['Strategy Pillars'],
-      ...(data.strategy_pillars || []).map((pillar, i) => [`Pillar ${i + 1}`, pillar]),
-      [''],
-      ['Personas'],
-      ...(data.personas || []).map((persona, i) => [`Persona ${i + 1}`, `${persona.name}: ${persona.summary}`]),
+      ["Marketing Strategy Report"],
+      ["Generated:", new Date().toLocaleDateString()],
+      [""],
+      ["Overview"],
+      ["Introduction", data.introduction || "N/A"],
+      [""],
+      ["Strategy Pillars"],
+      ...(data.strategy_pillars || []).map((pillar, i) => [
+        `Pillar ${i + 1}`,
+        pillar,
+      ]),
+      [""],
+      ["Personas"],
+      ...(data.personas || []).map((persona, i) => [
+        `Persona ${i + 1}`,
+        `${persona.name}: ${persona.summary}`,
+      ]),
     ];
-    
+
     const worksheet = XLSX.utils.aoa_to_sheet(summaryData);
-    XLSX.utils.book_append_sheet(workbook, worksheet, 'Strategy Summary');
-    
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Strategy Summary");
+
     // Add detailed sheets for each section
     if (data.marketing_mix_7ps) {
-      const mixData = [['Marketing Mix (7 Ps)'], ['Component', 'Details']];
+      const mixData = [["Marketing Mix (7 Ps)"], ["Component", "Details"]];
       Object.entries(data.marketing_mix_7ps).forEach(([key, value]) => {
-        mixData.push([key, typeof value === 'object' ? JSON.stringify(value) : value]);
+        mixData.push([
+          key,
+          typeof value === "object" ? JSON.stringify(value) : value,
+        ]);
       });
       const mixSheet = XLSX.utils.aoa_to_sheet(mixData);
-      XLSX.utils.book_append_sheet(workbook, mixSheet, 'Marketing Mix');
+      XLSX.utils.book_append_sheet(workbook, mixSheet, "Marketing Mix");
     }
-    
+
     if (data.calendar_next_90_days) {
-      const calendarData = [['90-Day Calendar'], ['Timeline', 'Activities']];
-      Object.entries(data.calendar_next_90_days).forEach(([period, activities]) => {
-        calendarData.push([period, Array.isArray(activities) ? activities.join('; ') : activities]);
-      });
+      const calendarData = [["90-Day Calendar"], ["Timeline", "Activities"]];
+      Object.entries(data.calendar_next_90_days).forEach(
+        ([period, activities]) => {
+          calendarData.push([
+            period,
+            Array.isArray(activities) ? activities.join("; ") : activities,
+          ]);
+        },
+      );
       const calendarSheet = XLSX.utils.aoa_to_sheet(calendarData);
-      XLSX.utils.book_append_sheet(workbook, calendarSheet, '90-Day Plan');
+      XLSX.utils.book_append_sheet(workbook, calendarSheet, "90-Day Plan");
     }
-    
-    XLSX.writeFile(workbook, 'marketing-strategy.xlsx');
+
+    XLSX.writeFile(workbook, "marketing-strategy.xlsx");
   } catch (error) {
-    console.error('Excel download failed:', error);
-    alert('Excel download failed. Please try again.');
+    console.error("Excel download failed:", error);
+    alert("Excel download failed. Please try again.");
   }
 };
 
 const downloadWord = async (data) => {
   try {
     const doc = new Document({
-      sections: [{
-        properties: {},
-        children: [
-          new Paragraph({
-            children: [new TextRun({ text: "Marketing Strategy Report", bold: true, size: 32 })],
-            heading: HeadingLevel.TITLE,
-          }),
-          new Paragraph({
-            children: [new TextRun({ text: `Generated: ${new Date().toLocaleDateString()}`, size: 20 })],
-          }),
-          new Paragraph({ text: "" }),
-          
-          new Paragraph({
-            children: [new TextRun({ text: "Introduction", bold: true, size: 28 })],
-            heading: HeadingLevel.HEADING_1,
-          }),
-          new Paragraph({
-            children: [new TextRun({ text: data.introduction || 'No introduction provided.', size: 22 })],
-          }),
-          new Paragraph({ text: "" }),
-          
-          new Paragraph({
-            children: [new TextRun({ text: "Strategy Pillars", bold: true, size: 28 })],
-            heading: HeadingLevel.HEADING_1,
-          }),
-          ...(data.strategy_pillars || []).map((pillar, i) => 
+      sections: [
+        {
+          properties: {},
+          children: [
             new Paragraph({
-              children: [new TextRun({ text: `${i + 1}. ${pillar}`, size: 22 })],
-            })
-          ),
-          new Paragraph({ text: "" }),
-          
-          new Paragraph({
-            children: [new TextRun({ text: "Personas", bold: true, size: 28 })],
-            heading: HeadingLevel.HEADING_1,
-          }),
-          ...(data.personas || []).flatMap((persona) => [
-            new Paragraph({
-              children: [new TextRun({ text: persona.name || 'Unnamed Persona', bold: true, size: 24 })],
-              heading: HeadingLevel.HEADING_2,
+              children: [
+                new TextRun({
+                  text: "Marketing Strategy Report",
+                  bold: true,
+                  size: 32,
+                }),
+              ],
+              heading: HeadingLevel.TITLE,
             }),
             new Paragraph({
-              children: [new TextRun({ text: persona.summary || 'No summary provided.', size: 22 })],
+              children: [
+                new TextRun({
+                  text: `Generated: ${new Date().toLocaleDateString()}`,
+                  size: 20,
+                }),
+              ],
             }),
             new Paragraph({ text: "" }),
-          ]),
-          
-          new Paragraph({
-            children: [new TextRun({ text: "Marketing Mix (7 Ps)", bold: true, size: 28 })],
-            heading: HeadingLevel.HEADING_1,
-          }),
-          ...Object.entries(data.marketing_mix_7ps || {}).flatMap(([key, value]) => [
+
             new Paragraph({
-              children: [new TextRun({ text: key.replace(/_/g, ' ').toUpperCase(), bold: true, size: 24 })],
-              heading: HeadingLevel.HEADING_2,
+              children: [
+                new TextRun({ text: "Introduction", bold: true, size: 28 }),
+              ],
+              heading: HeadingLevel.HEADING_1,
             }),
             new Paragraph({
-              children: [new TextRun({ 
-                text: typeof value === 'object' ? JSON.stringify(value, null, 2) : value || 'No details provided.',
-                size: 22 
-              })],
+              children: [
+                new TextRun({
+                  text: data.introduction || "No introduction provided.",
+                  size: 22,
+                }),
+              ],
             }),
             new Paragraph({ text: "" }),
-          ]),
-        ],
-      }],
+
+            new Paragraph({
+              children: [
+                new TextRun({ text: "Strategy Pillars", bold: true, size: 28 }),
+              ],
+              heading: HeadingLevel.HEADING_1,
+            }),
+            ...(data.strategy_pillars || []).map(
+              (pillar, i) =>
+                new Paragraph({
+                  children: [
+                    new TextRun({ text: `${i + 1}. ${pillar}`, size: 22 }),
+                  ],
+                }),
+            ),
+            new Paragraph({ text: "" }),
+
+            new Paragraph({
+              children: [
+                new TextRun({ text: "Personas", bold: true, size: 28 }),
+              ],
+              heading: HeadingLevel.HEADING_1,
+            }),
+            ...(data.personas || []).flatMap((persona) => [
+              new Paragraph({
+                children: [
+                  new TextRun({
+                    text: persona.name || "Unnamed Persona",
+                    bold: true,
+                    size: 24,
+                  }),
+                ],
+                heading: HeadingLevel.HEADING_2,
+              }),
+              new Paragraph({
+                children: [
+                  new TextRun({
+                    text: persona.summary || "No summary provided.",
+                    size: 22,
+                  }),
+                ],
+              }),
+              new Paragraph({ text: "" }),
+            ]),
+
+            new Paragraph({
+              children: [
+                new TextRun({
+                  text: "Marketing Mix (7 Ps)",
+                  bold: true,
+                  size: 28,
+                }),
+              ],
+              heading: HeadingLevel.HEADING_1,
+            }),
+            ...Object.entries(data.marketing_mix_7ps || {}).flatMap(
+              ([key, value]) => [
+                new Paragraph({
+                  children: [
+                    new TextRun({
+                      text: key.replace(/_/g, " ").toUpperCase(),
+                      bold: true,
+                      size: 24,
+                    }),
+                  ],
+                  heading: HeadingLevel.HEADING_2,
+                }),
+                new Paragraph({
+                  children: [
+                    new TextRun({
+                      text:
+                        typeof value === "object"
+                          ? JSON.stringify(value, null, 2)
+                          : value || "No details provided.",
+                      size: 22,
+                    }),
+                  ],
+                }),
+                new Paragraph({ text: "" }),
+              ],
+            ),
+          ],
+        },
+      ],
     });
 
     const buffer = await Packer.toBuffer(doc);
-    const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' });
-    saveAs(blob, 'marketing-strategy.docx');
+    const blob = new Blob([buffer], {
+      type: "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+    });
+    saveAs(blob, "marketing-strategy.docx");
   } catch (error) {
-    console.error('Word download failed:', error);
-    alert('Word download failed. Please try again.');
+    console.error("Word download failed:", error);
+    alert("Word download failed. Please try again.");
   }
 };
 
