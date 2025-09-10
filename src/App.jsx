@@ -397,11 +397,10 @@ function App() {
             {loading ? <LoadingSpinner /> : "Generate Marketing Plan"}
           </button>
         </form>
-          </div>
-
-          {/* Report */}
-          <Report plan={result} loading={loading} />
         </div>
+
+        {/* Report */}
+        <Report plan={result} loading={loading} />
       </div>
     </div>
   );
