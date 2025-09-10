@@ -303,13 +303,17 @@ export default function App() {
               placeholder="e.g., Home gardeners aged 35-55"
             />
             <p className="text-xs text-gray-500 mt-1">
-              Press comma or Enter to add. Maximum 3 segments.
+              Press comma or Enter to add. Up to 3 customer groups (optional).
             </p>
           </Field>
 
 
           {/* Primary action for the target segment */}
-          <Field label="What is the primary action you want your target segment to take?">
+          <Field 
+            label="Desired customer action" 
+            required
+            tooltip="What do you want customers to do? This determines your marketing funnel and KPIs"
+          >
             <select
               value={motion}
               onChange={(e) => setMotion(e.target.value)}
@@ -340,7 +344,11 @@ export default function App() {
           </Field>
 
           {/* Budget level (bands only) */}
-          <Field label="Budget level">
+          <Field 
+            label="Marketing budget level" 
+            required
+            tooltip="Select your overall marketing budget range"
+          >
             <select
               value={budgetBand}
               onChange={(e) => setBudgetBand(e.target.value)}
@@ -358,7 +366,10 @@ export default function App() {
           </Field>
 
           {/* Competitors */}
-          <Field label="Top competitors – comma to add, max 3 (optional)">
+          <Field 
+            label="Key competitors (optional)" 
+            tooltip="Who else is competing for your customers? List up to 3 main competitors"
+          >
             <div className="mb-1">
               {competitors.map((c, i) => (
                 <Pill
@@ -377,6 +388,9 @@ export default function App() {
               className="w-full mt-1 mb-2 px-4 py-2 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-400"
               placeholder="e.g., Amazon, Local garden center, Seeds4Life"
             />
+            <p className="text-xs text-gray-500 mt-1">
+              Press comma or Enter to add. Up to 3 competitors.
+            </p>
           </Field>
 
           <button
