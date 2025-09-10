@@ -286,49 +286,6 @@ function OptimizedContent({ data }) {
 
   if (typeof data === "object") {
     const entries = Object.entries(data);
-    
-    // Check if this looks like a grouped structure (Channel, Intent, Role pattern)
-    const isChannelGroup = entries.some(([k]) => k.toLowerCase().includes('channel'));
-    
-    if (isChannelGroup) {
-      // Group every 3 items (Channel, Intent, Role)
-      const groups = [];
-      for (let i = 0; i < entries.length; i += 3) {
-        groups.push(entries.slice(i, i + 3));
-      }
-      
-      return (
-        <div className="space-y-6">
-          {groups.map((group, groupIndex) => (
-            <div key={groupIndex} className="border border-slate-200 rounded-lg p-5 bg-slate-50">
-              {group.map(([k, v], index) => (
-                <div key={k} className={index === 0 ? "mb-4" : "mb-2"}>
-                  {index === 0 ? (
-                    <div>
-                      <h6 className="font-bold text-slate-900 text-lg mb-1">
-                        {typeof v === "string" ? v : <OptimizedContent data={v} />}
-                      </h6>
-                      <div className="text-xs text-slate-500 uppercase tracking-wide">{formatSubheading(k)}</div>
-                    </div>
-                  ) : (
-                    <div className="flex items-center gap-2">
-                      <span className="font-medium text-slate-600 text-sm min-w-12">
-                        {formatSubheading(k)}:
-                      </span>
-                      <span className="text-slate-700 text-sm">
-                        {typeof v === "string" ? v : <OptimizedContent data={v} />}
-                      </span>
-                    </div>
-                  )}
-                </div>
-              ))}
-            </div>
-          ))}
-        </div>
-      );
-    }
-    
-    // Fallback for other structures
     return (
       <div className="space-y-3">
         {entries.map(([k, v]) => (
