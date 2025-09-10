@@ -394,16 +394,59 @@ function OptimizedContent({ data }) {
   );
 }
 
-/* text splitter */
+/* text splitter with subheading detection */
 function FormattedText({ text }) {
   const paras = text.split("\n\n").filter((p) => p.trim());
+  
   return (
-    <div className="space-y-2">
-      {paras.map((p, i) => (
-        <p key={i} className="leading-snug text-slate-700">
-          {p.trim()}
-        </p>
-      ))}
+    <div className="space-y-3">
+      {paras.map((p, i) => {
+        const trimmed = p.trim();
+        
+        // Split on single line breaks to catch inline subheadings
+        const lines = trimmed.split("\n").filter(line => line.trim());
+        
+        return (
+          <div key={i} className="space-y-2">
+            {lines.map((line, lineIndex) => {
+              const cleanLine = line.trim();
+              
+              // Skip Executive Summary
+              if (cleanLine === "Executive Summary") {
+                return (
+                  <p key={lineIndex} className="leading-relaxed text-slate-700">
+                    {cleanLine}
+                  </p>
+                );
+              }
+              
+              // Detect subheadings (short lines that look like headers)
+              const isSubheading = (
+                cleanLine.length < 60 && // Not too long
+                cleanLine.length > 3 && // Not too short
+                /^[A-Z][a-zA-Z\s&:-]+$/.test(cleanLine) && // Starts with capital, contains letters/spaces/basic punctuation
+                !cleanLine.includes('.') && // No periods (usually not in headings)
+                !cleanLine.includes('http') && // Not a URL
+                !cleanLine.match(/\d{2,}/) // No long numbers
+              );
+              
+              if (isSubheading) {
+                return (
+                  <h6 key={lineIndex} className="font-bold text-slate-900 text-base mt-4 mb-2 first:mt-0">
+                    {cleanLine}
+                  </h6>
+                );
+              }
+              
+              return (
+                <p key={lineIndex} className="leading-relaxed text-slate-700">
+                  {cleanLine}
+                </p>
+              );
+            })}
+          </div>
+        );
+      })}
     </div>
   );
 }
