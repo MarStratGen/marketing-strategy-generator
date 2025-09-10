@@ -324,16 +324,56 @@ function OptimizedContent({ data }) {
   );
 }
 
-/* text splitter */
+/* Enhanced text formatter with proper subheading separation */
 function FormattedText({ text }) {
   const paras = text.split("\n\n").filter((p) => p.trim());
+  
   return (
-    <div className="space-y-2">
-      {paras.map((p, i) => (
-        <p key={i} className="leading-snug text-slate-700">
-          {p.trim()}
-        </p>
-      ))}
+    <div className="space-y-4">
+      {paras.map((p, i) => {
+        const content = p.trim();
+        
+        // Check if this paragraph starts with a likely subheading pattern
+        const subheadingMatch = content.match(/^([A-Z][a-zA-Z\s]+?)\s+([A-Z][a-z].*)/);
+        
+        if (subheadingMatch) {
+          const [, heading, body] = subheadingMatch;
+          // Common subheading words that should be treated as headers
+          const commonSubheadings = [
+            'Product', 'Price', 'Place', 'Promotion', 'People', 'Process', 'Physical Evidence',
+            'Primary', 'Secondary', 'Tertiary', 'Channel', 'Intent', 'Role', 'Persona',
+            'Overview', 'Strategy', 'Analysis', 'Insights', 'Opportunities', 'Framework',
+            'Allocation', 'Rationale', 'Month', 'Week', 'Pillar', 'Core', 'Key',
+            'Market', 'Customer', 'Competitive', 'Budget', 'Calendar', 'Timeline',
+            'Strengths', 'Weaknesses', 'Threats', 'Positioning', 'Messaging',
+            'Foundation', 'Execution', 'Implementation', 'Testing', 'Measurement'
+          ];
+          
+          const isLikelySubheading = commonSubheadings.some(sub => 
+            heading.toLowerCase().includes(sub.toLowerCase()) && heading.length <= 25
+          );
+          
+          if (isLikelySubheading) {
+            return (
+              <div key={i} className="space-y-2">
+                <h6 className="font-bold text-slate-900 text-lg border-l-4 border-blue-500 pl-3 py-1 bg-blue-50/50">
+                  {heading}
+                </h6>
+                <p className="leading-relaxed text-slate-700 ml-4">
+                  {body}
+                </p>
+              </div>
+            );
+          }
+        }
+        
+        // Regular paragraph - no subheading detected
+        return (
+          <p key={i} className="leading-relaxed text-slate-700">
+            {content}
+          </p>
+        );
+      })}
     </div>
   );
 }
