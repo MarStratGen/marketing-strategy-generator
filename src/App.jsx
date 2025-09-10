@@ -339,7 +339,7 @@ export default function App() {
               />
             )}
 
-            <p className="text-sm text-blue-200/90 mt-2 bg-white/5 backdrop-blur-sm p-3 rounded-lg border-l-4 border-blue-400/60">
+            <p className="text-sm text-slate-300 mt-2">
               💡 This determines your marketing funnel and KPIs - can be online or offline actions.
             </p>
           </Field>
@@ -359,7 +359,7 @@ export default function App() {
                 </option>
               ))}
             </select>
-            <p className="text-sm text-emerald-200/90 mt-2 bg-white/5 backdrop-blur-sm p-3 rounded-lg border-l-4 border-emerald-400/60">
+            <p className="text-sm text-slate-300 mt-2">
               💰 We'll provide percentage allocations rather than specific dollar amounts.
             </p>
           </Field>
@@ -386,19 +386,19 @@ export default function App() {
               className="w-full mt-1 mb-2 px-4 py-3 rounded-xl border border-white/20 bg-white/10 backdrop-blur-md text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-white/40 focus:border-white/30 transition-all duration-200 shadow-lg hover:shadow-xl hover:bg-white/15"
               placeholder="e.g., Amazon, Local garden center, Seeds4Life"
             />
-            <p className="text-xs text-gray-500 mt-1">
+            <p className="text-sm text-white/60 mt-1">
               Press comma or Enter to add. Up to 3 competitors.
             </p>
           </Field>
+              
               <button
-            disabled={loading}
-            className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white font-semibold py-4 px-6 rounded-xl transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            {loading ? <LoadingSpinner /> : "🚀 Generate Marketing Plan"}
+                disabled={loading}
+                className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white font-semibold py-4 px-6 rounded-xl transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {loading ? <LoadingSpinner /> : "🚀 Generate Marketing Plan"}
               </button>
             </form>
           </div>
-        </div>
 
           {/* Report */}
           <Report plan={result} loading={loading} />
