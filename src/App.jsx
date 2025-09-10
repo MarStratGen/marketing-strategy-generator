@@ -244,12 +244,11 @@ function App() {
     <div>
       {/* Hero Section with Gradient and Background Image */}
       <div 
-        className="min-h-screen bg-gradient-to-br from-blue-600 via-purple-600 to-pink-600 relative"
+        className="min-h-screen bg-gradient-to-br from-blue-600 via-purple-600 to-pink-600"
         style={{
           backgroundImage: `linear-gradient(to bottom right, rgba(37, 99, 235, 0.85), rgba(147, 51, 234, 0.85), rgba(219, 39, 119, 0.85)), url('/attached_assets/birmingham-museums-trust-YvNiIyGdMfs-unsplash_1757466351093.jpg')`,
           backgroundSize: 'cover',
-          backgroundPosition: 'center',
-          backgroundAttachment: 'fixed'
+          backgroundPosition: 'center'
         }}
       >
         <div className="py-16 px-4">
