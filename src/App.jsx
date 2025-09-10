@@ -263,7 +263,7 @@ function App() {
           {/* Header - Outside Form */}
           <div className="text-center mb-16">
             <h1 className="text-5xl font-bold text-white mb-6 tracking-tight">
-              Marketing Strategy Generator
+              Marketing Strategy Generator*
             </h1>
             <p className="text-xl text-white/90 max-w-3xl mx-auto leading-relaxed">
               Create comprehensive go-to-market strategies with AI-powered insights
@@ -508,10 +508,7 @@ function App() {
       <footer className="bg-gray-800 py-8">
         <div className="max-w-2xl mx-auto px-4 text-center">
           <p className="text-xs text-gray-400 leading-relaxed">
-            [Disclaimer text will be added here - please provide the copy you'd like to include]
-          </p>
-          <p className="text-xs text-gray-500 mt-4">
-            © 2024 Marketing Plan Generator. All rights reserved.
+            *[Disclaimer text will be added here - please provide the copy you'd like to include]
           </p>
         </div>
       </footer>
