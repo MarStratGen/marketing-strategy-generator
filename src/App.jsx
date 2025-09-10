@@ -218,8 +218,24 @@ export default function App() {
         throw new Error(`API returned ${r.status}: ${errorText}`);
       }
 
-      const data = await r.json();
-      console.log("Response data:", data);
+      // Get response text first to check if it's empty
+      const responseText = await r.text();
+      console.log("Raw response text:", responseText);
+      
+      if (!responseText || responseText.trim() === '') {
+        throw new Error("Cloudflare Worker returned empty response. Please check the Worker configuration and ensure it has an OpenAI API key.");
+      }
+
+      let data;
+      try {
+        data = JSON.parse(responseText);
+      } catch (parseError) {
+        console.error("JSON Parse Error:", parseError);
+        console.error("Response text that failed to parse:", responseText);
+        throw new Error(`Worker returned invalid JSON: ${responseText.substring(0, 100)}...`);
+      }
+      
+      console.log("Parsed response data:", data);
       
       // Check if the response contains actual marketing strategy data
       if (!data || Object.keys(data).length === 0) {
