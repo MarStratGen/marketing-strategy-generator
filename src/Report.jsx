@@ -50,7 +50,7 @@ export default function Report({ plan, loading }) {
         <h2 className="text-4xl font-bold text-slate-900 mb-4 tracking-tight">
           Your Marketing Strategy
         </h2>
-        <p className="text-xl text-slate-700 max-w-3xl mx-auto leading-relaxed font-medium">
+        <p className="text-xl text-slate-900 max-w-3xl mx-auto leading-relaxed font-medium">
           A comprehensive plan organised into actionable sections for immediate implementation
         </p>
       </div>
@@ -261,35 +261,39 @@ function ContentCard({ title, data, color }) {
   );
 }
 
-/* Recursive content renderer (IMPROVED CLUSTERING) */
+/* Clean content renderer (UX EXPERT REDESIGN) */
 function OptimizedContent({ data }) {
   if (!data) return <p className="text-slate-500 italic">No data available</p>;
 
   if (Array.isArray(data)) {
     return (
-      <ul className="space-y-1 list-disc list-inside ml-2">
+      <div className="space-y-2">
         {data.map((item, i) => (
-          <li key={i} className="text-slate-700 leading-tight pl-1">
-            {typeof item === "object" ? (
-              <OptimizedContent data={item} />
-            ) : (
-              <FormattedText text={String(item)} />
-            )}
-          </li>
+          <div key={i} className="flex items-start gap-3">
+            <span className="text-blue-600 mt-1 text-sm font-bold">•</span>
+            <div className="flex-1 text-slate-700 leading-relaxed">
+              {typeof item === "object" ? (
+                <OptimizedContent data={item} />
+              ) : (
+                <FormattedText text={String(item)} />
+              )}
+            </div>
+          </div>
         ))}
-      </ul>
+      </div>
     );
   }
 
   if (typeof data === "object") {
     return (
-      <div className="space-y-3">
+      <div className="space-y-6">
         {Object.entries(data).map(([k, v]) => (
-          <div key={k} className="border-l-2 border-slate-300 pl-3 py-1">
-            <h5 className="font-bold text-slate-900 mb-1 text-base tracking-tight">
+          <div key={k} className="bg-slate-50 rounded-lg p-4">
+            <h5 className="font-bold text-slate-900 mb-3 text-base tracking-tight flex items-center gap-2">
+              <span className="w-2 h-2 bg-blue-600 rounded-full"></span>
               {formatSubheading(k)}
             </h5>
-            <div className="ml-1 text-slate-700">
+            <div className="ml-4 text-slate-700">
               <OptimizedContent data={v} />
             </div>
           </div>
