@@ -394,16 +394,51 @@ function OptimizedContent({ data }) {
   );
 }
 
-/* text splitter */
+/* enhanced text splitter with subheading detection */
 function FormattedText({ text }) {
   const paras = text.split("\n\n").filter((p) => p.trim());
+  
   return (
-    <div className="space-y-2">
-      {paras.map((p, i) => (
-        <p key={i} className="leading-snug text-slate-700">
-          {p.trim()}
-        </p>
-      ))}
+    <div className="space-y-4">
+      {paras.map((p, i) => {
+        const trimmed = p.trim();
+        
+        // Detect subheadings - common marketing section patterns
+        const subheadingPatterns = [
+          /^(Product|Price|Place|Promotion|People|Process|Physical Evidence|Physical Environment)$/i,
+          /^(Market Overview|Customer Behaviour|Market Opportunities|Key Market Trends)$/i,
+          /^(Executive Summary|Strategic Overview|Implementation Plan)$/i,
+          /^(Primary [A-Za-z\s]+|Secondary [A-Za-z\s]+|Tertiary [A-Za-z\s]+)$/i,
+          /^(Week \d+|Month \d+|Quarter \d+|Phase \d+)$/i,
+          /^(High-Risk|Medium-Risk|Low-Risk|Primary KPIs|Secondary KPIs)$/i,
+          /^(Core Strategy|Positioning|Messaging Framework|Brand Strategy)$/i,
+          /^(Target Audience|Customer Segments|Market Positioning)$/i,
+          /^(Budget Allocation|Resource Planning|Timeline|Implementation)$/i,
+          /^(Why this matters|How to execute|Key Benefits|Success Metrics)$/i
+        ];
+        
+        const isSubheading = subheadingPatterns.some(pattern => pattern.test(trimmed)) ||
+                           (trimmed.length < 50 && trimmed.endsWith(':')) ||
+                           (/^[A-Z][a-z\s]+$/.test(trimmed) && trimmed.length < 30);
+        
+        if (isSubheading) {
+          return (
+            <div key={i} className="mt-6 mb-3 first:mt-0">
+              <div className="bg-blue-50 border-l-4 border-blue-400 px-4 py-3 rounded-r-lg">
+                <h6 className="font-semibold text-blue-900 text-base tracking-wide">
+                  {trimmed.replace(/:$/, '')}
+                </h6>
+              </div>
+            </div>
+          );
+        }
+        
+        return (
+          <p key={i} className="leading-relaxed text-slate-700 text-base">
+            {trimmed}
+          </p>
+        );
+      })}
     </div>
   );
 }
