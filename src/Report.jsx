@@ -423,7 +423,7 @@ function FormattedText({ text }) {
   const paras = text.split("\n\n").filter((p) => p.trim());
   
   return (
-    <div className="space-y-2">
+    <div className="space-y-1">
       {paras.map((p, i) => {
         const trimmed = p.trim();
         
