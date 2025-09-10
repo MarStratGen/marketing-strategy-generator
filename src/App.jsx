@@ -3,18 +3,35 @@ import Report from "./Report.jsx";
 
 /* tiny UI helpers */
 const Pill = ({ text, onRemove }) => (
-  <span className="inline-flex items-center bg-blue-100 text-blue-800 text-xs px-2 py-0.5 rounded mr-1 mb-1">
+  <span className="inline-flex items-center bg-blue-100 hover:bg-blue-200 text-blue-800 text-xs px-2 py-0.5 rounded mr-1 mb-1 transition-colors">
     {text}
-    <button onClick={onRemove} className="ml-1">
+    <button 
+      onClick={onRemove} 
+      className="ml-1 hover:text-blue-900 hover:bg-blue-300 rounded px-1 transition-colors"
+      title="Remove"
+    >
       ×
     </button>
   </span>
 );
 
-const Field = ({ label, children }) => (
+const Field = ({ label, children, tooltip, required }) => (
   <div className="space-y-1">
-    <label className="block text-sm font-medium text-gray-700">{label}</label>
+    <label className="block text-sm font-medium text-gray-700">
+      {label}
+      {required && <span className="text-red-500 ml-1">*</span>}
+      {tooltip && (
+        <span className="ml-1 text-gray-400 cursor-help" title={tooltip}>ℹ️</span>
+      )}
+    </label>
     {children}
+  </div>
+);
+
+const LoadingSpinner = () => (
+  <div className="inline-flex items-center">
+    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+    Generating your strategic marketing plan...
   </div>
 );
 
@@ -191,7 +208,11 @@ export default function App() {
 
         <form onSubmit={handleSubmit} className="space-y-4">
           {/* Country */}
-          <Field label="Country">
+          <Field 
+            label="Country" 
+            required 
+            tooltip="Select your primary market country"
+          >
             <select
               value={country}
               onChange={(e) => setCountry(e.target.value)}
@@ -215,7 +236,10 @@ export default function App() {
           </Field>
 
           {/* Sector */}
-          <Field label="Sector (optional)">
+          <Field 
+            label="Industry sector" 
+            tooltip="Choose the industry that best describes your business"
+          >
             <select
               value={sector}
               onChange={(e) => setSector(e.target.value)}
@@ -242,17 +266,25 @@ export default function App() {
           </Field>
 
           {/* Offering */}
-          <Field label="Offering (product or service)">
+          <Field 
+            label="Product or service" 
+            required 
+            tooltip="Describe what you're selling - be specific and clear"
+          >
             <input
               value={product}
               onChange={(e) => setProduct(e.target.value)}
-              className="w-full mt-1 mb-2 px-4 py-2 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-400"
+              className="w-full mt-1 mb-2 px-4 py-2 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:border-transparent"
+              placeholder="e.g., Organic vegetable seeds, SaaS project management tool"
               required
             />
           </Field>
 
           {/* Target segment(s) */}
-          <Field label="Target segment(s)">
+          <Field 
+            label="Target customer segments" 
+            tooltip="Describe specific groups of customers (e.g., 'Working parents aged 30-45')"
+          >
             <div className="mb-1">
               {segments.map((s, i) => (
                 <Pill
@@ -348,9 +380,9 @@ export default function App() {
 
           <button
             disabled={loading}
-            className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2 rounded-md transition-colors"
+            className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-medium py-3 px-6 rounded-md transition-all transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none shadow-lg"
           >
-            {loading ? "Thinking…" : "Generate Plan"}
+            {loading ? <LoadingSpinner /> : "🚀 Generate Marketing Plan"}
           </button>
         </form>
       </div>
