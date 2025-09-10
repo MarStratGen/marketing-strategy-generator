@@ -477,28 +477,20 @@ function App() {
           </h2>
           <div className="space-y-4">
             <FAQItemDark 
-              question="How does the marketing plan generator work?"
-              answer="The AI analyzes your business inputs and creates comprehensive marketing strategies tailored to your specific industry, target market, and budget constraints."
+              question="How does the Marketing Strategy Generator work?"
+              answer="You answer a short form. This page turns your inputs into a clear brief and sends it to the OpenAI API to draft a plan. The draft is mapped to classic frameworks like STP and the 7 Ps, with budgets shown as percentages and a 90-day calendar, KPIs, and experiments."
             />
             <FAQItemDark 
-              question="How accurate are the marketing recommendations?"
-              answer="The recommendations are based on proven marketing frameworks and industry best practices, customized to your specific business context and market conditions."
+              question="Who is the Marketing Strategy Generator for?"
+              answer="Founders, small teams, and marketers who want a structured plan they can act on. It works for product and service businesses, online and offline, B2C and B2B. Treat it as guidance, not professional advice. AI can draft quickly, but a real marketer will still make better calls where context, trade offs, and judgement matter."
             />
             <FAQItemDark 
-              question="Can I use this for any type of business?"
-              answer="Yes, this generator works for businesses across all industries, from startups to established companies, both B2B and B2C markets."
-            />
-            <FAQItemDark 
-              question="What's included in the marketing plan?"
-              answer="Each plan includes STP analysis, marketing mix (7 Ps), budget allocation, tactical calendar, KPIs, and strategic recommendations."
-            />
-            <FAQItemDark 
-              question="How long does it take to generate a plan?"
-              answer="Most plans are generated within 30-60 seconds, depending on the complexity of your requirements and current system load."
+              question="Is this enough on its own?"
+              answer="Use it as version one. Validate the ideas with customers, run small tests, measure results, and iterate. When stakes are high, ask a real marketer to sanity check the plan and tailor it to your budget, brand, and operations."
             />
             <FAQItemDark 
               question="Is my business information kept private?"
-              answer="Yes, your privacy is prioritized. Your business information is used only to generate your marketing plan and is not stored or shared."
+              answer="This page keeps data use minimal. Plan inputs are processed in memory to generate your draft and are not stored by this page after the response is returned. Inputs are sent to the OpenAI API solely to create the draft and may be briefly retained by that provider for security or operations. This page does not run analytics or set cookies. Please do not submit sensitive or personal information."
             />
           </div>
         </div>
