@@ -508,7 +508,7 @@ function App() {
       <footer className="bg-gray-800 py-8">
         <div className="max-w-2xl mx-auto px-4 text-center">
           <p className="text-xs text-gray-400 leading-relaxed">
-            *[Disclaimer text will be added here - please provide the copy you'd like to include]
+            *This page provides general information only. It is not legal, financial, tax, or professional advice. Outputs may contain errors or omissions. Review them and apply your own judgement before acting. Results are not guaranteed. This page is provided "as is" and "as available". To the maximum extent permitted by applicable law, liability for any loss or damage arising from use of this page is excluded. Nothing here excludes liability that cannot be excluded by law.
           </p>
         </div>
       </footer>
