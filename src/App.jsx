@@ -364,9 +364,8 @@ export default function App() {
               />
             )}
 
-            <p className="text-xs text-gray-500">
-              Pick one. This sets the funnel and KPIs. It can be online or
-              offline.
+            <p className="text-sm text-gray-500 mt-2 bg-blue-50/50 p-3 rounded-lg border-l-4 border-blue-400">
+              💡 This determines your marketing funnel and KPIs - can be online or offline actions.
             </p>
           </Field>
                 </div>
@@ -395,8 +394,8 @@ export default function App() {
                 </option>
               ))}
             </select>
-            <p className="text-xs text-gray-500">
-              We will allocate percentages only and avoid currency amounts.
+            <p className="text-sm text-gray-500 mt-2 bg-green-50/50 p-3 rounded-lg border-l-4 border-green-400">
+              💰 We'll provide percentage allocations rather than specific dollar amounts.
             </p>
           </Field>
 
