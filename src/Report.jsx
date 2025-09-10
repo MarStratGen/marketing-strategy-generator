@@ -269,8 +269,8 @@ function OptimizedContent({ data }) {
     return (
       <ul className="space-y-8 list-none">
         {data.map((item, i) => (
-          <li key={i} className="flex items-start gap-3 text-slate-700 leading-relaxed">
-            <span className="text-blue-600 font-bold mt-0.5">•</span>
+          <li key={i} className="flex items-baseline gap-3 text-slate-700 leading-relaxed">
+            <span className="text-blue-600 font-bold">•</span>
             <div className="flex-1">
               {typeof item === "object" ? (
                 <OptimizedContent data={item} />
