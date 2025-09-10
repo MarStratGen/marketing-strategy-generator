@@ -271,7 +271,7 @@ function App() {
           </div>
 
           {/* Form Container - Clean White */}
-          <div className="bg-white rounded-3xl shadow-xl p-10 max-w-lg mx-auto border border-gray-100 mb-20">
+          <div className="bg-white rounded-3xl shadow-xl p-12 max-w-3xl mx-auto border border-gray-100 mb-20">
 
             {error && (
               <div className="bg-red-50 border border-red-200 text-red-800 px-4 py-3 rounded-lg mb-6">
@@ -279,7 +279,7 @@ function App() {
               </div>
             )}
 
-            <form onSubmit={handleSubmit} className="space-y-7">
+            <form onSubmit={handleSubmit} className="space-y-7 max-w-lg mx-auto">
           <Field 
             label="Which country are you targeting?" 
             required 
