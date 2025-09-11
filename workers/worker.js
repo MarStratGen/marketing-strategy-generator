@@ -379,10 +379,12 @@ export default {
         return report;
       }
 
-      // Take first 3 channels from playbook (already have budget_percent values)
-      const channels = report.channel_playbook.slice(0, 3);
+      // Take first 5 channels from playbook (already have budget_percent values)
+      const channels = report.channel_playbook.slice(0, 5);
       
-      if (channels.length >= 3) {
+      if (channels.length >= 5) {
+        const budgetText = `Primary Allocation\n${channels[0].channel}: ${channels[0].budget_percent}% to ${channels[0].role.toLowerCase()}.\n\nSecondary Allocation\n${channels[1].channel}: ${channels[1].budget_percent}% to ${channels[1].role.toLowerCase()}.\n\nSupporting Channels\n${channels[2].channel}: ${channels[2].budget_percent}% to ${channels[2].role.toLowerCase()}.\n${channels[3].channel}: ${channels[3].budget_percent}% to ${channels[3].role.toLowerCase()}.\n${channels[4].channel}: ${channels[4].budget_percent}% to ${channels[4].role.toLowerCase()}.\n\nAllocation Rationale\nPrioritise the primary channel to capture high-intent demand whilst supporting with secondary channels and comprehensive supporting channels for complete market coverage through integrated multi-channel approach.`;
+      } else if (channels.length >= 3) {
         const budgetText = `Primary Allocation\n${channels[0].channel}: ${channels[0].budget_percent}% to ${channels[0].role.toLowerCase()}.\n\nSecondary Allocation\n${channels[1].channel}: ${channels[1].budget_percent}% to ${channels[1].role.toLowerCase()}.\n\nSupporting Allocation\n${channels[2].channel}: ${channels[2].budget_percent}% to ${channels[2].role.toLowerCase()}.\n\nAllocation Rationale\nPrioritise the primary channel to capture high-intent demand whilst supporting with secondary and tertiary channels for comprehensive market coverage through integrated channel approach.`;
         
         if (!report.budget) report.budget = {};
@@ -488,7 +490,7 @@ REQUIRED JSON STRUCTURE WITH EXACT FIELD NAMES:
       "summary": "Implement [channel strategy] to capture [audience type]. Launch [specific approach] targeting [segment] whilst optimising for [outcome]. Execute [tactics] to achieve [performance goals].",
       "key_actions": ["Launch specific campaign type", "Implement targeting strategy", "Execute optimisation protocol", "Deploy measurement system"],
       "success_metric": "Track [specific metric] to measure [outcome]",
-      "budget_percent": 45,
+      "budget_percent": 35,
       "why_it_works": "This channel performs effectively because [market dynamics]. Implement this approach to leverage [competitive advantage] whilst capturing [opportunity]."
     },
     {
@@ -498,18 +500,38 @@ REQUIRED JSON STRUCTURE WITH EXACT FIELD NAMES:
       "summary": "Deploy [channel approach] to engage [audience]. Execute [strategy] through [methods] whilst monitoring [performance indicators]. Launch [initiatives] to drive [outcomes].",
       "key_actions": ["Execute specific tactic", "Launch engagement strategy", "Implement measurement system"],
       "success_metric": "Monitor [key metric] for [results]",
-      "budget_percent": 30,
+      "budget_percent": 25,
       "why_it_works": "Execute this channel strategy to capitalise on [market conditions]. Implement [approach] to achieve [competitive positioning]."
     },
     {
-      "channel": "Tertiary Channel Name",
+      "channel": "Third Channel Name",
       "intent": "High|Mid|Low", 
       "role": "Channel function",
       "summary": "Launch [supporting strategy] to complement primary channels. Implement [tactics] targeting [specific segment] whilst tracking [performance]. Execute [approach] to enhance [overall strategy].",
       "key_actions": ["Deploy supporting campaign", "Execute measurement protocol"],
       "success_metric": "Track [supporting metric] for [contribution]", 
-      "budget_percent": 25,
+      "budget_percent": 20,
       "why_it_works": "Deploy this supporting channel to enhance [strategic objective]. Execute [tactics] to maximise [channel synergy]."
+    },
+    {
+      "channel": "Fourth Channel Name",
+      "intent": "High|Mid|Low",
+      "role": "Channel function",
+      "summary": "Execute [supplementary strategy] to support core marketing efforts. Deploy [tactics] for [target audience] whilst maintaining [approach]. Implement [methods] to strengthen [overall positioning].",
+      "key_actions": ["Launch supplementary campaign", "Execute support tactics"],
+      "success_metric": "Monitor [supplementary metric] for [additional results]",
+      "budget_percent": 15,
+      "why_it_works": "Implement this channel to create [strategic benefit]. Execute [approach] to complement [primary strategy] and achieve [comprehensive coverage]."
+    },
+    {
+      "channel": "Fifth Channel Name",
+      "intent": "High|Mid|Low",
+      "role": "Channel function",
+      "summary": "Deploy [supporting approach] to enhance market presence. Execute [tactical methods] targeting [niche segment] whilst tracking [specific outcomes]. Launch [initiatives] to complete [comprehensive strategy].",
+      "key_actions": ["Execute niche targeting", "Deploy measurement tracking"],
+      "success_metric": "Track [niche metric] for [strategic contribution]",
+      "budget_percent": 5,
+      "why_it_works": "Execute this channel to achieve [comprehensive market coverage]. Deploy [tactics] to maximise [overall strategic impact] and ensure [complete audience reach]."
     }
   ],
   
