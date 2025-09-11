@@ -7,25 +7,25 @@ const EXAMPLES = [
 `Market Foundation
 
 Market Overview
-The Australian seed market demonstrates diversity across segments, with offerings catering to gardening enthusiasts and agricultural professionals. Industry analysis reveals established distribution networks and seasonal demand patterns.
+The Australian seed market demonstrates diversity across segments, with offerings catering to gardening enthusiasts and agricultural professionals. Industry analysis reveals established distribution networks through both traditional garden centres and emerging digital platforms.
 
 Customer Behaviour Insights
-Research indicates peak demand occurs during spring planting season (September-November). Customer analysis shows buyers typically spend 2-3 weeks researching before purchase. Behavioural data demonstrates quality-focused decision making dominates, with 78% prioritising germination rates over price considerations.
+Research indicates peak demand occurs during spring planting season (September-November). Customer analysis shows buyers typically spend 2-3 weeks researching before purchase, consulting both online resources and local experts. Behavioural data demonstrates quality-focused decision making dominates, with 78% prioritising germination rates over price considerations.
 
 Competitor Analysis
-Market analysis reveals SeedCo maintains strong brand recognition through extensive product range and established retail partnerships. The competitive landscape shows vulnerabilities in higher price points and limited digital presence.
+Market analysis reveals SeedCo maintains strong brand recognition through extensive product range and established retail partnerships. The competitive landscape shows vulnerabilities in higher price points and limited digital presence, whilst traditional channels remain strong.
 `,
 
 `Budget Allocation
 
 Primary Allocation
-Allocate 45% to search adverts to capture high-intent traffic for immediate conversions. Assign 30% to paid social to build awareness and drive consideration across demographics.
+Allocate 35% to search advertising to capture high-intent digital traffic. Assign 25% to local print advertising targeting gardening publications and community newspapers for credibility building.
 
 Secondary Allocation  
-Direct 15% to content marketing for educational content nurturing and retention. Reserve 10% for email marketing to manage customer lifecycle and repeat purchases.
+Direct 20% to radio sponsorships during gardening programmes to reach traditional audiences. Reserve 10% for trade show participation to demonstrate products. Assign remaining 10% to email marketing for customer retention.
 
 Allocation Rationale
-Prioritise search investment to capture bottom-funnel demand when customers are ready to convert. Allocate social spend to build top-funnel awareness for market expansion. Establish content authority to support organic discovery whilst maximising customer lifetime value through retention campaigns.`
+Balance digital and traditional channels to reach diverse customer segments. Prioritise search investment for immediate conversion capture whilst maintaining strong traditional media presence for authority building. Local print and radio provide credibility with established gardening community, whilst trade shows enable product demonstration and relationship building.`
 ];
 
 export default {
@@ -50,56 +50,94 @@ export default {
     /* ─── lookup helpers ─── */
     const channelByMotion = {
       ecom_checkout: [
-        { channel: "Search", intent: "High", role: "Capture" },
-        { channel: "Paid social", intent: "Mid", role: "Spark demand" }
+        { channel: "Search advertising", intent: "High", role: "Capture" },
+        { channel: "Paid social media", intent: "Mid", role: "Spark demand" },
+        { channel: "Email marketing", intent: "Mid", role: "Nurture" },
+        { channel: "Influencer partnerships", intent: "Mid", role: "Social proof" }
       ],
       saas_checkout: [
-        { channel: "Search", intent: "High", role: "Capture" },
-        { channel: "Paid social", intent: "Mid", role: "Scale" }
+        { channel: "Search advertising", intent: "High", role: "Capture" },
+        { channel: "Content marketing", intent: "Mid", role: "Educate" },
+        { channel: "LinkedIn advertising", intent: "Mid", role: "Target professionals" },
+        { channel: "Webinars and demos", intent: "High", role: "Convert" }
       ],
       marketplace_checkout: [
-        { channel: "Marketplace adverts", intent: "High", role: "Capture" },
-        { channel: "Search", intent: "Mid", role: "Assist" }
+        { channel: "Marketplace advertising", intent: "High", role: "Capture" },
+        { channel: "Search advertising", intent: "Mid", role: "Assist" },
+        { channel: "Product review platforms", intent: "Mid", role: "Build trust" }
       ],
       store_visit: [
-        { channel: "Local search", intent: "High", role: "Drive visits" },
-        { channel: "Maps/GBP", intent: "High", role: "Presence" }
+        { channel: "Local search advertising", intent: "High", role: "Drive visits" },
+        { channel: "Radio advertising", intent: "Mid", role: "Build awareness" },
+        { channel: "Local print advertising", intent: "Mid", role: "Community presence" },
+        { channel: "Outdoor advertising", intent: "Low", role: "Brand visibility" },
+        { channel: "Direct mail campaigns", intent: "Mid", role: "Target locals" }
       ],
       call_now: [
-        { channel: "Call-extensions search", intent: "High", role: "Click to call" },
-        { channel: "Local search", intent: "High", role: "Capture" }
+        { channel: "Search with call extensions", intent: "High", role: "Click to call" },
+        { channel: "Radio sponsorships", intent: "Mid", role: "Audio presence" },
+        { channel: "Local directory listings", intent: "High", role: "Capture searches" },
+        { channel: "Yellow Pages advertising", intent: "Mid", role: "Traditional search" }
       ],
       lead_capture: [
-        { channel: "Search", intent: "High", role: "Capture" },
-        { channel: "Retargeting", intent: "Mid", role: "Nudge" }
+        { channel: "Search advertising", intent: "High", role: "Capture" },
+        { channel: "LinkedIn advertising", intent: "Mid", role: "B2B targeting" },
+        { channel: "Trade publications", intent: "Mid", role: "Industry reach" },
+        { channel: "Trade shows and exhibitions", intent: "High", role: "Face-to-face" },
+        { channel: "Direct mail campaigns", intent: "Mid", role: "Targeted outreach" },
+        { channel: "Telemarketing", intent: "High", role: "Direct contact" }
       ],
       booking: [
-        { channel: "Search", intent: "High", role: "Capture" },
-        { channel: "Local social", intent: "Mid", role: "Presence" }
+        { channel: "Search advertising", intent: "High", role: "Capture" },
+        { channel: "Local social media", intent: "Mid", role: "Community presence" },
+        { channel: "Local print advertising", intent: "Mid", role: "Traditional reach" },
+        { channel: "Radio advertising", intent: "Mid", role: "Drive bookings" },
+        { channel: "Referral programmes", intent: "High", role: "Word of mouth" }
       ],
       saas_trial: [
-        { channel: "Search", intent: "High", role: "Capture" },
-        { channel: "Content/SEO", intent: "Mid", role: "Educate" }
+        { channel: "Search advertising", intent: "High", role: "Capture" },
+        { channel: "Content marketing", intent: "Mid", role: "Educate" },
+        { channel: "Industry publications", intent: "Mid", role: "Authority building" },
+        { channel: "Professional networking", intent: "Mid", role: "Personal connections" },
+        { channel: "Webinars and events", intent: "Mid", role: "Demonstrate value" }
       ],
       saas_demo: [
-        { channel: "Search", intent: "High", role: "Capture" },
-        { channel: "LinkedIn", intent: "Mid", role: "Target accounts" }
+        { channel: "Search advertising", intent: "High", role: "Capture" },
+        { channel: "LinkedIn advertising", intent: "Mid", role: "Target accounts" },
+        { channel: "Trade shows", intent: "High", role: "Demo platform" },
+        { channel: "Industry conferences", intent: "Mid", role: "Thought leadership" },
+        { channel: "Direct sales outreach", intent: "High", role: "Personal contact" }
       ],
       app_install: [
-        { channel: "App store adverts", intent: "High", role: "Convert" },
-        { channel: "Paid social", intent: "Mid", role: "Scale" }
+        { channel: "App store advertising", intent: "High", role: "Convert" },
+        { channel: "Social media advertising", intent: "Mid", role: "Scale awareness" },
+        { channel: "Influencer marketing", intent: "Mid", role: "Social validation" },
+        { channel: "Television advertising", intent: "Low", role: "Mass awareness" },
+        { channel: "Podcast sponsorships", intent: "Mid", role: "Audio engagement" }
       ],
       donation: [
-        { channel: "Search", intent: "High", role: "Capture intent" },
-        { channel: "Email", intent: "Mid", role: "Appeal" }
+        { channel: "Search advertising", intent: "High", role: "Capture intent" },
+        { channel: "Direct mail appeals", intent: "Mid", role: "Personal touch" },
+        { channel: "Community events", intent: "Mid", role: "Local engagement" },
+        { channel: "Radio sponsorships", intent: "Mid", role: "Cause awareness" },
+        { channel: "Print advertising", intent: "Mid", role: "Credibility building" },
+        { channel: "Telemarketing campaigns", intent: "High", role: "Direct appeal" }
       ],
       wholesale_inquiry: [
-        { channel: "Search", intent: "High", role: "Capture B2B" },
-        { channel: "LinkedIn", intent: "Mid", role: "Prospect" }
+        { channel: "Search advertising", intent: "High", role: "Capture B2B" },
+        { channel: "LinkedIn advertising", intent: "Mid", role: "Prospect" },
+        { channel: "Trade publications", intent: "Mid", role: "Industry authority" },
+        { channel: "Trade shows", intent: "High", role: "Relationship building" },
+        { channel: "Direct sales outreach", intent: "High", role: "Personal contact" },
+        { channel: "Industry directories", intent: "Mid", role: "Visibility" }
       ],
       partner_recruitment: [
-        { channel: "Search", intent: "High", role: "Capture partners" },
-        { channel: "Partnership outreach", intent: "Mid", role: "Recruit" }
+        { channel: "Search advertising", intent: "High", role: "Capture partners" },
+        { channel: "LinkedIn outreach", intent: "Mid", role: "Recruit" },
+        { channel: "Industry publications", intent: "Mid", role: "Authority" },
+        { channel: "Trade associations", intent: "Mid", role: "Network access" },
+        { channel: "Partner events", intent: "High", role: "Relationship building" },
+        { channel: "Direct recruitment campaigns", intent: "High", role: "Targeted outreach" }
       ]
     };
 
@@ -216,6 +254,12 @@ CRITICAL FORMATTING REQUIREMENTS:
 - Write in clean, readable paragraphs with proper line breaks
 - NO asterisks, NO bullet symbols, NO markdown formatting anywhere
 - Well-structured, professional British business report format
+
+INTEGRATED MARKETING APPROACH:
+- Recommend BOTH digital AND traditional marketing channels based on business type and target market
+- Consider local market context, customer demographics, and sector norms when selecting channels
+- Include traditional channels: print advertising, radio, television, direct mail, outdoor advertising, trade shows, telemarketing, community events, referral programmes, trade publications, networking events
+- Balance digital efficiency with traditional credibility and local market presence
 
 COMPETITOR ANALYSIS REQUIREMENT:
 ${competitorAnalysisInstructions}
@@ -350,7 +394,7 @@ Return valid JSON only with the exact field structure, clean formatting, and Bri
           response_format: { type: "json_object" },
           messages: [
             { role: "system",
-              content: "You are Mark Ritson meets Philip Kotler - the world's leading marketing strategist. Write comprehensive, actionable marketing strategies EXCLUSIVELY in British English with UK spelling and terminology. Use clean, professional business report format with NO markdown formatting, NO asterisks, NO bullet symbols. Always prominently feature any named competitors provided. Use percentage allocations only for budgets - no currency symbols. Create rich, detailed channel playbook content with comprehensive tactical details. MANDATORY: Use British spellings - adverts not ads, organisations not organizations, realise not realize, optimise not optimize, analyse not analyze, behaviour not behavior, colour not color, centre not center. Follow section-specific language styles: analytical sections use descriptive language, strategic sections use business recommendations, tactical sections use action directives, planning sections use strategic recommendations." },
+              content: "You are Mark Ritson meets Philip Kotler - the world's leading marketing strategist. Write comprehensive, actionable marketing strategies EXCLUSIVELY in British English with UK spelling and terminology. Use clean, professional business report format with NO markdown formatting, NO asterisks, NO bullet symbols. Always prominently feature any named competitors provided. Use percentage allocations only for budgets - no currency symbols. Create rich, detailed channel playbook content with comprehensive tactical details. CRITICAL: Recommend integrated marketing approaches combining BOTH digital AND traditional channels based on business type, target market, and local context. Consider print advertising, radio, television, direct mail, outdoor advertising, trade shows, telemarketing, local community engagement, and other traditional tactics alongside digital channels. MANDATORY: Use British spellings - adverts not ads, organisations not organizations, realise not realize, optimise not optimize, analyse not analyze, behaviour not behavior, colour not color, centre not center. Follow section-specific language styles: analytical sections use descriptive language, strategic sections use business recommendations, tactical sections use action directives, planning sections use strategic recommendations." },
             ...EXAMPLES.map(t => ({ role: "assistant", content: t })),
             { role: "user", content: prompt }
           ]
