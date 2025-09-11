@@ -265,6 +265,14 @@ function ContentCard({ title, data, color }) {
       "border-indigo-100 bg-gradient-to-br from-indigo-50 to-indigo-100/50",
   };
 
+  // NORMALIZE Channel Playbook data
+  if (title === "Channel Playbook" && data && typeof data === "object" && !Array.isArray(data)) {
+    data = Object.entries(data).map(([channelName, channelData]) => ({
+      channel: channelName,
+      ...channelData
+    }));
+  }
+
   return (
     <div className={`border-2 ${colours[color]} rounded-xl p-6 shadow-sm`}>
       <h4 className="text-xl font-bold text-slate-900 mb-5 tracking-tight">
@@ -328,22 +336,28 @@ function OptimizedContent({ data }) {
   }
 
   if (typeof data === "object") {
+    
     /* ----------------------------------------------------------
-       SPECIAL RENDERER for individual channel objects
+       SPECIAL RENDERER for channel objects (now works with normalized data)
        ---------------------------------------------------------- */
     if (
       !Array.isArray(data) &&
       data &&
       typeof data === "object" &&
-      data.channel &&
       (data.intent || data.purchase_intent) &&
       (data.role || data.funnel_job)
     ) {
+      const channelName = data.channel || data.name || data.channel_name;
+      const intent = data.intent || data.purchase_intent;
+      const role = data.role || data.funnel_job;
+      
       return (
         <div>
-          <h6 className="font-bold text-slate-900 text-base" style={{marginTop: '0px', marginBottom: '0px'}}>
-            {data.channel}
-          </h6>
+          {channelName && (
+            <h6 className="font-bold text-slate-900 text-base" style={{marginTop: '0px', marginBottom: '0px'}}>
+              {channelName}
+            </h6>
+          )}
 
           {data.summary && (
             <p className="text-slate-700 leading-relaxed" style={{marginTop: '12px', marginBottom: '12px'}}>{data.summary}</p>
@@ -353,8 +367,8 @@ function OptimizedContent({ data }) {
             <p className="text-slate-700 leading-relaxed" style={{marginTop: '0px', marginBottom: '12px'}}>{data.why_it_works}</p>
           )}
 
-          <p className="text-slate-700" style={{marginTop: '0px', marginBottom: '4px'}}>Purchase intent level: {data.intent}</p>
-          <p className="text-slate-700" style={{marginTop: '0px', marginBottom: '4px'}}>Funnel job: {data.role}</p>
+          <p className="text-slate-700" style={{marginTop: '0px', marginBottom: '4px'}}>Purchase intent level: {intent}</p>
+          <p className="text-slate-700" style={{marginTop: '0px', marginBottom: '4px'}}>Funnel job: {role}</p>
           {data.success_metric && (
             <p className="text-slate-700" style={{marginTop: '0px', marginBottom: '4px'}}>Success metric: {data.success_metric}</p>
           )}
