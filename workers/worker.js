@@ -35,7 +35,23 @@ export default {
     /* 1. CORS pre-flight */
     if (req.method === "OPTIONS") return new Response(null, cors(200, origin));
 
-    /* 2. only POST /generate */
+    /* 2. Only allow requests from approved origins */
+    const allowedOrigins = [
+      'http://localhost:5000',
+      'https://localhost:5000',
+      'http://127.0.0.1:5000', 
+      'https://127.0.0.1:5000'
+      // Add production domain here
+    ];
+    
+    if (origin && !allowedOrigins.includes(origin)) {
+      return new Response(
+        JSON.stringify({ error: "forbidden_origin" }),
+        cors(403, origin)
+      );
+    }
+
+    /* 3. only POST /generate */
     const url = new URL(req.url);
     if (req.method !== "POST" || url.pathname !== "/generate") {
       return new Response(
@@ -44,7 +60,7 @@ export default {
       );
     }
 
-    /* 3. Input validation and sanitization */
+    /* 4. Input validation and sanitization */
     let form;
     try { 
       const text = await req.text();
@@ -55,7 +71,7 @@ export default {
     }
     catch { return new Response(JSON.stringify({ error: "invalid_request" }), cors(400, origin)); }
 
-    /* 4. Validate required fields */
+    /* 5. Validate required fields */
     if (!form.country || typeof form.country !== 'string' || form.country.length > 100) {
       return new Response(JSON.stringify({ error: "invalid_country" }), cors(400, origin));
     }
@@ -63,7 +79,7 @@ export default {
       return new Response(JSON.stringify({ error: "invalid_product_type" }), cors(400, origin));
     }
     
-    /* 5. Sanitize inputs */
+    /* 6. Sanitize inputs */
     form.country = form.country.trim().substring(0, 100);
     form.sector = form.sector ? form.sector.trim().substring(0, 100) : '';
     form.product_type = form.product_type.trim().substring(0, 1000);
@@ -427,7 +443,7 @@ Create a comprehensive, well-structured marketing strategy using the exact JSON 
 OUTPUT:
 Return valid JSON only with the exact field structure, clean formatting, and British English language specified above.`;
 
-    /* 6. Check API key */
+    /* 7. Check API key */
     if (!env.OPENAI_API_KEY) {
       return new Response(
         JSON.stringify({ error: "api_key_not_configured" }), 
@@ -435,7 +451,7 @@ Return valid JSON only with the exact field structure, clean formatting, and Bri
       );
     }
 
-    /* 7. OpenAI call */
+    /* 8. OpenAI call */
     try {
       const ai = await fetch("https://api.openai.com/v1/chat/completions", {
         method: "POST",
@@ -493,28 +509,35 @@ Return valid JSON only with the exact field structure, clean formatting, and Bri
 };
 
 function cors(status = 200, origin = null) {
-  // Security: Only allow specific origins instead of wildcard
+  // Security: Strict CORS allowlist - only allow specific origins
   const allowedOrigins = [
     'http://localhost:5000',
-    'https://localhost:5000',
+    'https://localhost:5000', 
     'http://127.0.0.1:5000',
     'https://127.0.0.1:5000',
     // Add your production domain here when deployed
     // 'https://your-domain.com'
   ];
   
-  const corsOrigin = origin && allowedOrigins.includes(origin) ? origin : 'http://localhost:5000';
+  // Only set CORS origin if the request origin is in allowlist
+  const corsOrigin = origin && allowedOrigins.includes(origin) ? origin : null;
   
-  return {
-    status,
-    headers: {
-      "Access-Control-Allow-Origin": corsOrigin,
-      "Access-Control-Allow-Methods": "POST,OPTIONS",
-      "Access-Control-Allow-Headers": "Content-Type",
-      "Content-Type": "application/json",
-      "X-Content-Type-Options": "nosniff",
-      "X-Frame-Options": "DENY",
-      "X-XSS-Protection": "1; mode=block"
-    }
+  const headers = {
+    "Content-Type": "application/json",
+    "X-Content-Type-Options": "nosniff",
+    "X-Frame-Options": "DENY", 
+    "X-XSS-Protection": "1; mode=block",
+    "Referrer-Policy": "strict-origin-when-cross-origin",
+    "Permissions-Policy": "geolocation=(), microphone=(), camera=()",
+    "Content-Security-Policy": "default-src 'self'; script-src 'none'; object-src 'none'; frame-ancestors 'none'"
   };
+
+  if (corsOrigin) {
+    headers["Access-Control-Allow-Origin"] = corsOrigin;
+    headers["Access-Control-Allow-Methods"] = "POST,OPTIONS";
+    headers["Access-Control-Allow-Headers"] = "Content-Type";
+    headers["Vary"] = "Origin";
+  }
+  
+  return { status, headers };
 }
