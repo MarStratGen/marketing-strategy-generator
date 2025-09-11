@@ -262,7 +262,22 @@ export default function App() {
       setResult(data);
     } catch (err) {
       console.error(err);
-      setErr(err.message || "Something went wrong.");
+      const errorMessage = err.message || "Something went wrong.";
+      
+      // Handle specific error messages from the new content filtering
+      if (errorMessage.includes("meaningful description") || errorMessage.includes("detailed description")) {
+        setErr("Please provide a clear, meaningful description of your business offering.");
+      } else if (errorMessage.includes("guidelines") || errorMessage.includes("appropriate business information")) {
+        setErr("Please ensure your business information follows our content guidelines.");
+      } else if (errorMessage.includes("valid business sector")) {
+        setErr("Please select or enter a valid business sector.");
+      } else if (errorMessage.includes("api_key") || errorMessage.includes("OPENAI_API_KEY")) {
+        setErr("API configuration issue. Please contact support if this persists.");
+      } else if (errorMessage.includes("rate_limit") || errorMessage.includes("quota")) {
+        setErr("Service temporarily busy. Please wait a moment and try again.");
+      } else {
+        setErr(errorMessage);
+      }
     } finally {
       setLoading(false);
     }

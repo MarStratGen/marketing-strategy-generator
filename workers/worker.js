@@ -91,6 +91,124 @@ export default {
       form.competitors = form.competitors.slice(0, 10).map(c => String(c).trim().substring(0, 100));
     }
 
+    /* 7. Content quality validation */
+    function isGibberish(text) {
+      if (!text || typeof text !== 'string') return true;
+      
+      // Remove spaces and convert to lowercase for analysis
+      const cleanText = text.replace(/\s+/g, '').toLowerCase();
+      
+      // Too short or empty
+      if (cleanText.length < 3) return true;
+      
+      // Repeated characters (aaaaa, 11111, etc.)
+      if (/(.)\1{4,}/.test(cleanText)) return true;
+      
+      // No vowels at all (pure consonants unlikely to be meaningful)
+      if (!/[aeiouAEIOU]/.test(text)) return true;
+      
+      // Only symbols/numbers
+      if (/^[\W\d]+$/.test(cleanText)) return true;
+      
+      // Random keyboard mashing patterns
+      if (/qwerty|asdfgh|zxcvbn|123456|abcdef/i.test(cleanText)) return true;
+      
+      return false;
+    }
+
+    function hasMeaningfulContent(text) {
+      if (!text || typeof text !== 'string') return false;
+      
+      // Must have reasonable length for a business description
+      if (text.trim().length < 5) return false;
+      
+      // Should have multiple words for a product description
+      const words = text.trim().split(/\s+/);
+      if (words.length < 2) return false;
+      
+      // Check for business-related context
+      const businessKeywords = [
+        'business', 'company', 'service', 'product', 'sell', 'buy', 'customer', 'client',
+        'market', 'industry', 'software', 'app', 'website', 'online', 'digital', 'tech',
+        'consulting', 'education', 'training', 'healthcare', 'finance', 'retail', 'food',
+        'restaurant', 'shop', 'store', 'manufacturing', 'construction', 'real estate',
+        'agency', 'studio', 'clinic', 'practice', 'firm', 'solutions', 'platform',
+        'tool', 'system', 'management', 'analytics', 'design', 'development', 'marketing'
+      ];
+      
+      const lowerText = text.toLowerCase();
+      const hasBusinessContext = businessKeywords.some(keyword => lowerText.includes(keyword));
+      
+      // Allow if it has business context OR if it's a reasonable length with multiple words
+      return hasBusinessContext || (words.length >= 3 && text.length >= 10);
+    }
+
+    // Validate content quality
+    if (isGibberish(form.product_type)) {
+      return new Response(JSON.stringify({ 
+        error: "Please provide a meaningful description of your product or service" 
+      }), cors(400, origin));
+    }
+
+    if (!hasMeaningfulContent(form.product_type)) {
+      return new Response(JSON.stringify({ 
+        error: "Please provide a more detailed description of what your business offers" 
+      }), cors(400, origin));
+    }
+
+    if (form.sector && isGibberish(form.sector)) {
+      return new Response(JSON.stringify({ 
+        error: "Please select a valid business sector" 
+      }), cors(400, origin));
+    }
+
+    /* 8. Content moderation check - only if API key is available */
+    async function checkContentModeration(text, apiKey) {
+      if (!apiKey) {
+        // Skip moderation if no API key available
+        return { flagged: false };
+      }
+
+      try {
+        const moderationResponse = await fetch('https://api.openai.com/v1/moderations', {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${apiKey}`,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            input: text
+          }),
+          signal: AbortSignal.timeout(5000) // 5 second timeout
+        });
+
+        if (!moderationResponse.ok) {
+          // If moderation fails, allow content but log the issue
+          console.log('Moderation API failed, allowing content');
+          return { flagged: false };
+        }
+
+        const moderationData = await moderationResponse.json();
+        return moderationData.results[0] || { flagged: false };
+      } catch (error) {
+        // If moderation fails, allow content but log the issue
+        console.log('Moderation check failed:', error);
+        return { flagged: false };
+      }
+    }
+
+    // Check content for policy violations (only if API key available)
+    if (env.OPENAI_API_KEY) {
+      const contentToCheck = `${form.product_type} ${form.sector || ''} ${(form.audiences || []).join(' ')} ${(form.competitors || []).join(' ')}`.trim();
+      const moderationResult = await checkContentModeration(contentToCheck, env.OPENAI_API_KEY);
+
+      if (moderationResult.flagged) {
+        return new Response(JSON.stringify({ 
+          error: "Content does not meet our guidelines. Please provide appropriate business information." 
+        }), cors(400, origin));
+      }
+    }
+
     /* ─── lookup helpers ─── */
     const channelByMotion = {
       ecom_checkout: [
@@ -396,7 +514,7 @@ REQUIRED JSON STRUCTURE WITH EXACT FIELD NAMES:
   ],
   
   "budget": {
-    "band": "${form.budget_band || "Low"}",
+    "band": "${form.budget_band || 'Low'}",
     "allocation": "Budget allocation will be generated from channel_playbook data during post-processing."
   },
   
