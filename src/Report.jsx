@@ -265,13 +265,6 @@ function ContentCard({ title, data, color }) {
       "border-indigo-100 bg-gradient-to-br from-indigo-50 to-indigo-100/50",
   };
 
-  // NORMALIZE Channel Playbook data
-  if (title === "Channel Playbook" && data && typeof data === "object" && !Array.isArray(data)) {
-    data = Object.entries(data).map(([channelName, channelData]) => ({
-      channel: channelName,
-      ...channelData
-    }));
-  }
 
   return (
     <div className={`border-2 ${colours[color]} rounded-xl p-6 shadow-sm`}>
@@ -314,6 +307,39 @@ function OptimizedContent({ data }) {
   }
 
   if (Array.isArray(data)) {
+    // SPECIAL RENDERER for Channel Playbook arrays
+    if (data.length > 0 && data[0] && typeof data[0] === "object" && data[0].channel && data[0].intent && data[0].role) {
+      return (
+        <div>
+          {data.map((channel, i) => (
+            <div key={i} style={{marginTop: i > 0 ? '32px' : '0px'}}>
+              <h6 className="font-bold text-slate-900 text-base" style={{marginTop: '0px', marginBottom: '0px'}}>
+                {channel.channel}
+              </h6>
+
+              {channel.summary && (
+                <p className="text-slate-700 leading-relaxed" style={{marginTop: '12px', marginBottom: '12px'}}>{channel.summary}</p>
+              )}
+
+              {channel.why_it_works && (
+                <p className="text-slate-700 leading-relaxed" style={{marginTop: '0px', marginBottom: '12px'}}>{channel.why_it_works}</p>
+              )}
+
+              <p className="text-slate-700" style={{marginTop: '0px', marginBottom: '4px'}}>Purchase intent level: {channel.intent}</p>
+              <p className="text-slate-700" style={{marginTop: '0px', marginBottom: '4px'}}>Funnel job: {channel.role}</p>
+              {channel.success_metric && (
+                <p className="text-slate-700" style={{marginTop: '0px', marginBottom: '4px'}}>Success metric: {channel.success_metric}</p>
+              )}
+              {channel.budget_percent !== undefined && (
+                <p className="text-slate-700" style={{marginTop: '0px', marginBottom: '4px'}}>Budget percent: {channel.budget_percent}%</p>
+              )}
+            </div>
+          ))}
+        </div>
+      );
+    }
+    
+    // Default array renderer (with bullets)
     return (
       <ul className="space-y-2 list-none">
         {data.map((item, i) => (
