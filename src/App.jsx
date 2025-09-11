@@ -488,7 +488,7 @@ export default function App() {
                 disabled={loading}
                 className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-semibold py-4 px-6 rounded-xl transition-all duration-200 disabled:opacity-60 shadow-lg hover:shadow-xl mt-8"
               >
-                {loading ? <LoadingSpinner /> : "Generate Marketing Plan"}
+                {loading ? <LoadingSpinner /> : "Generate Marketing Strategy"}
               </button>
             </form>
           </div>
