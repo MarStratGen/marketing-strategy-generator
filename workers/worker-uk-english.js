@@ -250,7 +250,7 @@ REQUIRED JSON STRUCTURE WITH EXACT FIELD NAMES:
   
   "personas": "Primary Persona: Name\\nDemographics and psychographics, pain points and challenges, goals and motivations, preferred channels.\\n\\nSecondary Persona: Name\\nDemographics and psychographics, pain points and challenges, goals and motivations, preferred channels.\\n\\nTertiary Persona: Name\\nDemographics and psychographics, pain points and challenges, goals and motivations, preferred channels.",
   
-  "competitors_brief": "[Competitor Name Analysis]\\nStrengths and advantages, weaknesses and vulnerabilities, market positioning, share of voice, competitive threats.\\n\\n[Additional Competitors if provided]\\nAnalysis for each named competitor with specific focus on market position.\\n\\nCompetitive Landscape Summary\\nMarket dynamics, competitive gaps, and positioning opportunities.",
+  "competitors_brief": "[Competitor Name Analysis]\\nStrengths and advantages, weaknesses and vulnerabilities, market positioning, share of voice, competitive threats.\\n\\n[Additional Competitors if provided]\\nAnalysis for each named competitor with specific focus on market position.",
   
   "differentiation_moves": "Core Differentiation Strategy\\nUnique value proposition, key differentiators, and competitive advantages.\\n\\nPositioning Tactics\\nSpecific positioning against named competitors and market positioning approach.\\n\\nMessaging Framework\\nCore messages, proof points, and communication strategy.",
   

@@ -125,7 +125,6 @@ function ContentSections({ data }) {
       color: "purple",
       priority: "high",
       items: [
-        { title: "Competitive Landscape", data: data.competitors_brief },
         { title: "Strategy Pillars", data: data.strategy_pillars },
         { title: "Marketing Mix (7 Ps)", data: data.marketing_mix_7ps },
         { title: "Channel Playbook", data: data.channel_playbook },
