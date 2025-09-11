@@ -20,8 +20,14 @@ const friendlyLabel = (k) => {
 };
 
 /* ── main ───────────────────────────────────────────────── */
-export default function Report({ plan, loading }) {
+export default function Report({ plan, loading, streaming, streamingContent }) {
   if (loading) return <SkeletonTimeline />;
+  
+  // Show streaming content while it's being generated
+  if (streaming && streamingContent) {
+    return <StreamingDisplay content={streamingContent} />;
+  }
+  
   if (!plan) return null;
 
   /* error handling */
@@ -739,6 +745,44 @@ function SkeletonTimeline() {
             </div>
           </div>
         ))}
+      </div>
+    </div>
+  );
+}
+
+/* ── streaming display component ──────────────────────────── */
+function StreamingDisplay({ content }) {
+  return (
+    <div className="mt-12 w-full max-w-5xl mx-auto px-4">
+      {/* header */}
+      <div className="text-center mb-16">
+        <h2 className="text-4xl font-bold text-white mb-4 tracking-tight">
+          Your Marketing Strategy
+        </h2>
+        <p className="text-xl text-white max-w-3xl mx-auto leading-relaxed font-medium">
+          <span className="inline-flex items-center">
+            <div className="animate-pulse rounded-full h-2 w-2 bg-white/60 mr-2"></div>
+            Streaming your strategy in real-time...
+          </span>
+        </p>
+      </div>
+
+      {/* streaming content display */}
+      <div className="bg-white rounded-3xl shadow-xl border border-gray-100 overflow-hidden">
+        <div className="p-8">
+          <div className="prose max-w-none">
+            <div className="bg-gray-50 rounded-lg p-6 border border-gray-200 font-mono text-sm text-gray-800 whitespace-pre-wrap break-words">
+              {content}
+              <span className="animate-pulse">|</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div className="mt-8 text-center">
+        <p className="text-white/80 text-sm">
+          Once complete, your strategy will be formatted and ready for download
+        </p>
       </div>
     </div>
   );

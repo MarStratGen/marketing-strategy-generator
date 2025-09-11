@@ -3,8 +3,6 @@
     ───────────────────────────────────────────── */
 const MODEL = "gpt-4o";
 
-// Removed verbose examples to reduce token count and speed up generation
-
 export default {
   async fetch(req, env) {
     const origin = req.headers.get('Origin');
@@ -118,8 +116,8 @@ export default {
       const lowerText = text.toLowerCase();
       const hasBusinessContext = businessKeywords.some(keyword => lowerText.includes(keyword));
       
-      // Allow if it has business context OR if it's a reasonable length with multiple words
-      return hasBusinessContext || (words.length >= 3 && text.length >= 10);
+      // FIXED: Allow if it has business context OR if it's reasonable length with 2+ words (was 3+)
+      return hasBusinessContext || (words.length >= 2 && text.length >= 8);
     }
 
     // Validate content quality
@@ -194,18 +192,22 @@ export default {
         { channel: "Search advertising", intent: "High", role: "Capture" },
         { channel: "Paid social media", intent: "Mid", role: "Spark demand" },
         { channel: "Email marketing", intent: "Mid", role: "Nurture" },
-        { channel: "Influencer partnerships", intent: "Mid", role: "Social proof" }
+        { channel: "Influencer partnerships", intent: "Mid", role: "Social proof" },
+        { channel: "Direct mail campaigns", intent: "Mid", role: "Target locals" }
       ],
       saas_checkout: [
         { channel: "Search advertising", intent: "High", role: "Capture" },
         { channel: "Content marketing", intent: "Mid", role: "Educate" },
         { channel: "LinkedIn advertising", intent: "Mid", role: "Target professionals" },
-        { channel: "Webinars and demos", intent: "High", role: "Convert" }
+        { channel: "Webinars and demos", intent: "High", role: "Convert" },
+        { channel: "Trade publications", intent: "Mid", role: "Industry reach" }
       ],
       marketplace_checkout: [
         { channel: "Marketplace advertising", intent: "High", role: "Capture" },
         { channel: "Search advertising", intent: "Mid", role: "Assist" },
-        { channel: "Product review platforms", intent: "Mid", role: "Build trust" }
+        { channel: "Product review platforms", intent: "Mid", role: "Build trust" },
+        { channel: "Email marketing", intent: "Mid", role: "Nurture" },
+        { channel: "Influencer partnerships", intent: "Mid", role: "Social proof" }
       ],
       store_visit: [
         { channel: "Local search advertising", intent: "High", role: "Drive visits" },
@@ -218,15 +220,15 @@ export default {
         { channel: "Search with call extensions", intent: "High", role: "Click to call" },
         { channel: "Radio sponsorships", intent: "Mid", role: "Audio presence" },
         { channel: "Local directory listings", intent: "High", role: "Capture searches" },
-        { channel: "Yellow Pages advertising", intent: "Mid", role: "Traditional search" }
+        { channel: "Yellow Pages advertising", intent: "Mid", role: "Traditional search" },
+        { channel: "Telemarketing campaigns", intent: "High", role: "Direct contact" }
       ],
       lead_capture: [
         { channel: "Search advertising", intent: "High", role: "Capture" },
         { channel: "LinkedIn advertising", intent: "Mid", role: "B2B targeting" },
         { channel: "Trade publications", intent: "Mid", role: "Industry reach" },
         { channel: "Trade shows and exhibitions", intent: "High", role: "Face-to-face" },
-        { channel: "Direct mail campaigns", intent: "Mid", role: "Targeted outreach" },
-        { channel: "Telemarketing", intent: "High", role: "Direct contact" }
+        { channel: "Direct mail campaigns", intent: "Mid", role: "Targeted outreach" }
       ],
       booking: [
         { channel: "Search advertising", intent: "High", role: "Capture" },
@@ -261,24 +263,21 @@ export default {
         { channel: "Direct mail appeals", intent: "Mid", role: "Personal touch" },
         { channel: "Community events", intent: "Mid", role: "Local engagement" },
         { channel: "Radio sponsorships", intent: "Mid", role: "Cause awareness" },
-        { channel: "Print advertising", intent: "Mid", role: "Credibility building" },
-        { channel: "Telemarketing campaigns", intent: "High", role: "Direct appeal" }
+        { channel: "Print advertising", intent: "Mid", role: "Credibility building" }
       ],
       wholesale_inquiry: [
         { channel: "Search advertising", intent: "High", role: "Capture B2B" },
         { channel: "LinkedIn advertising", intent: "Mid", role: "Prospect" },
         { channel: "Trade publications", intent: "Mid", role: "Industry authority" },
         { channel: "Trade shows", intent: "High", role: "Relationship building" },
-        { channel: "Direct sales outreach", intent: "High", role: "Personal contact" },
-        { channel: "Industry directories", intent: "Mid", role: "Visibility" }
+        { channel: "Direct sales outreach", intent: "High", role: "Personal contact" }
       ],
       partner_recruitment: [
         { channel: "Search advertising", intent: "High", role: "Capture partners" },
         { channel: "LinkedIn outreach", intent: "Mid", role: "Recruit" },
         { channel: "Industry publications", intent: "Mid", role: "Authority" },
         { channel: "Trade associations", intent: "Mid", role: "Network access" },
-        { channel: "Partner events", intent: "High", role: "Relationship building" },
-        { channel: "Direct recruitment campaigns", intent: "High", role: "Targeted outreach" }
+        { channel: "Partner events", intent: "High", role: "Relationship building" }
       ]
     };
 
@@ -363,6 +362,9 @@ export default {
       
       if (channels.length >= 5) {
         const budgetText = `Primary Allocation\n${channels[0].channel}: ${channels[0].budget_percent}% to ${channels[0].role.toLowerCase()}.\n\nSecondary Allocation\n${channels[1].channel}: ${channels[1].budget_percent}% to ${channels[1].role.toLowerCase()}.\n\nSupporting Channels\n${channels[2].channel}: ${channels[2].budget_percent}% to ${channels[2].role.toLowerCase()}.\n${channels[3].channel}: ${channels[3].budget_percent}% to ${channels[3].role.toLowerCase()}.\n${channels[4].channel}: ${channels[4].budget_percent}% to ${channels[4].role.toLowerCase()}.\n\nAllocation Rationale\nPrioritise the primary channel to capture high-intent demand whilst supporting with secondary channels and comprehensive supporting channels for complete market coverage through integrated multi-channel approach.`;
+        
+        if (!report.budget) report.budget = {};
+        report.budget.allocation = budgetText;
       } else if (channels.length >= 3) {
         const budgetText = `Primary Allocation\n${channels[0].channel}: ${channels[0].budget_percent}% to ${channels[0].role.toLowerCase()}.\n\nSecondary Allocation\n${channels[1].channel}: ${channels[1].budget_percent}% to ${channels[1].role.toLowerCase()}.\n\nSupporting Allocation\n${channels[2].channel}: ${channels[2].budget_percent}% to ${channels[2].role.toLowerCase()}.\n\nAllocation Rationale\nPrioritise the primary channel to capture high-intent demand whilst supporting with secondary and tertiary channels for comprehensive market coverage through integrated channel approach.`;
         
@@ -398,13 +400,30 @@ export default {
 
     let prompt = `You are Mark Ritson meets Philip Kotler - the world's leading marketing strategist. 
 
-REQUIREMENTS:
-- EXCLUSIVELY British English spelling and terminology throughout
-- Clean professional format, NO markdown, NO asterisks, NO bullet symbols
-- Prominently feature any named competitors provided
-- Recommend BOTH digital AND traditional marketing channels
-- Generate contextual, business-specific risks and safety nets
-- Use percentage allocations only for budgets
+CRITICAL LANGUAGE REQUIREMENT:
+- Write EXCLUSIVELY in British English with UK spelling throughout
+- Use UK terminology: adverts (not ads), organisations (not organizations), realise (not realize), colour (not color), centre (not center), analyse (not analyze), optimise (not optimize), behaviour (not behavior), favourite (not favorite), honour (not honor), labour (not labor), flavour (not flavor), neighbourhood (not neighborhood), travelled (not traveled), cancelled (not canceled), modelling (not modeling), programme (not program when referring to plans), whilst (not while), amongst (not among)
+- Use British business language and terminology consistently
+- Apply proper sentence case throughout
+- NO American spellings or terminology whatsoever
+
+CRITICAL LANGUAGE STYLE BY SECTION TYPE:
+- ANALYTICAL sections (Market Foundation, Personas, Competitors): Use OBJECTIVE, DESCRIPTIVE language - "The market demonstrates...", "Customers typically exhibit...", "Research indicates..."
+- STRATEGIC sections (Strategy Pillars, Differentiation, 7Ps): Use BUSINESS-FOCUSED RECOMMENDATIONS - "The business should focus on...", "Position the brand as...", "Prioritise..."
+- TACTICAL sections (Channel Playbook, Calendar, Experiments): Use ACTION-ORIENTED DIRECTIVES - "Implement search campaigns...", "Launch social media initiatives...", "Execute testing protocols..."
+- PLANNING sections (Budget, KPIs, Risks): Use STRATEGIC RECOMMENDATIONS - "Allocate 45% to search...", "Track conversion rates...", "Monitor competitive response..."
+
+CRITICAL FORMATTING REQUIREMENTS:
+- Use section headings without any markdown formatting (no asterisks or special symbols)
+- Write in clean, readable paragraphs with proper line breaks
+- NO asterisks, NO bullet symbols, NO markdown formatting anywhere
+- Well-structured, professional British business report format
+
+INTEGRATED MARKETING APPROACH:
+- Recommend BOTH digital AND traditional marketing channels based on business type and target market
+- Consider local market context, customer demographics, and sector norms when selecting channels
+- Include traditional channels: print advertising, radio, television, direct mail, outdoor advertising, trade shows, telemarketing, community events, referral programmes, trade publications, networking events
+- Balance digital efficiency with traditional credibility and local market presence
 
 COMPETITOR ANALYSIS REQUIREMENT:
 ${competitorAnalysisInstructions}
@@ -586,17 +605,92 @@ Return valid JSON only with the exact field structure, clean formatting, and Bri
       }
 
       if (isStreaming) {
-        // Return streaming response
+        // Create proper streaming response
+        const { readable, writable } = new TransformStream();
+        const writer = writable.getWriter();
+        const textEncoder = new TextEncoder();
+        
+        // Start processing stream in background
+        (async () => {
+          try {
+            const reader = ai.body.getReader();
+            let buffer = '';
+            let completeResponse = '';
+            
+            while (true) {
+              const { done, value } = await reader.read();
+              if (done) break;
+              
+              // Decode chunk and add to buffer
+              const chunk = new TextDecoder().decode(value);
+              buffer += chunk;
+              
+              // Process complete lines from buffer
+              const lines = buffer.split('\n');
+              buffer = lines.pop() || ''; // Keep incomplete line in buffer
+              
+              for (const line of lines) {
+                if (line.trim() === '') continue;
+                if (line.startsWith('data: ')) {
+                  const data = line.slice(6);
+                  if (data === '[DONE]') {
+                    // Process the complete response and apply post-processing
+                    try {
+                      let finalPlan = JSON.parse(completeResponse);
+                      
+                      // Apply post-processing like the non-streaming version
+                      if (!finalPlan.error) {
+                        finalPlan = applyMotionDefaults(finalPlan, form);
+                        finalPlan = stripCurrencyAndAmounts(finalPlan);
+                        finalPlan = alignBudgetWithChannels(finalPlan);
+                      }
+                      
+                      // Send final structured plan
+                      await writer.write(textEncoder.encode(`data: ${JSON.stringify({ type: 'final', plan: finalPlan })}\n\n`));
+                    } catch (e) {
+                      await writer.write(textEncoder.encode(`data: ${JSON.stringify({ error: 'failed_to_process_final_plan' })}\n\n`));
+                    }
+                    
+                    await writer.write(textEncoder.encode('data: [DONE]\n\n'));
+                    break;
+                  }
+                  
+                  try {
+                    const parsed = JSON.parse(data);
+                    const content = parsed.choices?.[0]?.delta?.content || '';
+                    if (content) {
+                      // Accumulate the complete response
+                      completeResponse += content;
+                      
+                      // Send content as SSE for progressive display
+                      await writer.write(textEncoder.encode(`data: ${JSON.stringify({ content })}\n\n`));
+                    }
+                  } catch (e) {
+                    // Skip invalid JSON chunks
+                  }
+                }
+              }
+            }
+            
+          } catch (error) {
+            console.error('Streaming error:', error);
+            await writer.write(textEncoder.encode(`data: ${JSON.stringify({ error: 'streaming_error' })}\n\n`));
+          } finally {
+            await writer.close();
+          }
+        })();
+        
+        // Return streaming response with proper headers
         const headers = {
           'Content-Type': 'text/event-stream',
           'Cache-Control': 'no-cache',
           'Connection': 'keep-alive',
           ...cors(200, origin).headers
         };
-        delete headers['Content-Type']; // Remove JSON content type for SSE
+        delete headers['Content-Type']; // Remove JSON content type
         headers['Content-Type'] = 'text/event-stream';
         
-        return new Response(ai.body, { status: 200, headers });
+        return new Response(readable, { status: 200, headers });
       } else {
         // Non-streaming response (original behavior)
         const out = await ai.json();
