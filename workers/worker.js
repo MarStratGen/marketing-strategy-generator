@@ -3,30 +3,7 @@
     ───────────────────────────────────────────── */
 const MODEL = "gpt-4o";
 
-const EXAMPLES = [
-`Market Foundation
-
-Market Overview
-The Australian seed market demonstrates diversity across segments, with offerings catering to gardening enthusiasts and agricultural professionals. Industry analysis reveals established distribution networks through both traditional garden centres and emerging digital platforms.
-
-Customer Behaviour Insights
-Research indicates peak demand occurs during spring planting season (September-November). Customer analysis shows buyers typically spend 2-3 weeks researching before purchase, consulting both online resources and local experts. Behavioural data demonstrates quality-focused decision making dominates, with 78% prioritising germination rates over price considerations.
-
-Competitor Analysis
-Market analysis reveals SeedCo maintains strong brand recognition through extensive product range and established retail partnerships. The competitive landscape shows vulnerabilities in higher price points and limited digital presence, whilst traditional channels remain strong.
-`,
-
-`Budget Allocation
-
-Primary Allocation
-Allocate 35% to search advertising to capture high-intent digital traffic. Assign 25% to local print advertising targeting gardening publications and community newspapers for credibility building.
-
-Secondary Allocation  
-Direct 20% to radio sponsorships during gardening programmes to reach traditional audiences. Reserve 10% for trade show participation to demonstrate products. Assign remaining 10% to email marketing for customer retention.
-
-Allocation Rationale
-Balance digital and traditional channels to reach diverse customer segments. Prioritise search investment for immediate conversion capture whilst maintaining strong traditional media presence for authority building. Local print and radio provide credibility with established gardening community, whilst trade shows enable product demonstration and relationship building.`
-];
+// Removed verbose examples to reduce token count and speed up generation
 
 export default {
   async fetch(req, env) {
@@ -51,9 +28,11 @@ export default {
       );
     }
 
-    /* 3. only POST /generate */
+    /* 3. Handle both /generate (non-streaming) and /stream (streaming) */
     const url = new URL(req.url);
-    if (req.method !== "POST" || url.pathname !== "/generate") {
+    const isStreaming = url.pathname === "/stream";
+    
+    if (req.method !== "POST" || (!url.pathname.endsWith("/generate") && !isStreaming)) {
       return new Response(
         JSON.stringify({ error: "method_not_allowed" }),
         cors(405, origin)
@@ -419,30 +398,13 @@ export default {
 
     let prompt = `You are Mark Ritson meets Philip Kotler - the world's leading marketing strategist. 
 
-CRITICAL LANGUAGE REQUIREMENT:
-- Write EXCLUSIVELY in British English with UK spelling throughout
-- Use UK terminology: adverts (not ads), organisations (not organizations), realise (not realize), colour (not color), centre (not center), analyse (not analyze), optimise (not optimize), behaviour (not behavior), favourite (not favorite), honour (not honor), labour (not labor), flavour (not flavor), neighbourhood (not neighborhood), travelled (not traveled), cancelled (not canceled), modelling (not modeling), programme (not program when referring to plans), whilst (not while), amongst (not among)
-- Use British business language and terminology consistently
-- Apply proper sentence case throughout
-- NO American spellings or terminology whatsoever
-
-CRITICAL LANGUAGE STYLE BY SECTION TYPE:
-- ANALYTICAL sections (Market Foundation, Personas, Competitors): Use OBJECTIVE, DESCRIPTIVE language - "The market demonstrates...", "Customers typically exhibit...", "Research indicates..."
-- STRATEGIC sections (Strategy Pillars, Differentiation, 7Ps): Use BUSINESS-FOCUSED RECOMMENDATIONS - "The business should focus on...", "Position the brand as...", "Prioritise..."
-- TACTICAL sections (Channel Playbook, Calendar, Experiments): Use ACTION-ORIENTED DIRECTIVES - "Implement search campaigns...", "Launch social media initiatives...", "Execute testing protocols..."
-- PLANNING sections (Budget, KPIs, Risks): Use STRATEGIC RECOMMENDATIONS - "Allocate 45% to search...", "Track conversion rates...", "Monitor competitive response..."
-
-CRITICAL FORMATTING REQUIREMENTS:
-- Use section headings without any markdown formatting (no asterisks or special symbols)
-- Write in clean, readable paragraphs with proper line breaks
-- NO asterisks, NO bullet symbols, NO markdown formatting anywhere
-- Well-structured, professional British business report format
-
-INTEGRATED MARKETING APPROACH:
-- Recommend BOTH digital AND traditional marketing channels based on business type and target market
-- Consider local market context, customer demographics, and sector norms when selecting channels
-- Include traditional channels: print advertising, radio, television, direct mail, outdoor advertising, trade shows, telemarketing, community events, referral programmes, trade publications, networking events
-- Balance digital efficiency with traditional credibility and local market presence
+REQUIREMENTS:
+- EXCLUSIVELY British English spelling and terminology throughout
+- Clean professional format, NO markdown, NO asterisks, NO bullet symbols
+- Prominently feature any named competitors provided
+- Recommend BOTH digital AND traditional marketing channels
+- Generate contextual, business-specific risks and safety nets
+- Use percentage allocations only for budgets
 
 COMPETITOR ANALYSIS REQUIREMENT:
 ${competitorAnalysisInstructions}
@@ -591,30 +553,31 @@ Return valid JSON only with the exact field structure, clean formatting, and Bri
       );
     }
 
-    /* 8. OpenAI call */
+    /* 8. OpenAI call with streaming support */
     try {
+      const requestBody = {
+        model: MODEL,
+        temperature: 0.4,
+        top_p: 0.9,
+        max_tokens: 4000,
+        response_format: { type: "json_object" },
+        stream: isStreaming,
+        messages: [
+          { role: "system",
+            content: "You are Mark Ritson meets Philip Kotler - the world's leading marketing strategist. Write comprehensive, actionable marketing strategies EXCLUSIVELY in British English with UK spelling and terminology. Use clean, professional business report format with NO markdown formatting, NO asterisks, NO bullet symbols. Always prominently feature any named competitors provided. Use percentage allocations only for budgets - no currency symbols. Create rich, detailed channel playbook content with comprehensive tactical details. CRITICAL: Recommend integrated marketing approaches combining BOTH digital AND traditional channels based on business type and target market. Consider print advertising, radio, television, direct mail, outdoor advertising, trade shows, telemarketing, local community engagement, and other traditional tactics alongside digital channels. MANDATORY: Use British spellings - adverts not ads, organisations not organizations, realise not realize, optimise not optimize, analyse not analyze, behaviour not behavior, colour not color, centre not center. Follow section-specific language styles: analytical sections use descriptive language, strategic sections use business recommendations, tactical sections use action directives, planning sections use strategic recommendations. CRITICAL: Generate contextual, business-specific risks and safety nets that relate to the actual sector, marketing channels, business model, and market conditions rather than generic digital marketing risks." },
+          { role: "user", content: prompt }
+        ]
+      };
+
       const ai = await fetch("https://api.openai.com/v1/chat/completions", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${env.OPENAI_API_KEY}`
         },
-        body: JSON.stringify({
-          model: MODEL,
-          temperature: 0.4,
-          top_p: 0.9,
-          max_tokens: 4000,
-          response_format: { type: "json_object" },
-          messages: [
-            { role: "system",
-              content: "You are Mark Ritson meets Philip Kotler - the world's leading marketing strategist. Write comprehensive, actionable marketing strategies EXCLUSIVELY in British English with UK spelling and terminology. Use clean, professional business report format with NO markdown formatting, NO asterisks, NO bullet symbols. Always prominently feature any named competitors provided. Use percentage allocations only for budgets - no currency symbols. Create rich, detailed channel playbook content with comprehensive tactical details. CRITICAL: Recommend integrated marketing approaches combining BOTH digital AND traditional channels based on business type and target market. Consider print advertising, radio, television, direct mail, outdoor advertising, trade shows, telemarketing, local community engagement, and other traditional tactics alongside digital channels. MANDATORY: Use British spellings - adverts not ads, organisations not organizations, realise not realize, optimise not optimize, analyse not analyze, behaviour not behavior, colour not color, centre not center. Follow section-specific language styles: analytical sections use descriptive language, strategic sections use business recommendations, tactical sections use action directives, planning sections use strategic recommendations. CRITICAL: Generate contextual, business-specific risks and safety nets that relate to the actual sector, marketing channels, business model, and market conditions rather than generic digital marketing risks." },
-            ...EXAMPLES.map(t => ({ role: "assistant", content: t })),
-            { role: "user", content: prompt }
-          ]
-        })
+        body: JSON.stringify(requestBody)
       });
 
-      const out = await ai.json();
       if (!ai.ok) {
         return new Response(
           JSON.stringify({ error: "ai_service_unavailable" }),
@@ -622,22 +585,38 @@ Return valid JSON only with the exact field structure, clean formatting, and Bri
         );
       }
 
-      let json;
-      try {
-        const content = out.choices?.[0]?.message?.content;
-        json = content ? JSON.parse(content)
-                       : { error: "no_content_generated" };
-      } catch (e) {
-        json = { error: "invalid_ai_response" };
-      }
+      if (isStreaming) {
+        // Return streaming response
+        const headers = {
+          'Content-Type': 'text/event-stream',
+          'Cache-Control': 'no-cache',
+          'Connection': 'keep-alive',
+          ...cors(200, origin).headers
+        };
+        delete headers['Content-Type']; // Remove JSON content type for SSE
+        headers['Content-Type'] = 'text/event-stream';
+        
+        return new Response(ai.body, { status: 200, headers });
+      } else {
+        // Non-streaming response (original behavior)
+        const out = await ai.json();
+        let json;
+        try {
+          const content = out.choices?.[0]?.message?.content;
+          json = content ? JSON.parse(content)
+                         : { error: "no_content_generated" };
+        } catch (e) {
+          json = { error: "invalid_ai_response" };
+        }
 
-      if (!json.error) {
-        json = applyMotionDefaults(json, form);
-        json = stripCurrencyAndAmounts(json);
-        json = alignBudgetWithChannels(json);
-      }
+        if (!json.error) {
+          json = applyMotionDefaults(json, form);
+          json = stripCurrencyAndAmounts(json);
+          json = alignBudgetWithChannels(json);
+        }
 
-      return new Response(JSON.stringify(json), cors(200, origin));
+        return new Response(JSON.stringify(json), cors(200, origin));
+      }
 
     } catch (e) {
       return new Response(
