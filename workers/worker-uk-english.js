@@ -15,8 +15,7 @@ Peak demand occurs during spring planting season (September-November). Customers
 Key Market Trends
 Organic movement shows 45% increase in demand year-over-year. Small-space gardening drives urban container gardening growth. Educational content consumption influences 60% of purchases through video tutorials.
 
-Why this matters: Understanding these patterns allows for targeted timing and messaging.
-How to execute: Align marketing campaigns with seasonal peaks and create educational content.`,
+`,
 
 `Budget Allocation
 
@@ -218,7 +217,6 @@ CRITICAL FORMATTING REQUIREMENTS:
 - Write in clean, readable paragraphs with proper line breaks
 - NO asterisks, NO bullet symbols, NO markdown formatting anywhere
 - Well-structured, professional British business report format
-- Include "Why this matters:" and "How to execute:" guidance sections
 
 COMPETITOR ANALYSIS REQUIREMENT:
 ${competitorAnalysisInstructions}
@@ -246,15 +244,15 @@ REQUIRED JSON STRUCTURE WITH EXACT FIELD NAMES:
     "goal": "${derivedGoal}"
   },
   
-  "market_foundation": "Market Overview\\nMarket size, growth trends, and key dynamics affecting the sector.\\n\\nCustomer Behaviour Insights\\nPurchasing patterns, decision-making factors, pain points and motivations that drive customer behaviour.\\n\\nMarket Opportunities\\nUnderserved segments, emerging trends, and growth areas to target.\\n\\nWhy this matters: Strategic context for market positioning.\\nHow to execute: Action steps for market entry and expansion.",
+  "market_foundation": "Market Overview\\nMarket size, growth trends, and key dynamics affecting the sector.\\n\\nCustomer Behaviour Insights\\nPurchasing patterns, decision-making factors, pain points and motivations that drive customer behaviour.\\n\\nMarket Opportunities\\nUnderserved segments, emerging trends, and growth areas to target.",
   
-  "strategy_pillars": "Pillar 1: Strategic Focus Name\\nStrategic focus, key activities, and success metrics for the first pillar.\\n\\nPillar 2: Strategic Focus Name\\nStrategic focus, key activities, and success metrics for the second pillar.\\n\\nPillar 3: Strategic Focus Name\\nStrategic focus, key activities, and success metrics for the third pillar.\\n\\nWhy this matters: Strategic importance of these pillars.\\nHow to execute: Implementation roadmap for all three pillars.",
+  "strategy_pillars": "Pillar 1: Strategic Focus Name\\nStrategic focus, key activities, and success metrics for the first pillar.\\n\\nPillar 2: Strategic Focus Name\\nStrategic focus, key activities, and success metrics for the second pillar.\\n\\nPillar 3: Strategic Focus Name\\nStrategic focus, key activities, and success metrics for the third pillar.",
   
   "personas": "Primary Persona: Name\\nDemographics and psychographics, pain points and challenges, goals and motivations, preferred channels.\\n\\nSecondary Persona: Name\\nDemographics and psychographics, pain points and challenges, goals and motivations, preferred channels.\\n\\nTertiary Persona: Name\\nDemographics and psychographics, pain points and challenges, goals and motivations, preferred channels.",
   
-  "competitors_brief": "[Competitor Name Analysis]\\nStrengths and advantages, weaknesses and vulnerabilities, market positioning, share of voice, competitive threats.\\n\\n[Additional Competitors if provided]\\nAnalysis for each named competitor with specific focus on market position.\\n\\nCompetitive Landscape Summary\\nMarket dynamics, competitive gaps, and positioning opportunities.\\n\\nWhy this matters: Competitive context and strategic implications.\\nHow to execute: Competitive response strategy and positioning tactics.",
+  "competitors_brief": "[Competitor Name Analysis]\\nStrengths and advantages, weaknesses and vulnerabilities, market positioning, share of voice, competitive threats.\\n\\n[Additional Competitors if provided]\\nAnalysis for each named competitor with specific focus on market position.\\n\\nCompetitive Landscape Summary\\nMarket dynamics, competitive gaps, and positioning opportunities.",
   
-  "differentiation_moves": "Core Differentiation Strategy\\nUnique value proposition, key differentiators, and competitive advantages.\\n\\nPositioning Tactics\\nSpecific positioning against named competitors and market positioning approach.\\n\\nMessaging Framework\\nCore messages, proof points, and communication strategy.\\n\\nWhy this matters: Differentiation importance in the competitive landscape.\\nHow to execute: Positioning implementation and messaging deployment.",
+  "differentiation_moves": "Core Differentiation Strategy\\nUnique value proposition, key differentiators, and competitive advantages.\\n\\nPositioning Tactics\\nSpecific positioning against named competitors and market positioning approach.\\n\\nMessaging Framework\\nCore messages, proof points, and communication strategy.",
   
   "marketing_mix_7ps": "Product\\nProduct strategy, features and benefits, product development priorities.\\n\\nPrice\\nPricing strategy, competitive pricing analysis, value communication.\\n\\nPlace\\nDistribution channels, channel strategy, market access approach.\\n\\nPromotion\\nPromotional strategy, communication channels, campaign approach.\\n\\nPeople\\nTarget audiences, customer service strategy, team requirements.\\n\\nProcess\\nCustomer journey, service delivery, operational excellence.\\n\\nPhysical Evidence\\nBrand assets, customer touchpoints, credibility factors.",
   
@@ -300,7 +298,7 @@ REQUIRED JSON STRUCTURE WITH EXACT FIELD NAMES:
   
   "kpis": "Primary KPIs\\nCore metrics with targets and measurement methodology.\\n\\nSecondary KPIs\\nSupporting metrics for performance tracking.\\n\\nLeading Indicators\\nEarly success signals, predictive metrics, and warning indicators.\\n\\nMeasurement Framework\\nReporting frequency, data sources, and analysis approach.",
   
-  "risks_and_safety_nets": "High-Risk Scenarios\\nKey risks with impact assessment and probability analysis.\\n\\nMitigation Strategies\\nPreventive measures, contingency plans, and response protocols.\\n\\nSafety Nets\\nBackup plans, alternative approaches, and recovery strategies.\\n\\nWhy this matters: Risk context and strategic importance.\\nHow to execute: Risk management approach and implementation.",
+  "risks_and_safety_nets": "High-Risk Scenarios\\nKey risks with impact assessment and probability analysis.\\n\\nMitigation Strategies\\nPreventive measures, contingency plans, and response protocols.\\n\\nSafety Nets\\nBackup plans, alternative approaches, and recovery strategies.",
   
   "experiments": "Priority Tests\\nKey experiments with hypothesis, methodology, and success criteria for each test.\\n\\nTesting Framework\\nTest design principles, measurement approach, and learning objectives.\\n\\nImplementation Plan\\nTesting sequence, resource requirements, timeline and milestones.",
   
@@ -314,7 +312,6 @@ CONTENT REQUIREMENTS:
 - Include specific competitor names where provided
 - NO asterisks, NO bullet points, NO markdown formatting
 - Clean, professional British business report format
-- Actionable insights with "Why this matters" and "How to execute"
 - Percentage-only budget allocations (e.g., "Search: 45%")
 - Channel summaries must be 2-3 comprehensive sentences with tactical details
 - Key actions must be specific, actionable tactical items

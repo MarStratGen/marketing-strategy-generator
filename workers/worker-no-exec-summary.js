@@ -18,8 +18,7 @@ Key Market Trends
 
 Organic movement shows 45% increase in demand year-over-year. Small-space gardening drives urban container gardening growth. Educational content consumption influences 60% of purchases through video tutorials.
 
-Why this matters: Understanding these patterns allows for targeted timing and messaging.
-How to execute: Align marketing campaigns with seasonal peaks and create educational content.`,
+`,
 
 `Budget Allocation
 
@@ -225,7 +224,6 @@ CRITICAL FORMATTING REQUIREMENTS:
 - Write in clean, readable paragraphs with proper line breaks
 - NO asterisks, NO bullet symbols, NO markdown formatting anywhere
 - Well-structured, professional British business report format
-- Include "Why this matters:" and "How to execute:" guidance sections
 - DO NOT include "Executive Summary" as a subheading - start directly with Strategic Overview
 
 COMPETITOR ANALYSIS REQUIREMENT:
@@ -322,7 +320,6 @@ CONTENT REQUIREMENTS:
 - Include specific competitor names where provided
 - NO asterisks, NO bullet points, NO markdown formatting
 - Clean, professional British business report format
-- Actionable insights with "Why this matters" and "How to execute"
 - Percentage-only budget allocations (e.g., "Search: 45%")
 - Channel summaries must be 2-3 comprehensive sentences with tactical details
 - Key actions must be specific, actionable tactical items

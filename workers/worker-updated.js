@@ -15,8 +15,7 @@ Peak demand occurs during spring planting season (September-November). Customers
 Key Market Trends
 Organic movement shows 45% increase in demand year-over-year. Small-space gardening drives urban container gardening growth. Educational content consumption influences 60% of purchases through video tutorials.
 
-Why this matters: Understanding these patterns allows for targeted timing and messaging.
-How to execute: Align marketing campaigns with seasonal peaks and create educational content.`,
+`,
 
 `Budget Allocation
 
@@ -212,7 +211,6 @@ CRITICAL FORMATTING REQUIREMENTS:
 - NO asterisks, NO bullet symbols, NO markdown formatting anywhere
 - Use proper sentence case throughout
 - Well-structured, professional business report format
-- Include "Why this matters:" and "How to execute:" guidance sections
 
 COMPETITOR ANALYSIS REQUIREMENT:
 ${competitorAnalysisInstructions}
@@ -308,7 +306,6 @@ CONTENT REQUIREMENTS:
 - Include specific competitor names where provided
 - NO asterisks, NO bullet points, NO markdown formatting
 - Clean, professional business report format
-- Actionable insights with "Why this matters" and "How to execute"
 - Percentage-only budget allocations (e.g., "Search: 45%")
 - Channel summaries must be 2-3 comprehensive sentences with tactical details
 - Key actions must be specific, actionable tactical items
