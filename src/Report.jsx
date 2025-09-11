@@ -340,29 +340,27 @@ function OptimizedContent({ data }) {
       (data.role || data.funnel_job)
     ) {
       return (
-        <div className="space-y-4">
+        <div>
           <h6 className="font-bold text-slate-900 text-base" style={{marginTop: '0px', marginBottom: '0px'}}>
             {data.channel}
           </h6>
 
           {data.summary && (
-            <p className="text-slate-700 leading-relaxed" style={{marginTop: '12px'}}>{data.summary}</p>
+            <p className="text-slate-700 leading-relaxed" style={{marginTop: '12px', marginBottom: '12px'}}>{data.summary}</p>
           )}
 
           {data.why_it_works && (
-            <p className="text-slate-700 leading-relaxed">{data.why_it_works}</p>
+            <p className="text-slate-700 leading-relaxed" style={{marginTop: '0px', marginBottom: '12px'}}>{data.why_it_works}</p>
           )}
 
-          <div className="space-y-2 text-slate-700">
-            <p>Purchase intent level: {data.intent}</p>
-            <p>Funnel job: {data.role}</p>
-            {data.success_metric && (
-              <p>Success metric: {data.success_metric}</p>
-            )}
-            {data.budget_percent !== undefined && (
-              <p>Budget percent: {data.budget_percent}%</p>
-            )}
-          </div>
+          <p className="text-slate-700" style={{marginTop: '0px', marginBottom: '4px'}}>Purchase intent level: {data.intent}</p>
+          <p className="text-slate-700" style={{marginTop: '0px', marginBottom: '4px'}}>Funnel job: {data.role}</p>
+          {data.success_metric && (
+            <p className="text-slate-700" style={{marginTop: '0px', marginBottom: '4px'}}>Success metric: {data.success_metric}</p>
+          )}
+          {data.budget_percent !== undefined && (
+            <p className="text-slate-700" style={{marginTop: '0px', marginBottom: '4px'}}>Budget percent: {data.budget_percent}%</p>
+          )}
         </div>
       );
     }
