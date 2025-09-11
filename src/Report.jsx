@@ -329,46 +329,40 @@ function OptimizedContent({ data }) {
 
   if (typeof data === "object") {
     /* ----------------------------------------------------------
-       SPECIAL RENDERER for channel_playbook objects
+       SPECIAL RENDERER for individual channel objects
        ---------------------------------------------------------- */
     if (
-      Array.isArray(data) &&
-      data.length > 0 &&
-      data[0] &&
-      typeof data[0] === "object" &&
-      (data[0].channel || data[0].name) &&
-      (data[0].intent || data[0].purchase_intent) &&
-      (data[0].role || data[0].funnel_job)
+      !Array.isArray(data) &&
+      data &&
+      typeof data === "object" &&
+      data.channel &&
+      (data.intent || data.purchase_intent) &&
+      (data.role || data.funnel_job)
     ) {
       return (
-        <div className="space-y-8">
-          {data.map((row, idx) => (
-            <div key={idx} className="space-y-4">
-              <h6 className="font-bold text-slate-900 text-base" style={{marginTop: idx > 0 ? '32px' : '0px', marginBottom: '0px'}}>
-                {row.channel || row.name}
-              </h6>
+        <div className="space-y-4">
+          <h6 className="font-bold text-slate-900 text-base" style={{marginTop: '0px', marginBottom: '0px'}}>
+            {data.channel}
+          </h6>
 
-              {(row.summary || row.description) && (
-                <p className="text-slate-700 leading-relaxed" style={{marginTop: '12px'}}>{row.summary || row.description}</p>
-              )}
+          {data.summary && (
+            <p className="text-slate-700 leading-relaxed" style={{marginTop: '12px'}}>{data.summary}</p>
+          )}
 
-              {(row.why_it_works || row.rationale) && (
-                <p className="text-slate-700 leading-relaxed">{row.why_it_works || row.rationale}</p>
-              )}
+          {data.why_it_works && (
+            <p className="text-slate-700 leading-relaxed">{data.why_it_works}</p>
+          )}
 
-              <div className="space-y-2 text-slate-700">
-                <p>Purchase intent level: {row.intent || row.purchase_intent || 'N/A'}</p>
-                <p>Funnel job: {row.role || row.funnel_job || 'N/A'}</p>
-                {(row.success_metric || row.metric) && (
-                  <p>Success metric: {row.success_metric || row.metric}</p>
-                )}
-                {(row.budget_percent !== undefined || row.budget !== undefined) && (
-                  <p>Budget percent: {row.budget_percent || row.budget}%</p>
-                )}
-              </div>
-
-            </div>
-          ))}
+          <div className="space-y-2 text-slate-700">
+            <p>Purchase intent level: {data.intent}</p>
+            <p>Funnel job: {data.role}</p>
+            {data.success_metric && (
+              <p>Success metric: {data.success_metric}</p>
+            )}
+            {data.budget_percent !== undefined && (
+              <p>Budget percent: {data.budget_percent}%</p>
+            )}
+          </div>
         </div>
       );
     }
