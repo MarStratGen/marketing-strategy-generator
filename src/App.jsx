@@ -505,6 +505,9 @@ export default function App() {
               >
                 {loading ? <LoadingSpinner /> : "Generate Marketing Strategy"}
               </button>
+              <p className="text-sm text-gray-500 text-center mt-2">
+                Usually takes 15-30 seconds
+              </p>
             </form>
           </div>
 
