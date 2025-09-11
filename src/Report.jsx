@@ -340,25 +340,29 @@ function OptimizedContent({ data }) {
       data[0].role
     ) {
       return (
-        <ul className="space-y-2 list-none">
+        <div className="space-y-8">
           {data.map((row, idx) => (
-            <li key={idx} className="space-y-1">
-              <p className="font-bold text-lg text-slate-900">
-                {idx + 1}. {row.channel}
-              </p>
+            <div key={idx} className="space-y-4">
+              <h6 className="font-bold text-slate-900 text-base" style={{marginTop: idx > 0 ? '32px' : '0px', marginBottom: '0px'}}>
+                {row.channel}
+              </h6>
 
               {row.summary && (
-                <p className="text-slate-700 leading-relaxed">{row.summary}</p>
+                <p className="text-slate-700 leading-relaxed" style={{marginTop: '12px'}}>{row.summary}</p>
               )}
 
-              <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                <InfoBox label="Purchase intent level" value={row.intent} />
-                <InfoBox label="Funnel job" value={row.role} />
+              {row.why_it_works && (
+                <p className="text-slate-700 leading-relaxed">{row.why_it_works}</p>
+              )}
+
+              <div className="space-y-2 text-slate-700">
+                <p>Purchase intent level: {row.intent}</p>
+                <p>Funnel job: {row.role}</p>
+                {row.success_metric && (
+                  <p>Success metric: {row.success_metric}</p>
+                )}
                 {row.budget_percent !== undefined && (
-                  <InfoBox
-                    label="Budget share"
-                    value={`${row.budget_percent}%`}
-                  />
+                  <p>Budget percent: {row.budget_percent}%</p>
                 )}
               </div>
 
@@ -372,21 +376,9 @@ function OptimizedContent({ data }) {
                   </ul>
                 </div>
               )}
-
-              {row.success_metric && (
-                <p className="text-sm text-slate-600 italic mt-2">
-                  Success metric · {row.success_metric}
-                </p>
-              )}
-
-              {row.why_it_works && (
-                <p className="text-sm text-blue-600 mt-1 italic">
-                  Why it works: {row.why_it_works}
-                </p>
-              )}
-            </li>
+            </div>
           ))}
-        </ul>
+        </div>
       );
     }
     /* ----- keep existing object-renderer below this line ----- */
