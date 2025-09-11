@@ -211,6 +211,25 @@ export default {
       return report;
     }
 
+    // Align budget allocation with channel playbook
+    function alignBudgetWithChannels(report) {
+      if (!report.channel_playbook || !Array.isArray(report.channel_playbook)) {
+        return report;
+      }
+
+      // Take first 3 channels from playbook (already have budget_percent values)
+      const channels = report.channel_playbook.slice(0, 3);
+      
+      if (channels.length >= 3) {
+        const budgetText = `Primary Allocation\n${channels[0].channel}: ${channels[0].budget_percent}% to ${channels[0].role.toLowerCase()}.\n\nSecondary Allocation\n${channels[1].channel}: ${channels[1].budget_percent}% to ${channels[1].role.toLowerCase()}.\n\nSupporting Allocation\n${channels[2].channel}: ${channels[2].budget_percent}% to ${channels[2].role.toLowerCase()}.\n\nAllocation Rationale\nPrioritise the primary channel to capture high-intent demand whilst supporting with secondary and tertiary channels for comprehensive market coverage through integrated channel approach.`;
+        
+        if (!report.budget) report.budget = {};
+        report.budget.allocation = budgetText;
+      }
+      
+      return report;
+    }
+
     /* ─── build prompt ─── */
     const hintChannels = JSON.stringify(channelByMotion[form.motion] || []);
 
@@ -334,14 +353,14 @@ REQUIRED JSON STRUCTURE WITH EXACT FIELD NAMES:
   
   "budget": {
     "band": "${form.budget_band || "Low"}",
-    "allocation": "Primary Allocation\\nAllocate 45% to the highest-intent channel to capture ready-to-convert traffic. Assign 30% to the secondary channel to build awareness and engagement across target segments.\\n\\nSupporting Allocation\\nDirect 25% to the tertiary channel for complementary reach and strategic support.\\n\\nAllocation Rationale\\nPrioritise the highest-performing channel to capture bottom-funnel demand when customers are ready to convert. Balance with secondary channels to build top-funnel awareness and provide comprehensive market coverage through integrated channel approach."
+    "allocation": "Budget allocation will be generated from channel_playbook data during post-processing."
   },
   
   "calendar_next_90_days": "Month 1: Foundation\\nWeek 1: Launch search campaigns and establish tracking systems. Week 2: Deploy social media advertising and content calendar. Week 3: Implement email sequences and retargeting pixels. Week 4: Execute A/B tests and optimise initial performance.\\n\\nMonth 2: Scaling\\nWeek 5: Scale successful campaigns and expand audience targeting. Week 6: Launch additional creative variations and test new channels. Week 7: Implement conversion optimisation protocols. Week 8: Execute competitive response initiatives.\\n\\nMonth 3: Optimisation\\nWeek 9: Analyse performance data and adjust budget allocation. Week 10: Deploy advanced targeting and personalisation. Week 11: Execute retention campaigns and loyalty programmes. Week 12: Prepare quarterly review and strategy adjustments.\\n\\nCritical Milestones\\nExecute campaign launches by week 1. Complete initial optimisation by week 4. Achieve scaling targets by week 8. Deliver quarterly objectives by week 12.",
   
   "kpis": "Primary KPIs\\nTrack conversion rate at 3.5% to measure campaign effectiveness. Monitor cost per acquisition at £25 to ensure profitability. Measure return on advertising spend at 400% for overall performance.\\n\\nSecondary KPIs\\nMonitor click-through rates across channels to assess engagement quality. Track customer lifetime value to evaluate long-term success. Measure brand awareness lift through surveys and organic search volume.\\n\\nLeading Indicators\\nTrack impression share to predict market capture potential. Monitor quality scores to anticipate cost efficiency changes. Measure engagement rates to forecast conversion performance.\\n\\nMeasurement Framework\\nReport weekly performance against targets. Analyse monthly trends and quarterly strategic reviews. Source data from Google Analytics, advertising platforms, and customer surveys.",
   
-  "risks_and_safety_nets": "High-Risk Scenarios\\nMarket analysis reveals potential competitor response could increase acquisition costs by 40%. Economic downturn might reduce customer demand by 25%. Platform algorithm changes could decrease organic reach by 60%.\\n\\nMitigation Strategies\\nDiversify advertising spend across multiple platforms to reduce dependency. Establish contingency budgets for competitive responses. Develop organic content strategies to offset paid media vulnerabilities.\\n\\nSafety Nets\\nMaintain reserve budget of 20% for rapid competitive response. Implement automated bid management to control cost increases. Establish alternative acquisition channels as backup options.",
+  "risks_and_safety_nets": "Generate contextual risks based on the specific business, sector, country, and marketing channels being recommended. Consider business-specific vulnerabilities like operational risks, market conditions, seasonal factors, regulatory concerns, competitive threats, and economic dependencies that actually affect this particular business type and sector. Include relevant mitigation strategies and safety nets that make sense for the recommended marketing channels and business model. DO NOT use generic digital marketing risks that don't apply to traditional marketing channels or specific business contexts.",
   
   "experiments": "Priority Tests\\nExecute landing page testing to compare conversion rates between [variation A] and [variation B]. Launch audience segmentation tests to identify highest-performing demographics. Implement creative testing to optimise advertising performance.\\n\\nTesting Framework\\nDesign experiments with statistical significance thresholds of 95%. Establish test duration of minimum 2 weeks for reliable results. Implement holdout groups for accurate measurement.\\n\\nImplementation Plan\\nLaunch landing page tests in week 1. Execute audience tests in week 3. Deploy creative tests in week 5. Analyse results and implement winning variations by week 8."
 }
@@ -358,6 +377,8 @@ CONTENT REQUIREMENTS:
 - Key actions must be specific, actionable tactical items
 - Why it works explanations must be detailed strategic reasoning
 - MANDATORY: Use British English spelling and terminology throughout
+- Budget allocation MUST reference exactly the same channels from channel_playbook with matching percentages
+- CRITICAL: Generate contextual, business-specific risks and safety nets that relate to the actual sector, marketing channels, and business model being recommended
 
 BRITISH ENGLISH COMPLIANCE:
 - adverts NOT ads
@@ -373,7 +394,7 @@ BRITISH ENGLISH COMPLIANCE:
 - amongst NOT among
 
 TASK:
-Create a comprehensive, well-structured marketing strategy using the exact JSON format above. Focus on clean, readable content with clear headings and actionable insights. Prominently feature any named competitors throughout the analysis. Pay special attention to creating rich, detailed channel playbook content. MUST use British English spelling and terminology exclusively throughout.
+Create a comprehensive, well-structured marketing strategy using the exact JSON format above. Focus on clean, readable content with clear headings and actionable insights. Prominently feature any named competitors throughout the analysis. Pay special attention to creating rich, detailed channel playbook content. Generate contextual risks specific to this business type, sector, and marketing approach. MUST use British English spelling and terminology exclusively throughout.
 
 OUTPUT:
 Return valid JSON only with the exact field structure, clean formatting, and British English language specified above.`;
@@ -394,7 +415,7 @@ Return valid JSON only with the exact field structure, clean formatting, and Bri
           response_format: { type: "json_object" },
           messages: [
             { role: "system",
-              content: "You are Mark Ritson meets Philip Kotler - the world's leading marketing strategist. Write comprehensive, actionable marketing strategies EXCLUSIVELY in British English with UK spelling and terminology. Use clean, professional business report format with NO markdown formatting, NO asterisks, NO bullet symbols. Always prominently feature any named competitors provided. Use percentage allocations only for budgets - no currency symbols. Create rich, detailed channel playbook content with comprehensive tactical details. CRITICAL: Recommend integrated marketing approaches combining BOTH digital AND traditional channels based on business type, target market, and local context. Consider print advertising, radio, television, direct mail, outdoor advertising, trade shows, telemarketing, local community engagement, and other traditional tactics alongside digital channels. MANDATORY: Use British spellings - adverts not ads, organisations not organizations, realise not realize, optimise not optimize, analyse not analyze, behaviour not behavior, colour not color, centre not center. Follow section-specific language styles: analytical sections use descriptive language, strategic sections use business recommendations, tactical sections use action directives, planning sections use strategic recommendations." },
+              content: "You are Mark Ritson meets Philip Kotler - the world's leading marketing strategist. Write comprehensive, actionable marketing strategies EXCLUSIVELY in British English with UK spelling and terminology. Use clean, professional business report format with NO markdown formatting, NO asterisks, NO bullet symbols. Always prominently feature any named competitors provided. Use percentage allocations only for budgets - no currency symbols. Create rich, detailed channel playbook content with comprehensive tactical details. CRITICAL: Recommend integrated marketing approaches combining BOTH digital AND traditional channels based on business type and target market. Consider print advertising, radio, television, direct mail, outdoor advertising, trade shows, telemarketing, local community engagement, and other traditional tactics alongside digital channels. MANDATORY: Use British spellings - adverts not ads, organisations not organizations, realise not realize, optimise not optimize, analyse not analyze, behaviour not behavior, colour not color, centre not center. Follow section-specific language styles: analytical sections use descriptive language, strategic sections use business recommendations, tactical sections use action directives, planning sections use strategic recommendations. CRITICAL: Generate contextual, business-specific risks and safety nets that relate to the actual sector, marketing channels, business model, and market conditions rather than generic digital marketing risks." },
             ...EXAMPLES.map(t => ({ role: "assistant", content: t })),
             { role: "user", content: prompt }
           ]
@@ -421,31 +442,28 @@ Return valid JSON only with the exact field structure, clean formatting, and Bri
       if (!json.error) {
         json = applyMotionDefaults(json, form);
         json = stripCurrencyAndAmounts(json);
+        json = alignBudgetWithChannels(json);
       }
 
-      return new Response(JSON.stringify(json), {
-        ...cors(),
-        headers: { ...cors().headers, "Content-Type":"application/json" }
-      });
+      return new Response(JSON.stringify(json), cors());
 
-    } catch (err) {
+    } catch (e) {
       return new Response(
-        JSON.stringify({ error:"worker_crash", detail:String(err) }),
+        JSON.stringify({ error:"worker_error", detail: String(e) }),
         cors(500)
       );
     }
   }
 };
 
-/* CORS helper */
 function cors(status = 200) {
   return {
     status,
     headers: {
       "Access-Control-Allow-Origin": "*",
-      "Access-Control-Allow-Headers": "Content-Type, Authorization",
-      "Access-Control-Allow-Methods": "POST,OPTIONS",
-      "Access-Control-Max-Age": "86400"
+      "Access-Control-Allow-Methods": "GET,POST,OPTIONS",
+      "Access-Control-Allow-Headers": "Content-Type, Authorization, X-Dev-Mode",
+      "Content-Type": "application/json"
     }
   };
 }
