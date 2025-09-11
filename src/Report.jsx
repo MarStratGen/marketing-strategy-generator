@@ -446,7 +446,8 @@ function FormattedText({ text }) {
                 !cleanLine.includes('.') && // No periods (usually not in headings)
                 !cleanLine.includes('http') && // Not a URL
                 !cleanLine.match(/\d{2,}/)) || // No long numbers
-                /^Month \d+:/.test(cleanLine) // OR month headers like "Month 1: Foundation"
+                /^Month \d+:/.test(cleanLine) || // OR month headers like "Month 1: Foundation"
+                /^Pillar \d+:/.test(cleanLine) // OR pillar headers like "Pillar 1: Market Penetration"
               );
               
               if (isSubheading) {
