@@ -311,7 +311,7 @@ REQUIRED JSON STRUCTURE WITH EXACT FIELD NAMES:
   
   "experiments": "Priority Tests\\n\\nKey experiments with hypothesis, methodology, and success criteria for each test.\\n\\nTesting Framework\\n\\nTest design principles, measurement approach, and learning objectives.\\n\\nImplementation Plan\\n\\nTesting sequence, resource requirements, timeline and milestones.",
   
-  "glossary": "Marketing Terms\\n\\nClear definitions of key marketing terms used in the strategy.\\n\\nIndustry-Specific Terms\\n\\nContext-specific definitions relevant to the sector.\\n\\nAcronyms and Abbreviations\\n\\nFull meanings and explanations of acronyms used throughout the report."
+  "glossary": "Marketing Terms\\n\\nClear definitions of key marketing terms used in the strategy.\\n\\nAcronyms and Abbreviations\\n\\nFull meanings and explanations of acronyms used throughout the report."
 }
 
 CONTENT REQUIREMENTS:
