@@ -152,7 +152,6 @@ function ContentSections({ data }) {
       priority: "medium",
       items: [
         { title: "Key Performance Indicators", data: data.kpis },
-        { title: "Glossary", data: data.glossary },
       ],
     },
   ];
