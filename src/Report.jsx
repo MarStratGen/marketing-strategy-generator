@@ -366,16 +366,6 @@ function OptimizedContent({ data }) {
                 )}
               </div>
 
-              {row.key_actions?.length && (
-                <div>
-                  <h6 className="font-semibold mt-3 mb-1">Key actions</h6>
-                  <ul className="list-disc ml-6 space-y-1">
-                    {row.key_actions.map((a, i) => (
-                      <li key={i}>{a}</li>
-                    ))}
-                  </ul>
-                </div>
-              )}
             </div>
           ))}
         </div>
