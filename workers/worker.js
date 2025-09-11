@@ -427,7 +427,15 @@ Create a comprehensive, well-structured marketing strategy using the exact JSON 
 OUTPUT:
 Return valid JSON only with the exact field structure, clean formatting, and British English language specified above.`;
 
-    /* 4. OpenAI call */
+    /* 6. Check API key */
+    if (!env.OPENAI_API_KEY) {
+      return new Response(
+        JSON.stringify({ error: "api_key_not_configured" }), 
+        cors(503, origin)
+      );
+    }
+
+    /* 7. OpenAI call */
     try {
       const ai = await fetch("https://api.openai.com/v1/chat/completions", {
         method: "POST",
