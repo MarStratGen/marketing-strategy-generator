@@ -254,7 +254,7 @@ REQUIRED JSON STRUCTURE WITH EXACT FIELD NAMES:
   
   "differentiation_moves": "Core Differentiation Strategy\\nUnique value proposition, key differentiators, and competitive advantages.\\n\\nPositioning Tactics\\nSpecific positioning against named competitors and market positioning approach.\\n\\nMessaging Framework\\nCore messages, proof points, and communication strategy.",
   
-  "marketing_mix_7ps": "Product\\nProduct strategy, features and benefits, product development priorities.\\n\\nPrice\\nPricing strategy, competitive pricing analysis, value communication.\\n\\nPlace\\nDistribution channels, channel strategy, market access approach.\\n\\nPromotion\\nPromotional strategy, communication channels, campaign approach.\\n\\nPeople\\nTarget audiences, customer service strategy, team requirements.\\n\\nProcess\\nCustomer journey, service delivery, operational excellence.\\n\\nPhysical Evidence\\nBrand assets, customer touchpoints, credibility factors.",
+  "marketing_mix_7ps": "Product\\nProduct strategy, features and benefits, product development priorities.\\n\\nPrice\\nPricing strategy, competitive pricing analysis, value communication.\\n\\nPlace\\nDistribution channels, channel strategy, market access approach.\\n\\nPromotion\\nPromotional strategy, communication channels, campaign approach.\\n\\nPeople\\nStaff capabilities, team training and development, customer service team strategy, human resource requirements.\\n\\nProcess\\nCustomer journey, service delivery, operational excellence.\\n\\nPhysical Evidence\\nBrand assets, customer touchpoints, credibility factors.",
   
   "channel_playbook": [
     {
