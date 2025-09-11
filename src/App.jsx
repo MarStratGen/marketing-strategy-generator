@@ -242,7 +242,7 @@ export default function App() {
       // Check for expected structure based on the updated Cloudflare Worker response format
       if (
         !data.meta &&
-        !data.introduction &&
+        false &&
         !data.marketing_mix_7ps &&
         !data.error
       ) {

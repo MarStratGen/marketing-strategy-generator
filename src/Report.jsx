@@ -111,7 +111,6 @@ function ContentSections({ data }) {
       color: "blue",
       priority: "high",
       items: [
-        { title: "Introduction", data: data.introduction },
         { title: "Market Foundation", data: data.market_foundation },
         { title: "Competitor Analysis", data: data.competitors_brief },
         { title: "Differentiation Moves", data: data.differentiation_moves },
@@ -510,7 +509,6 @@ const downloadExcel = (data) => {
       ["Generated:", new Date().toLocaleDateString()],
       [""],
       ["Overview"],
-      ["Introduction", data.introduction || "N/A"],
       [""],
       ["Strategy Pillars"],
       ...(data.strategy_pillars || []).map((pillar, i) => [
@@ -589,21 +587,6 @@ const downloadWord = async (data) => {
             }),
             new Paragraph({ text: "" }),
 
-            new Paragraph({
-              children: [
-                new TextRun({ text: "Introduction", bold: true, size: 28 }),
-              ],
-              heading: HeadingLevel.HEADING_1,
-            }),
-            new Paragraph({
-              children: [
-                new TextRun({
-                  text: data.introduction || "No introduction provided.",
-                  size: 22,
-                }),
-              ],
-            }),
-            new Paragraph({ text: "" }),
 
             new Paragraph({
               children: [

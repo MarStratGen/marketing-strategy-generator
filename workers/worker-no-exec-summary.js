@@ -253,7 +253,6 @@ REQUIRED JSON STRUCTURE WITH EXACT FIELD NAMES:
     "sector": "${form.sector}",
     "goal": "${derivedGoal}"
   },
-  "introduction": "Strategic Overview\\n\\nKey opportunity areas and primary recommendations. Expected outcomes and strategic direction for the campaign.\\n\\nWhy this matters: Context and strategic importance.\\nHow to execute: Implementation approach and next steps.",
   
   "market_foundation": "Market Overview\\n\\nMarket size, growth trends, and key dynamics affecting the sector.\\n\\nCustomer Behaviour Insights\\n\\nPurchasing patterns, decision-making factors, pain points and motivations that drive customer behaviour.\\n\\nMarket Opportunities\\n\\nUnderserved segments, emerging trends, and growth areas to target.\\n\\nWhy this matters: Strategic context for market positioning.\\nHow to execute: Action steps for market entry and expansion.",
   
