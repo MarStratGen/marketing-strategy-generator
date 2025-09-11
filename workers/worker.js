@@ -40,8 +40,8 @@ export default {
       'http://localhost:5000',
       'https://localhost:5000',
       'http://127.0.0.1:5000', 
-      'https://127.0.0.1:5000'
-      // Add production domain here
+      'https://127.0.0.1:5000',
+      'https://4ed238b6-44fe-47f0-8f40-754dbed6c70c-00-31bwxps5rwfru.worf.replit.dev'
     ];
     
     if (origin && !allowedOrigins.includes(origin)) {
@@ -515,8 +515,7 @@ function cors(status = 200, origin = null) {
     'https://localhost:5000', 
     'http://127.0.0.1:5000',
     'https://127.0.0.1:5000',
-    // Add your production domain here when deployed
-    // 'https://your-domain.com'
+    'https://4ed238b6-44fe-47f0-8f40-754dbed6c70c-00-31bwxps5rwfru.worf.replit.dev'
   ];
   
   // Only set CORS origin if the request origin is in allowlist
