@@ -472,19 +472,22 @@ function FormattedText({ text }) {
                 );
               }
               
-              // Check for multiple definitions/KPIs/weeks that should be on separate lines
+              // Check for multiple definitions/KPIs/weeks/milestones that should be on separate lines
               // Pattern 1: Comma + space + uppercase abbreviation + colon (e.g., "KPI: definition, CTR: definition")
               // Pattern 2: Period + space + words + colon (e.g., "sentence. New Term: definition")
               // Pattern 3: Period + Week (for action plans like "adverts.Week 3-4:")
+              // Pattern 4: Period + space + Capital letter (for milestones like "day 7. Complete initial")
               if ((cleanLine.includes(':') && 
                   (cleanLine.match(/, [A-Z]{2,}:/g) || cleanLine.match(/\. [A-Z][a-zA-Z\s]+:/g))) ||
-                  cleanLine.match(/\.\s*Week \d/g)) {
+                  cleanLine.match(/\.\s*Week \d/g) ||
+                  cleanLine.match(/\. [A-Z][a-z]/g)) {
                 
                 // Split on:
                 // - comma before abbreviations  
                 // - period before terms with colons
                 // - period before "Week" 
-                let parts = cleanLine.split(/, (?=[A-Z]{2,}:)|(?<=\.) (?=[A-Z][a-zA-Z\s]+:)|(?<=\.)\s*(?=Week \d)/)
+                // - period before capital letters (for milestones)
+                let parts = cleanLine.split(/, (?=[A-Z]{2,}:)|(?<=\.) (?=[A-Z][a-zA-Z\s]+:)|(?<=\.)\s*(?=Week \d)|(?<=\.)\s+(?=[A-Z][a-z])/)
                   .map(part => part.trim())
                   .filter(part => part.length > 0);
                 
