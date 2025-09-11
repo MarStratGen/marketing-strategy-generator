@@ -30,22 +30,50 @@ Balance digital and traditional channels to reach diverse customer segments. Pri
 
 export default {
   async fetch(req, env) {
+    const origin = req.headers.get('Origin');
+    
     /* 1. CORS pre-flight */
-    if (req.method === "OPTIONS") return new Response(null, cors());
+    if (req.method === "OPTIONS") return new Response(null, cors(200, origin));
 
     /* 2. only POST /generate */
     const url = new URL(req.url);
     if (req.method !== "POST" || url.pathname !== "/generate") {
       return new Response(
-        JSON.stringify({ ok: true, routes: ["/generate"] }),
-        cors()
+        JSON.stringify({ error: "method_not_allowed" }),
+        cors(405, origin)
       );
     }
 
-    /* 3. read JSON body */
+    /* 3. Input validation and sanitization */
     let form;
-    try { form = await req.json(); }
-    catch { return new Response(JSON.stringify({ error:"bad_json"}), cors(400)); }
+    try { 
+      const text = await req.text();
+      if (text.length > 10000) { // Prevent oversized requests
+        return new Response(JSON.stringify({ error: "request_too_large" }), cors(413, origin));
+      }
+      form = JSON.parse(text); 
+    }
+    catch { return new Response(JSON.stringify({ error: "invalid_request" }), cors(400, origin)); }
+
+    /* 4. Validate required fields */
+    if (!form.country || typeof form.country !== 'string' || form.country.length > 100) {
+      return new Response(JSON.stringify({ error: "invalid_country" }), cors(400, origin));
+    }
+    if (!form.product_type || typeof form.product_type !== 'string' || form.product_type.length > 1000) {
+      return new Response(JSON.stringify({ error: "invalid_product_type" }), cors(400, origin));
+    }
+    
+    /* 5. Sanitize inputs */
+    form.country = form.country.trim().substring(0, 100);
+    form.sector = form.sector ? form.sector.trim().substring(0, 100) : '';
+    form.product_type = form.product_type.trim().substring(0, 1000);
+    
+    if (form.audiences && Array.isArray(form.audiences)) {
+      form.audiences = form.audiences.slice(0, 10).map(a => String(a).trim().substring(0, 100));
+    }
+    if (form.competitors && Array.isArray(form.competitors)) {
+      form.competitors = form.competitors.slice(0, 10).map(c => String(c).trim().substring(0, 100));
+    }
 
     /* ─── lookup helpers ─── */
     const channelByMotion = {
@@ -425,8 +453,8 @@ Return valid JSON only with the exact field structure, clean formatting, and Bri
       const out = await ai.json();
       if (!ai.ok) {
         return new Response(
-          JSON.stringify({ error:"openai_error", detail: out }),
-          cors(ai.status)
+          JSON.stringify({ error: "ai_service_unavailable" }),
+          cors(503, origin)
         );
       }
 
@@ -434,9 +462,9 @@ Return valid JSON only with the exact field structure, clean formatting, and Bri
       try {
         const content = out.choices?.[0]?.message?.content;
         json = content ? JSON.parse(content)
-                       : { error:"no_content", detail: out };
+                       : { error: "no_content_generated" };
       } catch (e) {
-        json = { error:"bad_model_json", raw:out, parseError:String(e) };
+        json = { error: "invalid_ai_response" };
       }
 
       if (!json.error) {
@@ -445,25 +473,40 @@ Return valid JSON only with the exact field structure, clean formatting, and Bri
         json = alignBudgetWithChannels(json);
       }
 
-      return new Response(JSON.stringify(json), cors());
+      return new Response(JSON.stringify(json), cors(200, origin));
 
     } catch (e) {
       return new Response(
-        JSON.stringify({ error:"worker_error", detail: String(e) }),
-        cors(500)
+        JSON.stringify({ error: "internal_server_error" }),
+        cors(500, origin)
       );
     }
   }
 };
 
-function cors(status = 200) {
+function cors(status = 200, origin = null) {
+  // Security: Only allow specific origins instead of wildcard
+  const allowedOrigins = [
+    'http://localhost:5000',
+    'https://localhost:5000',
+    'http://127.0.0.1:5000',
+    'https://127.0.0.1:5000',
+    // Add your production domain here when deployed
+    // 'https://your-domain.com'
+  ];
+  
+  const corsOrigin = origin && allowedOrigins.includes(origin) ? origin : 'http://localhost:5000';
+  
   return {
     status,
     headers: {
-      "Access-Control-Allow-Origin": "*",
-      "Access-Control-Allow-Methods": "GET,POST,OPTIONS",
-      "Access-Control-Allow-Headers": "Content-Type, Authorization, X-Dev-Mode",
-      "Content-Type": "application/json"
+      "Access-Control-Allow-Origin": corsOrigin,
+      "Access-Control-Allow-Methods": "POST,OPTIONS",
+      "Access-Control-Allow-Headers": "Content-Type",
+      "Content-Type": "application/json",
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY",
+      "X-XSS-Protection": "1; mode=block"
     }
   };
 }
