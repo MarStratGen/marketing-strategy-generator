@@ -106,7 +106,7 @@ const MOTIONS = [
   { label: "Install the app", value: "app_install" },
   { label: "Request a quote or call-back", value: "lead_capture" },
   { label: "Start a free trial", value: "saas_trial" },
-  { label: "Visit a shop or stockist", value: "store_visit" },
+  { label: "Visit a business", value: "store_visit" },
   { label: "Wholesale or bulk enquiry", value: "wholesale_inquiry" },
   { label: "Other (custom)", value: "__custom_motion" },
 ];
