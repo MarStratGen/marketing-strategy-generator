@@ -386,7 +386,7 @@ export default function App() {
               Marketing Strategy Generator
             </h1>
             <p className="text-xl text-white/90 max-w-3xl mx-auto leading-relaxed">
-              Create comprehensive go-to-market strategies with AI-powered
+              Create go-to-market strategies with AI-powered
               insights*
             </p>
           </div>
