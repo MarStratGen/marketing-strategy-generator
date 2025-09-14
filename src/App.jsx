@@ -479,7 +479,7 @@ export default function App() {
               {/* segments */}
               <Field
                 label="Target segment(s)"
-                tooltip="Type a segment and press comma or Enter to add (max 3)."
+                tooltip="Add segments by typing and pressing comma or Enter (max 3)."
                 required
               >
                 <div className="mb-1">
@@ -552,7 +552,7 @@ export default function App() {
               {/* competitors */}
               <Field
                 label="Top competitors"
-                tooltip="Optional. Type a name, press comma or Enter to add (max 3)."
+                tooltip="Optional. Add competitors by typing and pressing comma or Enter (max 3)."
               >
                 <div className="mb-1">
                   {competitors.map((c, i) => (
