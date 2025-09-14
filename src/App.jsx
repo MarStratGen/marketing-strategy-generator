@@ -479,7 +479,7 @@ export default function App() {
               {/* segments */}
               <Field
                 label="Target segment(s)"
-                tooltip="Required. Type a segment and press comma or Enter to add (max 3)."
+                tooltip="Type a segment and press comma or Enter to add (max 3)."
                 required
               >
                 <div className="mb-1">
