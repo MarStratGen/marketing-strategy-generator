@@ -20,18 +20,18 @@ const Pill = ({ text, onRemove }) => (
   </span>
 );
 
-const Field = ({ label, children, tooltip, required }) => (
-  <div className="space-y-1">
-    <div>
-      <label className="block text-sm font-semibold text-gray-800">
-        {label}
-        {required && <span className="text-red-400 ml-1">*</span>}
-      </label>
+const Field = ({ label, children, tooltip, required, id }) => (
+  <div className="space-y-0">
+    <label htmlFor={id} className="block text-sm font-medium text-gray-900 mb-2">
+      {label}
+      {required && <span className="text-red-500 ml-1" aria-hidden="true">*</span>}
+    </label>
+    <div className="space-y-2">
+      {children}
       {tooltip && (
-        <p className="text-xs text-gray-500 mt-1 leading-relaxed">{tooltip}</p>
+        <p className="text-xs text-gray-600 leading-relaxed">{tooltip}</p>
       )}
     </div>
-    {children}
   </div>
 );
 
@@ -399,17 +399,19 @@ export default function App() {
               </div>
             )}
 
-            <form onSubmit={handleSubmit} className="space-y-2">
+            <form onSubmit={handleSubmit} className="space-y-5">
               {/* country */}
               <Field
                 label="Which country are you targeting?"
                 required
                 tooltip="This tailors regional insights and seasonality."
+                id="country"
               >
                 <select
+                  id="country"
                   value={country}
                   onChange={(e) => setCountry(e.target.value)}
-                  className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-white/80 focus:outline-none focus:ring-2 focus:ring-blue-400/50 focus:border-blue-300 focus:bg-white transition-all duration-200 text-gray-700"
+                  className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-white/80 focus:outline-none focus:ring-2 focus:ring-blue-400/50 focus:border-blue-300 focus:bg-white transition-all duration-200 text-gray-700 min-h-[44px]"
                 >
                   {COUNTRIES.map((c) => (
                     <option key={c.code} value={c.code}>
@@ -422,7 +424,7 @@ export default function App() {
                     ref={ccRef}
                     value={customCountry}
                     onChange={(e) => setCCountry(e.target.value)}
-                    className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-white/80 focus:outline-none focus:ring-2 focus:ring-blue-400/50 focus:border-blue-300 focus:bg-white transition-all duration-200 text-gray-700 mt-3"
+                    className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-white/80 focus:outline-none focus:ring-2 focus:ring-blue-400/50 focus:border-blue-300 focus:bg-white transition-all duration-200 text-gray-700 mt-3 min-h-[44px]"
                     placeholder="Type your country"
                   />
                 )}
