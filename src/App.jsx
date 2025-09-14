@@ -191,6 +191,13 @@ export default function App() {
       return;
     }
 
+    if (!segments || segments.length === 0) {
+      setErr("Please add at least one target segment.");
+      setLoading(false);
+      setStreaming(false);
+      return;
+    }
+
     try {
       const body = {
         country: finalCountry,
@@ -472,7 +479,8 @@ export default function App() {
               {/* segments */}
               <Field
                 label="Target segment(s)"
-                tooltip="Type a segment and press comma or Enter to add (max 3)."
+                tooltip="Required. Type a segment and press comma or Enter to add (max 3)."
+                required
               >
                 <div className="mb-1">
                   {segments.map((s, i) => (
