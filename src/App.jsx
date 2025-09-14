@@ -23,14 +23,27 @@ const Pill = ({ text, onRemove }) => (
 
 const Field = ({ label, children, tooltip, required, id }) => (
   <div className="space-y-0">
-    <label htmlFor={id} id={id ? `${id}-label` : undefined} className="block text-sm font-medium text-gray-900 mb-2">
+    <label
+      htmlFor={id}
+      id={id ? `${id}-label` : undefined}
+      className="block text-sm font-medium text-gray-900 mb-2"
+    >
       {label}
-      {required && <span className="text-red-500 ml-1" aria-hidden="true">*</span>}
+      {required && (
+        <span className="text-red-500 ml-1" aria-hidden="true">
+          *
+        </span>
+      )}
     </label>
     <div className="space-y-2">
       {children}
       {tooltip && (
-        <p id={id ? `${id}-help` : undefined} className="text-xs text-gray-600 leading-relaxed">{tooltip}</p>
+        <p
+          id={id ? `${id}-help` : undefined}
+          className="text-xs text-gray-600 leading-relaxed"
+        >
+          {tooltip}
+        </p>
       )}
     </div>
   </div>
@@ -228,8 +241,8 @@ export default function App() {
         // Handle streaming response
         const reader = response.body.getReader();
         const textDecoder = new TextDecoder();
-        let buffer = '';
-        let completeJsonStr = '';
+        let buffer = "";
+        let completeJsonStr = "";
         let finalPlanReceived = false;
 
         setLoading(false); // Start showing streaming content
@@ -239,7 +252,9 @@ export default function App() {
           if (done) {
             // Stream ended - check if we got final plan
             if (!finalPlanReceived) {
-              throw new Error("Stream ended without final plan - falling back to regular request");
+              throw new Error(
+                "Stream ended without final plan - falling back to regular request",
+              );
             }
             break;
           }
@@ -250,35 +265,35 @@ export default function App() {
 
           // Process complete lines from buffer (handle both \n and \r\n)
           const lines = buffer.split(/\r?\n/);
-          buffer = lines.pop() || ''; // Keep incomplete line in buffer
+          buffer = lines.pop() || ""; // Keep incomplete line in buffer
 
           for (const line of lines) {
-            if (line.trim() === '') continue;
-            if (line.startsWith('data: ')) {
+            if (line.trim() === "") continue;
+            if (line.startsWith("data: ")) {
               const data = line.slice(6);
-              if (data === '[DONE]') {
+              if (data === "[DONE]") {
                 // Don't hide streaming UI yet - wait for final event or fallback
                 continue;
               }
-              
+
               try {
                 const parsed = JSON.parse(data);
-                
+
                 // Handle final plan event
-                if (parsed.type === 'final' && parsed.plan) {
+                if (parsed.type === "final" && parsed.plan) {
                   setResult(parsed.plan);
                   setStreamingContent("");
                   finalPlanReceived = true;
                   setStreaming(false);
                   return;
                 }
-                
+
                 // Handle streaming content
                 if (parsed.content) {
                   completeJsonStr += parsed.content;
                   setStreamingContent(completeJsonStr);
                 }
-                
+
                 if (parsed.error) {
                   throw new Error(parsed.error);
                 }
@@ -290,8 +305,11 @@ export default function App() {
           }
         }
       } catch (streamError) {
-        console.log("Streaming failed, falling back to regular request:", streamError);
-        
+        console.log(
+          "Streaming failed, falling back to regular request:",
+          streamError,
+        );
+
         // Fallback to non-streaming
         const r = await fetch(WORKER_URL, {
           method: "POST",
@@ -337,17 +355,35 @@ export default function App() {
     } catch (err) {
       console.error(err);
       const errorMessage = err.message || "Something went wrong.";
-      
+
       // Handle specific error messages from content filtering
-      if (errorMessage.includes("meaningful description") || errorMessage.includes("detailed description")) {
-        setErr("Please provide a clear, meaningful description of your business offering.");
-      } else if (errorMessage.includes("guidelines") || errorMessage.includes("appropriate business information")) {
-        setErr("Please ensure your business information follows our content guidelines.");
+      if (
+        errorMessage.includes("meaningful description") ||
+        errorMessage.includes("detailed description")
+      ) {
+        setErr(
+          "Please provide a clear, meaningful description of your business offering.",
+        );
+      } else if (
+        errorMessage.includes("guidelines") ||
+        errorMessage.includes("appropriate business information")
+      ) {
+        setErr(
+          "Please ensure your business information follows our content guidelines.",
+        );
       } else if (errorMessage.includes("valid business sector")) {
         setErr("Please select or enter a valid business sector.");
-      } else if (errorMessage.includes("api_key") || errorMessage.includes("OPENAI_API_KEY")) {
-        setErr("API configuration issue. Please contact support if this persists.");
-      } else if (errorMessage.includes("rate_limit") || errorMessage.includes("quota")) {
+      } else if (
+        errorMessage.includes("api_key") ||
+        errorMessage.includes("OPENAI_API_KEY")
+      ) {
+        setErr(
+          "API configuration issue. Please contact support if this persists.",
+        );
+      } else if (
+        errorMessage.includes("rate_limit") ||
+        errorMessage.includes("quota")
+      ) {
         setErr("Service temporarily busy. Please wait a moment and try again.");
       } else {
         setErr(errorMessage);
@@ -387,17 +423,16 @@ export default function App() {
               Marketing Strategy Generator
             </h1>
             <p className="text-xl text-white/90 max-w-3xl mx-auto leading-relaxed">
-              Create a marketing strategy with AI-powered
-              insights*
+              Create a marketing strategy with AI-powered insights*
             </p>
           </div>
 
           {/* ---------- form card ---------- */}
           <div className="bg-white rounded-3xl shadow-xl p-10 max-w-lg mx-auto border border-gray-100 mb-20">
             {error && (
-              <div 
-                role="alert" 
-                aria-live="assertive" 
+              <div
+                role="alert"
+                aria-live="assertive"
                 className="bg-red-50 border border-red-200 text-red-800 px-4 py-3 rounded-lg mb-6"
               >
                 {error}
@@ -617,21 +652,32 @@ export default function App() {
                 disabled={loading || streaming}
                 className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-semibold py-4 px-6 rounded-xl transition-all duration-200 disabled:opacity-60 shadow-lg hover:shadow-xl mt-8"
               >
-                {loading ? <LoadingSpinner /> : streaming ? (
+                {loading ? (
+                  <LoadingSpinner />
+                ) : streaming ? (
                   <div className="inline-flex items-center">
                     <div className="animate-pulse rounded-full h-5 w-5 bg-white/30 mr-3"></div>
                     <span>Streaming your strategy…</span>
                   </div>
-                ) : "Generate Marketing Strategy"}
+                ) : (
+                  "Generate Marketing Strategy"
+                )}
               </button>
               <p className="text-sm text-gray-500 text-center mt-2">
-                {streaming ? "Content appears in real-time" : "Usually takes 15-30 seconds"}
+                {streaming
+                  ? "Content appears in real-time"
+                  : "Usually takes 15-30 seconds"}
               </p>
             </form>
           </div>
 
           {/* report */}
-          <Report plan={result} loading={loading} streaming={streaming} streamingContent={streamingContent} />
+          <Report
+            plan={result}
+            loading={loading}
+            streaming={streaming}
+            streamingContent={streamingContent}
+          />
         </div>
       </div>
 
@@ -647,7 +693,12 @@ export default function App() {
                 How does the Marketing Strategy Generator work?
               </h3>
               <p className="text-gray-700 leading-relaxed">
-                This page turns your inputs into a clear brief and sends it to the OpenAI API to draft a marketing strategy and plan. The draft is mapped to classic frameworks like STP and the 7 Ps, with budgets shown as percentages and a 90-day calendar, KPIs, and experiments. You get the result on screen with options to download or print.
+                This page turns your inputs into a clear brief and sends it to
+                the OpenAI API to draft a marketing strategy and plan. The draft
+                is mapped to classic frameworks like STP and the 7 Ps, with
+                budgets shown as percentages and a 90-day calendar, KPIs, and
+                experiments. You get the result on screen with options to
+                download or print.
               </p>
             </div>
 
@@ -656,7 +707,12 @@ export default function App() {
                 Who is the Marketing Strategy Generator for?
               </h3>
               <p className="text-gray-700 leading-relaxed">
-                Founders, small teams, and marketers who want a structured plan they can act on. It works for product and service businesses, online and offline, B2C and B2B. Treat it as guidance, not professional advice. AI can draft quickly, but a real marketer will still make better calls where context, trade offs, and judgement matter.
+                Founders, small teams, and marketers who want a structured plan
+                they can act on. It works for product and service businesses,
+                online and offline, B2C and B2B. Treat it as guidance, not
+                professional advice. AI can draft quickly, but a real marketer
+                will still make better calls where context, trade offs, and
+                judgement matter.
               </p>
             </div>
 
@@ -665,7 +721,10 @@ export default function App() {
                 Is this enough on its own?
               </h3>
               <p className="text-gray-700 leading-relaxed">
-                Use it as version one. Validate the ideas with customers, run small tests, measure results, and iterate. When stakes are high, ask a real marketer to sanity check the plan and tailor it to your budget, brand, and operations.
+                Use it as version one. Validate the ideas with customers, run
+                small tests, measure results, and iterate. When stakes are high,
+                ask a real marketer to sanity check the plan and tailor it to
+                your budget, brand, and operations.
               </p>
             </div>
 
@@ -674,7 +733,12 @@ export default function App() {
                 Is my business information kept private?
               </h3>
               <p className="text-gray-700 leading-relaxed">
-                This page keeps data use minimal. Plan inputs are processed in memory to generate your draft and are not stored by this page after the response is returned. Inputs are sent to the OpenAI API solely to create the draft and may be briefly retained by that provider for security or operations. This page does not run analytics or set cookies. Please do not submit sensitive or personal information.
+                This page keeps data use minimal. Plan inputs are processed in
+                memory to generate your draft and are not stored by this page
+                after the response is returned. Inputs are sent to the OpenAI
+                API solely to create the draft and may be briefly retained by
+                that provider for security or operations. Please do not submit
+                sensitive or personal information.
               </p>
             </div>
           </div>
