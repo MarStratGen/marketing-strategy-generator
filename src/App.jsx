@@ -544,7 +544,7 @@ export default function App() {
               {/* competitors */}
               <Field
                 label="Top competitors"
-                tooltip="Optional – up to three. Type a name, press comma or Enter."
+                tooltip="Optional. Type a name, press comma or Enter to add (max 3)."
               >
                 <div className="mb-1">
                   {competitors.map((c, i) => (
