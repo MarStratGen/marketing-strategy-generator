@@ -383,18 +383,8 @@ export default function App() {
 
         <div className="relative z-10 py-16 px-4">
           <div className="text-center mb-16">
-            <h1 className="text-5xl font-black text-yellow-400 mb-6 tracking-tight leading-tight" style={{
-              textShadow: `
-                2px 2px 0px #d97706,
-                4px 4px 0px #92400e,
-                6px 6px 0px #451a03,
-                8px 8px 12px rgba(0,0,0,0.4)
-              `,
-              WebkitTextStroke: '1px #f59e0b'
-            }}>
-              MARKETING<br/>
-              STRATEGY<br/>
-              GENERATOR
+            <h1 className="text-5xl font-bold text-white mb-6 tracking-tight">
+              Marketing Strategy Generator
             </h1>
             <p className="text-xl text-white/90 max-w-3xl mx-auto leading-relaxed">
               Create a marketing strategy with AI-powered
