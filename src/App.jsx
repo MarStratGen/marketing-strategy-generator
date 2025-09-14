@@ -552,7 +552,7 @@ export default function App() {
               {/* competitors */}
               <Field
                 label="Top competitors"
-                tooltip="Optional. Add competitors by typing and pressing comma or Enter (max 3)."
+                tooltip="Add competitors by typing and pressing comma or Enter (max 3)."
               >
                 <div className="mb-1">
                   {competitors.map((c, i) => (
