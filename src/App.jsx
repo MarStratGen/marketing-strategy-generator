@@ -432,7 +432,7 @@ export default function App() {
                   className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-white/80 focus:outline-none focus:ring-2 focus:ring-blue-400/50 focus:border-blue-300 focus:bg-white transition-all duration-200 text-gray-700"
                 >
                   <option value="" disabled>
-                    Choose your industry (optional)
+                    Choose your sector (optional)
                   </option>
                   {[
                     ...SECTORS.map((s) => ({ code: s, label: s })),
