@@ -12,8 +12,9 @@ const Pill = ({ text, onRemove }) => (
     {text}
     <button
       onClick={onRemove}
-      className="ml-2 w-4 h-4 flex items-center justify-center text-gray-400 hover:text-gray-600 hover:bg-gray-200 rounded-full text-xs transition-colours"
+      className="ml-2 w-4 h-4 flex items-center justify-center text-gray-400 hover:text-gray-600 hover:bg-gray-200 rounded-full text-xs transition-colors"
       title="Remove"
+      aria-label={`Remove ${text}`}
     >
       ×
     </button>
@@ -22,21 +23,21 @@ const Pill = ({ text, onRemove }) => (
 
 const Field = ({ label, children, tooltip, required, id }) => (
   <div className="space-y-0">
-    <label htmlFor={id} className="block text-sm font-medium text-gray-900 mb-2">
+    <label htmlFor={id} id={id ? `${id}-label` : undefined} className="block text-sm font-medium text-gray-900 mb-2">
       {label}
       {required && <span className="text-red-500 ml-1" aria-hidden="true">*</span>}
     </label>
     <div className="space-y-2">
       {children}
       {tooltip && (
-        <p className="text-xs text-gray-600 leading-relaxed">{tooltip}</p>
+        <p id={id ? `${id}-help` : undefined} className="text-xs text-gray-600 leading-relaxed">{tooltip}</p>
       )}
     </div>
   </div>
 );
 
 const LoadingSpinner = () => (
-  <div className="inline-flex items-centre">
+  <div className="inline-flex items-center">
     <div className="animate-spin rounded-full h-5 w-5 border-2 border-white/30 border-t-white mr-3"></div>
     <span>Creating your marketing strategy…</span>
   </div>
@@ -368,7 +369,7 @@ export default function App() {
           backgroundImage:
             "url('/birmingham-museums-trust-YvNiIyGdMfs-unsplash_1757466351093.jpg')",
           backgroundSize: "cover",
-          backgroundPosition: "centre",
+          backgroundPosition: "center",
           backgroundAttachment: "fixed",
         }}
       >
@@ -394,7 +395,11 @@ export default function App() {
           {/* ---------- form card ---------- */}
           <div className="bg-white rounded-3xl shadow-xl p-10 max-w-lg mx-auto border border-gray-100 mb-20">
             {error && (
-              <div className="bg-red-50 border border-red-200 text-red-800 px-4 py-3 rounded-lg mb-6">
+              <div 
+                role="alert" 
+                aria-live="assertive" 
+                className="bg-red-50 border border-red-200 text-red-800 px-4 py-3 rounded-lg mb-6"
+              >
                 {error}
               </div>
             )}
@@ -411,6 +416,8 @@ export default function App() {
                   id="country"
                   value={country}
                   onChange={(e) => setCountry(e.target.value)}
+                  aria-describedby="country-help"
+                  required
                   className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-white/80 focus:outline-none focus:ring-2 focus:ring-blue-400/50 focus:border-blue-300 focus:bg-white transition-all duration-200 text-gray-700 min-h-[44px]"
                 >
                   {COUNTRIES.map((c) => (
@@ -426,6 +433,9 @@ export default function App() {
                     onChange={(e) => setCCountry(e.target.value)}
                     className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-white/80 focus:outline-none focus:ring-2 focus:ring-blue-400/50 focus:border-blue-300 focus:bg-white transition-all duration-200 text-gray-700 mt-3 min-h-[44px]"
                     placeholder="Type your country"
+                    aria-labelledby="country-label"
+                    aria-describedby="country-help"
+                    required
                   />
                 )}
               </Field>
@@ -433,12 +443,15 @@ export default function App() {
               {/* sector */}
               <Field
                 label="Sector"
-                tooltip="If yours isn’t listed, choose Other."
+                tooltip="If yours isn't listed, choose Other."
+                id="sector"
               >
                 <select
+                  id="sector"
                   value={sector}
                   onChange={(e) => setSector(e.target.value)}
-                  className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-white/80 focus:outline-none focus:ring-2 focus:ring-blue-400/50 focus:border-blue-300 focus:bg-white transition-all duration-200 text-gray-700"
+                  aria-describedby="sector-help"
+                  className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-white/80 focus:outline-none focus:ring-2 focus:ring-blue-400/50 focus:border-blue-300 focus:bg-white transition-all duration-200 text-gray-700 min-h-[44px]"
                 >
                   <option value="" disabled>
                     Choose your sector (optional)
@@ -457,8 +470,10 @@ export default function App() {
                     ref={csRef}
                     value={customSector}
                     onChange={(e) => setCSector(e.target.value)}
-                    className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-white/80 focus:outline-none focus:ring-2 focus:ring-blue-400/50 focus:border-blue-300 focus:bg-white transition-all duration-200 text-gray-700 mt-3"
+                    className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-white/80 focus:outline-none focus:ring-2 focus:ring-blue-400/50 focus:border-blue-300 focus:bg-white transition-all duration-200 text-gray-700 mt-3 min-h-[44px]"
                     placeholder="Type your sector"
+                    aria-labelledby="sector-label"
+                    aria-describedby="sector-help"
                   />
                 )}
               </Field>
@@ -468,11 +483,15 @@ export default function App() {
                 label="Offering (product or service)"
                 required
                 tooltip="The more specific, the better the recommendations."
+                id="offering"
               >
                 <input
+                  id="offering"
                   value={offering}
                   onChange={(e) => setOffering(e.target.value)}
-                  className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-white/80 focus:outline-none focus:ring-2 focus:ring-blue-400/50 focus:border-blue-300 focus:bg-white transition-all duration-200 text-gray-700"
+                  aria-describedby="offering-help"
+                  aria-required="true"
+                  className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-white/80 focus:outline-none focus:ring-2 focus:ring-blue-400/50 focus:border-blue-300 focus:bg-white transition-all duration-200 text-gray-700 min-h-[44px]"
                   placeholder="e.g. Organic seed kits, AI project-management software"
                   required
                 />
@@ -483,6 +502,7 @@ export default function App() {
                 label="Target segment(s)"
                 tooltip="Add segments by typing and pressing comma or Enter (max 3)."
                 required
+                id="segments"
               >
                 <div className="mb-1">
                   {segments.map((s, i) => (
@@ -496,10 +516,13 @@ export default function App() {
                   ))}
                 </div>
                 <input
+                  id="segments"
                   value={segInp}
                   onChange={(e) => setSegInp(e.target.value)}
                   onKeyDown={(e) => onComma(e, setSeg, setSegInp, 3)}
-                  className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-white/80 focus:outline-none focus:ring-2 focus:ring-blue-400/50 focus:border-blue-300 focus:bg-white transition-all duration-200 text-gray-700"
+                  aria-describedby="segments-help"
+                  aria-required="true"
+                  className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-white/80 focus:outline-none focus:ring-2 focus:ring-blue-400/50 focus:border-blue-300 focus:bg-white transition-all duration-200 text-gray-700 min-h-[44px]"
                   placeholder="e.g. Home gardeners aged 35-55"
                 />
               </Field>
@@ -509,11 +532,15 @@ export default function App() {
                 label="Primary action"
                 required
                 tooltip="Pick the main action you want customers to take."
+                id="motion"
               >
                 <select
+                  id="motion"
                   value={motion}
                   onChange={(e) => setMotion(e.target.value)}
-                  className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-white/80 focus:outline-none focus:ring-2 focus:ring-blue-400/50 focus:border-blue-300 focus:bg-white transition-all duration-200 text-gray-700"
+                  aria-describedby="motion-help"
+                  required
+                  className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-white/80 focus:outline-none focus:ring-2 focus:ring-blue-400/50 focus:border-blue-300 focus:bg-white transition-all duration-200 text-gray-700 min-h-[44px]"
                 >
                   {MOTIONS.map((m) => (
                     <option key={m.value} value={m.value}>
@@ -525,8 +552,10 @@ export default function App() {
                   <input
                     value={customMotion}
                     onChange={(e) => setCustomMotion(e.target.value)}
-                    className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-white/80 focus:outline-none focus:ring-2 focus:ring-blue-400/50 focus:border-blue-300 focus:bg-white transition-all duration-200 text-gray-700 mt-3"
+                    className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-white/80 focus:outline-none focus:ring-2 focus:ring-blue-400/50 focus:border-blue-300 focus:bg-white transition-all duration-200 text-gray-700 mt-3 min-h-[44px]"
                     placeholder="Describe the action (e.g. Call to book)"
+                    aria-labelledby="motion-label"
+                    aria-describedby="motion-help"
                     required
                   />
                 )}
@@ -537,11 +566,15 @@ export default function App() {
                 label="Budget level"
                 required
                 tooltip="The plan uses percentages so you can scale up or down."
+                id="budget"
               >
                 <select
+                  id="budget"
                   value={budgetBand}
                   onChange={(e) => setBudgetBand(e.target.value)}
-                  className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                  aria-describedby="budget-help"
+                  required
+                  className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 min-h-[44px]"
                 >
                   {BUDGET_BANDS.map((b) => (
                     <option key={b.value} value={b.value}>
@@ -555,6 +588,7 @@ export default function App() {
               <Field
                 label="Top competitors"
                 tooltip="Add competitors by typing and pressing comma or Enter (max 3)."
+                id="competitors"
               >
                 <div className="mb-1">
                   {competitors.map((c, i) => (
@@ -568,10 +602,12 @@ export default function App() {
                   ))}
                 </div>
                 <input
+                  id="competitors"
                   value={compInp}
                   onChange={(e) => setCompInp(e.target.value)}
                   onKeyDown={(e) => onComma(e, setComp, setCompInp, 3)}
-                  className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-white/80 focus:outline-none focus:ring-2 focus:ring-blue-400/50 focus:border-blue-300 focus:bg-white transition-all duration-200 text-gray-700"
+                  aria-describedby="competitors-help"
+                  className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-white/80 focus:outline-none focus:ring-2 focus:ring-blue-400/50 focus:border-blue-300 focus:bg-white transition-all duration-200 text-gray-700 min-h-[44px]"
                   placeholder="e.g. Amazon, Local garden centre"
                 />
               </Field>
@@ -582,7 +618,7 @@ export default function App() {
                 className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-semibold py-4 px-6 rounded-xl transition-all duration-200 disabled:opacity-60 shadow-lg hover:shadow-xl mt-8"
               >
                 {loading ? <LoadingSpinner /> : streaming ? (
-                  <div className="inline-flex items-centre">
+                  <div className="inline-flex items-center">
                     <div className="animate-pulse rounded-full h-5 w-5 bg-white/30 mr-3"></div>
                     <span>Streaming your strategy…</span>
                   </div>
