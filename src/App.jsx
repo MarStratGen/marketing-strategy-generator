@@ -168,64 +168,79 @@ export default function App() {
   }, [sector]);
 
   /* ----- pill input handlers ----- */
+  // Centralized tokenization function that prevents data loss
+  const processTokenizedInput = (inputValue, currentList, max) => {
+    if (!inputValue.trim()) {
+      return { tokensAdded: [], remainingInput: "", itemsWereAdded: false };
+    }
+
+    // Split on commas and clean up tokens
+    const allTokens = inputValue
+      .split(",")
+      .map(token => token.trim())
+      .filter(token => token.length > 0);
+
+    const availableSlots = Math.max(0, max - currentList.length);
+    const tokensToAdd = allTokens.slice(0, availableSlots);
+    const overflowTokens = allTokens.slice(availableSlots);
+    
+    const remainingInput = overflowTokens.length > 0 ? overflowTokens.join(", ") : "";
+    
+    return {
+      tokensAdded: tokensToAdd,
+      remainingInput,
+      itemsWereAdded: tokensToAdd.length > 0
+    };
+  };
+
   // Handle comma detection in input - works on all keyboards
   const handlePillInputChange = (e, setter, inpSetter, max = 99) => {
     const value = e.target.value;
     
     if (value.includes(",")) {
-      // Split on commas and process
-      const parts = value.split(",").map(part => part.trim());
-      const completeParts = parts.slice(0, -1).filter(part => part.length > 0); // All but last
-      const remainder = parts[parts.length - 1]; // Last part (may be empty)
-      
-      if (completeParts.length > 0) {
-        setter((currentList) => {
-          const availableSlots = max - currentList.length;
-          const newItems = completeParts.slice(0, availableSlots);
-          return [...currentList, ...newItems];
-        });
-      }
-      
-      // Keep the remainder in the input (what user is still typing)
-      inpSetter(remainder);
+      setter((currentList) => {
+        const result = processTokenizedInput(value, currentList, max);
+        
+        // Only update input if tokens were processed
+        if (result.tokensAdded.length > 0 || result.remainingInput !== value.trim()) {
+          inpSetter(result.remainingInput);
+        }
+        
+        // Add the tokens that fit
+        if (result.tokensAdded.length > 0) {
+          return [...currentList, ...result.tokensAdded];
+        }
+        
+        return currentList;
+      });
     } else {
       // No comma, just update input normally
       inpSetter(value);
     }
   };
   
-  // Handle Enter key and blur events
+  // Handle Enter key
   const handlePillInputKeyDown = (e, setter, inpSetter, max = 99) => {
     if (e.key === "Enter") {
       e.preventDefault();
       const value = e.target.value.trim();
       
       if (value) {
-        if (value.includes(",")) {
-          // Handle comma-separated values on Enter
-          handlePillInputChange(e, setter, inpSetter, max);
-          // Also commit the remainder if any
-          const parts = value.split(",").map(part => part.trim());
-          const remainder = parts[parts.length - 1];
-          if (remainder) {
-            setter((currentList) => {
-              if (currentList.length < max) {
-                return [...currentList, remainder];
-              }
-              return currentList;
-            });
-            inpSetter("");
+        setter((currentList) => {
+          const result = processTokenizedInput(value, currentList, max);
+          
+          // Only clear input if items were actually added
+          if (result.itemsWereAdded) {
+            inpSetter(result.remainingInput);
           }
-        } else {
-          // Single value on Enter
-          setter((currentList) => {
-            if (currentList.length < max) {
-              return [...currentList, value];
-            }
-            return currentList;
-          });
-          inpSetter("");
-        }
+          
+          // Add the tokens that fit
+          if (result.tokensAdded.length > 0) {
+            return [...currentList, ...result.tokensAdded];
+          }
+          
+          return currentList;
+        });
       }
     }
   };
@@ -235,12 +250,20 @@ export default function App() {
     const value = e.target.value.trim();
     if (value) {
       setter((currentList) => {
-        if (currentList.length < max) {
-          return [...currentList, value];
+        const result = processTokenizedInput(value, currentList, max);
+        
+        // Only clear input if items were actually added
+        if (result.itemsWereAdded) {
+          inpSetter(result.remainingInput);
         }
+        
+        // Add the tokens that fit
+        if (result.tokensAdded.length > 0) {
+          return [...currentList, ...result.tokensAdded];
+        }
+        
         return currentList;
       });
-      inpSetter("");
     }
   };
   
@@ -249,12 +272,20 @@ export default function App() {
     const value = inputValue.trim();
     if (value) {
       setter((currentList) => {
-        if (currentList.length < max) {
-          return [...currentList, value];
+        const result = processTokenizedInput(value, currentList, max);
+        
+        // Only clear input if items were actually added
+        if (result.itemsWereAdded) {
+          inpSetter(result.remainingInput);
         }
+        
+        // Add the tokens that fit
+        if (result.tokensAdded.length > 0) {
+          return [...currentList, ...result.tokensAdded];
+        }
+        
         return currentList;
       });
-      inpSetter("");
     }
   };
 
