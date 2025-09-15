@@ -27,7 +27,7 @@ const Field = ({ label, children, tooltip, required, id }) => (
     <label
       htmlFor={id}
       id={id ? `${id}-label` : undefined}
-      className="block text-sm font-medium text-gray-900 mb-2"
+      className="block text-base font-medium text-gray-900 mb-2"
     >
       {label}
       {required && (
@@ -41,7 +41,7 @@ const Field = ({ label, children, tooltip, required, id }) => (
       {tooltip && (
         <p
           id={id ? `${id}-help` : undefined}
-          className="text-xs text-gray-600 leading-relaxed"
+          className="text-sm text-gray-600 leading-relaxed"
         >
           {tooltip}
         </p>
@@ -612,7 +612,7 @@ export default function App() {
               <div
                 role="alert"
                 aria-live="assertive"
-                className="bg-red-50 border border-red-200 text-red-800 px-4 py-3 rounded-lg mb-6"
+                className="bg-red-50 border border-red-200 text-red-700 font-medium text-base px-4 py-3 rounded-lg mb-6"
               >
                 {error}
               </div>
@@ -831,7 +831,7 @@ export default function App() {
               {/* submit */}
               <button
                 disabled={loading || streaming}
-                className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-semibold py-4 px-6 rounded-xl transition-all duration-200 disabled:opacity-60 shadow-lg hover:shadow-xl mt-8"
+                className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white text-lg font-semibold py-4 px-6 rounded-xl transition-all duration-200 disabled:opacity-60 shadow-lg hover:shadow-xl mt-8"
               >
                 {loading ? (
                   <LoadingSpinner />
