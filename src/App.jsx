@@ -2,7 +2,8 @@
    App.jsx – full file
    Tiny Marketing-Plan Generator (UK English)
    ────────────────────────────────────────────────────────── */
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
+import { flushSync } from "react-dom";
 import { ChevronDownIcon, ChevronRightIcon } from "@heroicons/react/24/outline";
 import Report from "./Report.jsx";
 
@@ -290,13 +291,17 @@ export default function App() {
   };
 
   /* ----- submit ----- */
-  const handleSubmit = async (e) => {
+  const handleSubmit = useCallback(async (e) => {
     e.preventDefault();
-    setErr("");
-    setResult(null);
-    setStreamingContent("");
-    setLoading(true);
-    setStreaming(true);
+
+    // Immediately set loading state to prevent double-clicks
+    flushSync(() => {
+      setErr("");
+      setResult(null);
+      setStreamingContent("");
+      setLoading(true);
+      setStreaming(true);
+    });
 
     // Flush any pending input to pills before validation
     flushPendingInput(segInp, setSeg, setSegInp, 3);
@@ -308,23 +313,29 @@ export default function App() {
     const finalSector = sector === "__custom_sector" ? customSector : sector;
 
     if (!finalCountry.trim()) {
-      setErr("Please select a country.");
-      setLoading(false);
-      setStreaming(false);
+      flushSync(() => {
+        setErr("Please select a country.");
+        setLoading(false);
+        setStreaming(false);
+      });
       return;
     }
 
     if (!offering.trim()) {
-      setErr("Please describe what you're selling.");
-      setLoading(false);
-      setStreaming(false);
+      flushSync(() => {
+        setErr("Please describe what you're selling.");
+        setLoading(false);
+        setStreaming(false);
+      });
       return;
     }
 
     if (!segments || segments.length === 0) {
-      setErr("Please add at least one target segment.");
-      setLoading(false);
-      setStreaming(false);
+      flushSync(() => {
+        setErr("Please add at least one target segment.");
+        setLoading(false);
+        setStreaming(false);
+      });
       return;
     }
 
@@ -342,16 +353,49 @@ export default function App() {
         budget_band: budgetBand,
       };
 
+      console.log("Attempting to submit form with data:", body);
+
+      // Create fetch with timeout helper
+      const fetchWithTimeout = async (url, options, timeout = 15000) => {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), timeout);
+        
+        try {
+          const response = await fetch(url, {
+            ...options,
+            signal: controller.signal,
+          });
+          clearTimeout(timeoutId);
+          return response;
+        } catch (error) {
+          clearTimeout(timeoutId);
+          if (error.name === 'AbortError') {
+            throw new Error('Request timed out after 15 seconds');
+          }
+          throw error;
+        }
+      };
+
       // Try streaming first
       try {
-        const response = await fetch(STREAM_URL, {
+        console.log("Attempting streaming request to:", STREAM_URL);
+        
+        const response = await fetchWithTimeout(STREAM_URL, {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
+          headers: { 
+            "Content-Type": "application/json",
+            "Accept": "text/event-stream"
+          },
           body: JSON.stringify(body),
         });
 
+        console.log("Streaming response status:", response.status);
+        console.log("Streaming response headers:", Object.fromEntries(response.headers.entries()));
+
         if (!response.ok) {
-          throw new Error(`Streaming failed: ${response.status}`);
+          const errorText = await response.text();
+          console.error("Streaming response error:", errorText);
+          throw new Error(`Streaming failed: ${response.status} - ${errorText || "No error details"}`);
         }
 
         // Handle streaming response
@@ -427,19 +471,24 @@ export default function App() {
         );
 
         // Fallback to non-streaming
-        const r = await fetch(WORKER_URL, {
+        console.log("Attempting fallback request to:", WORKER_URL);
+        
+        const r = await fetchWithTimeout(WORKER_URL, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(body),
         });
 
+        console.log("Fallback response status:", r.status);
+
         if (!r.ok) {
           const errorText = await r.text();
-          console.error("API Error:", errorText);
-          throw new Error(`API returned ${r.status}: ${errorText}`);
+          console.error("Fallback API Error:", errorText);
+          throw new Error(`API returned ${r.status}: ${errorText || "No error details"}`);
         }
 
         const responseText = await r.text();
+        console.log("Fallback response text length:", responseText.length);
 
         if (!responseText || responseText.trim() === "") {
           throw new Error(
@@ -469,11 +518,23 @@ export default function App() {
         setStreamingContent("");
       }
     } catch (err) {
-      console.error(err);
+      console.error("Form submission error:", err);
       const errorMessage = err.message || "Something went wrong.";
 
-      // Handle specific error messages from content filtering
-      if (
+      // Handle specific error types with better user messages
+      if (errorMessage.includes("Failed to fetch") || errorMessage.includes("fetch")) {
+        setErr(
+          "Unable to connect to our servers. Please check your internet connection and try again. If the problem persists, our service may be temporarily unavailable."
+        );
+      } else if (errorMessage.includes("timed out") || errorMessage.includes("timeout")) {
+        setErr(
+          "The request is taking longer than expected. Please try again with a simpler description or check your internet connection."
+        );
+      } else if (errorMessage.includes("CORS") || errorMessage.includes("cors")) {
+        setErr(
+          "Connection blocked by browser security. Please try refreshing the page and submitting again."
+        );
+      } else if (
         errorMessage.includes("meaningful description") ||
         errorMessage.includes("detailed description")
       ) {
@@ -501,15 +562,17 @@ export default function App() {
         errorMessage.includes("quota")
       ) {
         setErr("Service temporarily busy. Please wait a moment and try again.");
+      } else if (errorMessage.includes("500") || errorMessage.includes("502") || errorMessage.includes("503")) {
+        setErr("Our servers are experiencing issues. Please try again in a few moments.");
       } else {
-        setErr(errorMessage);
+        setErr(`Error: ${errorMessage}`);
       }
       setStreamingContent("");
     } finally {
       setLoading(false);
       setStreaming(false);
     }
-  };
+  }, [country, customCountry, sector, customSector, offering, segments, segInp, competitors, compInp, motion, customMotion, budgetBand]);
 
   /* ─────────────────────────────────────────── render ─── */
   return (
