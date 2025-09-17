@@ -351,7 +351,7 @@ export default function App() {
     console.log("Attempting to submit form with data:", body);
 
     // Create fetch with timeout helper
-    const fetchWithTimeout = async (url, options, timeout = 45000) => {
+    const fetchWithTimeout = async (url, options, timeout = 90000) => {
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), timeout);
       
@@ -365,7 +365,7 @@ export default function App() {
       } catch (error) {
         clearTimeout(timeoutId);
         if (error.name === 'AbortError') {
-          throw new Error('Request timed out after 45 seconds');
+          throw new Error('Request timed out after 90 seconds');
         }
         throw error;
       }
@@ -725,7 +725,7 @@ export default function App() {
                 )}
               </button>
               <p className="text-sm text-gray-500 text-center mt-2">
-                Usually takes 20-45 seconds
+                Usually takes 20-90 seconds
               </p>
             </form>
           </div>
