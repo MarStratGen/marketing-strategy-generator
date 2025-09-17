@@ -15,19 +15,19 @@ const formatSubheading = (k) =>
 /* prettier headings for intent / role */
 const friendlyLabel = (k) => {
   if (k === "intent") return "Purchase intent level";
-  if (k === "role")   return "Funnel job";
+  if (k === "role") return "Funnel job";
   return formatSubheading(k);
 };
 
 /* ── main ───────────────────────────────────────────────── */
 export default function Report({ plan, loading, streaming, streamingContent }) {
   if (loading) return <SkeletonTimeline />;
-  
+
   // Show streaming content while it's being generated
   if (streaming && streamingContent) {
     return <StreamingDisplay content={streamingContent} />;
   }
-  
+
   if (!plan) return null;
 
   /* error handling */
@@ -64,7 +64,7 @@ export default function Report({ plan, loading, streaming, streamingContent }) {
           Your Marketing Strategy
         </h2>
         <p className="text-xl text-white max-w-3xl mx-auto leading-relaxed font-medium">
-          A comprehensive plan organised into actionable sections for immediate
+          A marketing strategy organised into actionable sections for immediate
           implementation
         </p>
       </div>
@@ -119,7 +119,10 @@ function ContentSections({ data }) {
       items: [
         { title: "Market Foundation", data: data.market_foundation },
         { title: "Competitor Analysis", data: data.competitors_brief },
-        { title: "Differentiation Moves", data: data.differentiators || data.differentiation_moves },
+        {
+          title: "Differentiation Moves",
+          data: data.differentiators || data.differentiation_moves,
+        },
         { title: "Risks and Safety Nets", data: data.risks_and_safety_nets },
       ],
     },
@@ -132,7 +135,10 @@ function ContentSections({ data }) {
       priority: "high",
       items: [
         { title: "Strategy Pillars", data: data.strategy_pillars },
-        { title: "Marketing Mix (7 Ps)", data: data.seven_ps || data.marketing_mix_7ps },
+        {
+          title: "Marketing Mix (7 Ps)",
+          data: data.seven_ps || data.marketing_mix_7ps,
+        },
         { title: "Channel Playbook", data: data.channel_playbook },
         { title: "Personas", data: data.personas },
       ],
@@ -156,9 +162,7 @@ function ContentSections({ data }) {
       icon: "📊",
       color: "indigo",
       priority: "medium",
-      items: [
-        { title: "Key Performance Indicators", data: data.kpis },
-      ],
+      items: [{ title: "Key Performance Indicators", data: data.kpis }],
     },
   ];
 
@@ -271,7 +275,6 @@ function ContentCard({ title, data, color }) {
       "border-indigo-100 bg-gradient-to-br from-indigo-50 to-indigo-100/50",
   };
 
-
   return (
     <div className={`border-2 ${colours[color]} rounded-xl p-6 shadow-sm`}>
       <h4 className="text-xl font-bold text-slate-900 mb-5 tracking-tight">
@@ -291,19 +294,26 @@ function OptimizedContent({ data }) {
   // Special handling for budget band capitalization and context
   if (typeof data === "object" && data.band && data.allocation) {
     const bandMap = {
-      'none': 'No paid budget',
-      'low': 'Low', 
-      'medium': 'Medium',
-      'high': 'High'
+      none: "No paid budget",
+      low: "Low",
+      medium: "Medium",
+      high: "High",
     };
-    
+
     return (
       <div>
-        <h6 className="font-bold text-slate-900 text-base" style={{marginTop: '32px', marginBottom: '0px'}}>
+        <h6
+          className="font-bold text-slate-900 text-base"
+          style={{ marginTop: "32px", marginBottom: "0px" }}
+        >
           Budget Level
         </h6>
-        <p className="text-slate-700" style={{marginTop: '0px', marginBottom: '12px', lineHeight: '1.6'}}>
-          {bandMap[data.band] || data.band} - This indicates the overall budget tier for your marketing activities.
+        <p
+          className="text-slate-700"
+          style={{ marginTop: "0px", marginBottom: "12px", lineHeight: "1.6" }}
+        >
+          {bandMap[data.band] || data.band} - This indicates the overall budget
+          tier for your marketing activities.
         </p>
         <div className="text-slate-700 leading-relaxed">
           <FormattedText text={String(data.allocation)} />
@@ -314,48 +324,95 @@ function OptimizedContent({ data }) {
 
   if (Array.isArray(data)) {
     // SPECIAL RENDERER for Channel Playbook arrays
-    if (data.length > 0 && data[0] && typeof data[0] === "object" && data[0].channel && data[0].intent && data[0].role) {
+    if (
+      data.length > 0 &&
+      data[0] &&
+      typeof data[0] === "object" &&
+      data[0].channel &&
+      data[0].intent &&
+      data[0].role
+    ) {
       return (
         <div>
           {data.map((channel, i) => (
-            <div key={i} style={{marginTop: i > 0 ? '32px' : '0px'}}>
-              <h6 className="font-bold text-slate-900 text-base" style={{marginTop: '0px', marginBottom: '0px'}}>
+            <div key={i} style={{ marginTop: i > 0 ? "32px" : "0px" }}>
+              <h6
+                className="font-bold text-slate-900 text-base"
+                style={{ marginTop: "0px", marginBottom: "0px" }}
+              >
                 {channel.channel}
               </h6>
 
               {channel.summary && (
-                <p className="text-slate-700 leading-relaxed" style={{marginTop: '12px', marginBottom: '12px'}}>{channel.summary}</p>
+                <p
+                  className="text-slate-700 leading-relaxed"
+                  style={{ marginTop: "12px", marginBottom: "12px" }}
+                >
+                  {channel.summary}
+                </p>
               )}
 
               {channel.why_it_works && (
-                <p className="text-slate-700 leading-relaxed" style={{marginTop: '0px', marginBottom: '12px'}}>{channel.why_it_works}</p>
+                <p
+                  className="text-slate-700 leading-relaxed"
+                  style={{ marginTop: "0px", marginBottom: "12px" }}
+                >
+                  {channel.why_it_works}
+                </p>
               )}
 
               {channel.key_actions && channel.key_actions.length > 0 && (
-                <div style={{marginTop: '12px', marginBottom: '12px'}}>
-                  <h6 className="font-semibold text-slate-900 text-sm" style={{marginBottom: '4px'}}>Key Actions</h6>
+                <div style={{ marginTop: "12px", marginBottom: "12px" }}>
+                  <h6
+                    className="font-semibold text-slate-900 text-sm"
+                    style={{ marginBottom: "4px" }}
+                  >
+                    Key Actions
+                  </h6>
                   <ul className="text-slate-700 text-sm space-y-1 ml-4">
                     {channel.key_actions.map((action, actionIndex) => (
-                      <li key={actionIndex} className="list-disc">{action}</li>
+                      <li key={actionIndex} className="list-disc">
+                        {action}
+                      </li>
                     ))}
                   </ul>
                 </div>
               )}
 
-              <p className="text-slate-700" style={{marginTop: '0px', marginBottom: '4px'}}>Purchase intent level: {channel.intent}</p>
-              <p className="text-slate-700" style={{marginTop: '0px', marginBottom: '4px'}}>Funnel job: {channel.role}</p>
+              <p
+                className="text-slate-700"
+                style={{ marginTop: "0px", marginBottom: "4px" }}
+              >
+                Purchase intent level: {channel.intent}
+              </p>
+              <p
+                className="text-slate-700"
+                style={{ marginTop: "0px", marginBottom: "4px" }}
+              >
+                Funnel job: {channel.role}
+              </p>
               {channel.success_metric && (
-                <p className="text-slate-700" style={{marginTop: '0px', marginBottom: '4px'}}>Success metric: {channel.success_metric}</p>
+                <p
+                  className="text-slate-700"
+                  style={{ marginTop: "0px", marginBottom: "4px" }}
+                >
+                  Success metric: {channel.success_metric}
+                </p>
               )}
               {channel.budget_percent !== undefined && (
-                <p className="text-slate-700" style={{marginTop: '0px', marginBottom: '4px'}}>Budget percent: {channel.budget_percent}%</p>
+                <p
+                  className="text-slate-700"
+                  style={{ marginTop: "0px", marginBottom: "4px" }}
+                >
+                  Budget percent: {channel.budget_percent}%
+                </p>
               )}
             </div>
           ))}
         </div>
       );
     }
-    
+
     // Default array renderer (with bullets)
     return (
       <ul className="space-y-2 list-none">
@@ -379,7 +436,6 @@ function OptimizedContent({ data }) {
   }
 
   if (typeof data === "object") {
-    
     /* ----------------------------------------------------------
        SPECIAL RENDERER for channel objects (now works with normalized data)
        ---------------------------------------------------------- */
@@ -393,41 +449,81 @@ function OptimizedContent({ data }) {
       const channelName = data.channel || data.name || data.channel_name;
       const intent = data.intent || data.purchase_intent;
       const role = data.role || data.funnel_job;
-      
+
       return (
         <div>
           {channelName && (
-            <h6 className="font-bold text-slate-900 text-base" style={{marginTop: '0px', marginBottom: '0px'}}>
+            <h6
+              className="font-bold text-slate-900 text-base"
+              style={{ marginTop: "0px", marginBottom: "0px" }}
+            >
               {channelName}
             </h6>
           )}
 
           {data.summary && (
-            <p className="text-slate-700 leading-relaxed" style={{marginTop: '12px', marginBottom: '12px'}}>{data.summary}</p>
+            <p
+              className="text-slate-700 leading-relaxed"
+              style={{ marginTop: "12px", marginBottom: "12px" }}
+            >
+              {data.summary}
+            </p>
           )}
 
           {data.why_it_works && (
-            <p className="text-slate-700 leading-relaxed" style={{marginTop: '0px', marginBottom: '12px'}}>{data.why_it_works}</p>
+            <p
+              className="text-slate-700 leading-relaxed"
+              style={{ marginTop: "0px", marginBottom: "12px" }}
+            >
+              {data.why_it_works}
+            </p>
           )}
 
           {data.key_actions && data.key_actions.length > 0 && (
-            <div style={{marginTop: '12px', marginBottom: '12px'}}>
-              <h6 className="font-semibold text-slate-900 text-sm" style={{marginBottom: '4px'}}>Key Actions</h6>
+            <div style={{ marginTop: "12px", marginBottom: "12px" }}>
+              <h6
+                className="font-semibold text-slate-900 text-sm"
+                style={{ marginBottom: "4px" }}
+              >
+                Key Actions
+              </h6>
               <ul className="text-slate-700 text-sm space-y-1 ml-4">
                 {data.key_actions.map((action, actionIndex) => (
-                  <li key={actionIndex} className="list-disc">{action}</li>
+                  <li key={actionIndex} className="list-disc">
+                    {action}
+                  </li>
                 ))}
               </ul>
             </div>
           )}
 
-          <p className="text-slate-700" style={{marginTop: '0px', marginBottom: '4px'}}>Purchase intent level: {intent}</p>
-          <p className="text-slate-700" style={{marginTop: '0px', marginBottom: '4px'}}>Funnel job: {role}</p>
+          <p
+            className="text-slate-700"
+            style={{ marginTop: "0px", marginBottom: "4px" }}
+          >
+            Purchase intent level: {intent}
+          </p>
+          <p
+            className="text-slate-700"
+            style={{ marginTop: "0px", marginBottom: "4px" }}
+          >
+            Funnel job: {role}
+          </p>
           {data.success_metric && (
-            <p className="text-slate-700" style={{marginTop: '0px', marginBottom: '4px'}}>Success metric: {data.success_metric}</p>
+            <p
+              className="text-slate-700"
+              style={{ marginTop: "0px", marginBottom: "4px" }}
+            >
+              Success metric: {data.success_metric}
+            </p>
           )}
           {data.budget_percent !== undefined && (
-            <p className="text-slate-700" style={{marginTop: '0px', marginBottom: '4px'}}>Budget percent: {data.budget_percent}%</p>
+            <p
+              className="text-slate-700"
+              style={{ marginTop: "0px", marginBottom: "4px" }}
+            >
+              Budget percent: {data.budget_percent}%
+            </p>
           )}
         </div>
       );
@@ -438,11 +534,14 @@ function OptimizedContent({ data }) {
     return (
       <div>
         {entries.map(([k, v], index) => (
-          <div key={k} style={{marginTop: index > 0 ? '32px' : '0px'}}>
-            <h5 className="font-semibold text-slate-900 text-base" style={{marginBottom: '2px'}}>
+          <div key={k} style={{ marginTop: index > 0 ? "32px" : "0px" }}>
+            <h5
+              className="font-semibold text-slate-900 text-base"
+              style={{ marginBottom: "2px" }}
+            >
               {friendlyLabel(k)}
             </h5>
-            <div className="text-slate-700" style={{marginTop: '0px'}}>
+            <div className="text-slate-700" style={{ marginTop: "0px" }}>
               <OptimizedContent data={v} />
             </div>
           </div>
@@ -461,90 +560,144 @@ function OptimizedContent({ data }) {
 /* text splitter with subheading detection */
 function FormattedText({ text }) {
   const paras = text.split("\n\n").filter((p) => p.trim());
-  
+
   return (
     <div className="space-y-1">
       {paras.map((p, i) => {
         const trimmed = p.trim();
-        
+
         // Split on single line breaks to catch inline subheadings
-        const lines = trimmed.split("\n").filter(line => line.trim());
-        
+        const lines = trimmed.split("\n").filter((line) => line.trim());
+
         return (
           <div key={i}>
             {lines.map((line, lineIndex) => {
               const cleanLine = line.trim();
-              
-              // Skip Executive Summary and redundant standalone "Allocation" 
-              if (cleanLine === "Executive Summary" || cleanLine === "Allocation") {
+
+              // Skip Executive Summary and redundant standalone "Allocation"
+              if (
+                cleanLine === "Executive Summary" ||
+                cleanLine === "Allocation"
+              ) {
                 return null;
               }
-              
+
               // Detect bullet point subheadings (lines starting with •)
               const isBulletHeading = /^•\s+/.test(cleanLine);
-              
+
               // Detect other subheadings (short lines that look like headers)
-              const isSubheading = (
-                cleanLine.length < 60 && // Not too long
-                cleanLine.length > 3 && // Not too short
-                (/^[A-Z][a-zA-Z\s&:-]+$/.test(cleanLine) && // Starts with capital, contains letters/spaces/basic punctuation
-                !cleanLine.includes('.') && // No periods (usually not in headings)
-                !cleanLine.includes('http') && // Not a URL
-                !cleanLine.match(/\d{2,}/)) || // No long numbers
+              const isSubheading =
+                (cleanLine.length < 60 && // Not too long
+                  cleanLine.length > 3 && // Not too short
+                  /^[A-Z][a-zA-Z\s&:-]+$/.test(cleanLine) && // Starts with capital, contains letters/spaces/basic punctuation
+                  !cleanLine.includes(".") && // No periods (usually not in headings)
+                  !cleanLine.includes("http") && // Not a URL
+                  !cleanLine.match(/\d{2,}/)) || // No long numbers
                 /^Month \d+:/.test(cleanLine) || // OR month headers like "Month 1: Foundation"
-                /^Pillar \d+:/.test(cleanLine) // OR pillar headers like "Pillar 1: Market Penetration"
-              );
-              
+                /^Pillar \d+:/.test(cleanLine); // OR pillar headers like "Pillar 1: Market Penetration"
+
               if (isBulletHeading) {
-                const headingText = cleanLine.replace(/^•\s+/, ''); // Remove bullet point
+                const headingText = cleanLine.replace(/^•\s+/, ""); // Remove bullet point
                 return (
-                  <h6 key={lineIndex} className="font-bold text-slate-900 text-base flex items-center" style={{marginTop: '24px', marginBottom: '8px', marginLeft: '0px', marginRight: '0px', paddingTop: '0px', paddingBottom: '0px'}}>
-                    <span className="text-blue-600 font-bold text-lg mr-3">•</span>
+                  <h6
+                    key={lineIndex}
+                    className="font-bold text-slate-900 text-base flex items-center"
+                    style={{
+                      marginTop: "24px",
+                      marginBottom: "8px",
+                      marginLeft: "0px",
+                      marginRight: "0px",
+                      paddingTop: "0px",
+                      paddingBottom: "0px",
+                    }}
+                  >
+                    <span className="text-blue-600 font-bold text-lg mr-3">
+                      •
+                    </span>
                     <span>{headingText}</span>
                   </h6>
                 );
               }
-              
+
               if (isSubheading) {
                 return (
-                  <h6 key={lineIndex} className="font-bold text-slate-900 text-base" style={{marginTop: '32px', marginBottom: '8px', marginLeft: '0px', marginRight: '0px', paddingTop: '0px', paddingBottom: '0px'}}>
+                  <h6
+                    key={lineIndex}
+                    className="font-bold text-slate-900 text-base"
+                    style={{
+                      marginTop: "32px",
+                      marginBottom: "8px",
+                      marginLeft: "0px",
+                      marginRight: "0px",
+                      paddingTop: "0px",
+                      paddingBottom: "0px",
+                    }}
+                  >
                     {cleanLine}
                   </h6>
                 );
               }
-              
+
               // Check for multiple definitions/KPIs/weeks/milestones that should be on separate lines
               // Pattern 1: Comma + space + uppercase abbreviation + colon (e.g., "KPI: definition, CTR: definition")
               // Pattern 2: Period + space + words + colon (e.g., "sentence. New Term: definition")
               // Pattern 3: Period + Week (for action plans like "adverts.Week 3-4:")
               // Pattern 4: Period + space + Capital letter (for milestones like "day 7. Complete initial")
-              if ((cleanLine.includes(':') && 
-                  (cleanLine.match(/, [A-Z]{2,}:/g) || cleanLine.match(/\. [A-Z][a-zA-Z\s]+:/g))) ||
-                  cleanLine.match(/\.\s*Week \d/g) ||
-                  cleanLine.match(/\. [A-Z][a-z]/g)) {
-                
+              if (
+                (cleanLine.includes(":") &&
+                  (cleanLine.match(/, [A-Z]{2,}:/g) ||
+                    cleanLine.match(/\. [A-Z][a-zA-Z\s]+:/g))) ||
+                cleanLine.match(/\.\s*Week \d/g) ||
+                cleanLine.match(/\. [A-Z][a-z]/g)
+              ) {
                 // Split on:
-                // - comma before abbreviations  
+                // - comma before abbreviations
                 // - period before terms with colons
-                // - period before "Week" 
+                // - period before "Week"
                 // - period before capital letters (for milestones)
-                let parts = cleanLine.split(/, (?=[A-Z]{2,}:)|(?<=\.) (?=[A-Z][a-zA-Z\s]+:)|(?<=\.)\s*(?=Week \d)|(?<=\.)\s+(?=[A-Z][a-z])/)
-                  .map(part => part.trim())
-                  .filter(part => part.length > 0);
-                
+                let parts = cleanLine
+                  .split(
+                    /, (?=[A-Z]{2,}:)|(?<=\.) (?=[A-Z][a-zA-Z\s]+:)|(?<=\.)\s*(?=Week \d)|(?<=\.)\s+(?=[A-Z][a-z])/,
+                  )
+                  .map((part) => part.trim())
+                  .filter((part) => part.length > 0);
+
                 return (
-                  <div key={lineIndex} style={{marginTop: '0px', marginBottom: '12px'}}>
+                  <div
+                    key={lineIndex}
+                    style={{ marginTop: "0px", marginBottom: "12px" }}
+                  >
                     {parts.map((part, partIndex) => (
-                      <p key={partIndex} className="text-slate-700" style={{marginTop: '0px', marginBottom: '4px', paddingTop: '0px', paddingBottom: '0px', lineHeight: '1.6'}}>
+                      <p
+                        key={partIndex}
+                        className="text-slate-700"
+                        style={{
+                          marginTop: "0px",
+                          marginBottom: "4px",
+                          paddingTop: "0px",
+                          paddingBottom: "0px",
+                          lineHeight: "1.6",
+                        }}
+                      >
                         {part}
                       </p>
                     ))}
                   </div>
                 );
               }
-              
+
               return (
-                <p key={lineIndex} className="text-slate-700" style={{marginTop: '0px', marginBottom: '12px', paddingTop: '0px', paddingBottom: '0px', lineHeight: '1.6'}}>
+                <p
+                  key={lineIndex}
+                  className="text-slate-700"
+                  style={{
+                    marginTop: "0px",
+                    marginBottom: "12px",
+                    paddingTop: "0px",
+                    paddingBottom: "0px",
+                    lineHeight: "1.6",
+                  }}
+                >
                   {cleanLine}
                 </p>
               );
@@ -565,8 +718,8 @@ const downloadExcel = (data) => {
     const textToRows = (text, sectionTitle) => {
       if (!text) return [];
       const rows = [[sectionTitle], [""]];
-      const lines = text.split('\n').filter(line => line.trim());
-      lines.forEach(line => {
+      const lines = text.split("\n").filter((line) => line.trim());
+      lines.forEach((line) => {
         rows.push([line.trim()]);
       });
       rows.push([""]);
@@ -585,8 +738,14 @@ const downloadExcel = (data) => {
       ...textToRows(data.strategy_pillars, "Strategy Pillars"),
       ...textToRows(data.personas, "Target Personas"),
       ...textToRows(data.competitors_brief, "Competitor Analysis"),
-      ...textToRows(data.differentiators || data.differentiation_moves, "Key Differentiators"),
-      ...textToRows(data.seven_ps || data.marketing_mix_7ps, "Marketing Mix (7 Ps)"),
+      ...textToRows(
+        data.differentiators || data.differentiation_moves,
+        "Key Differentiators",
+      ),
+      ...textToRows(
+        data.seven_ps || data.marketing_mix_7ps,
+        "Marketing Mix (7 Ps)",
+      ),
       ...textToRows(data.calendar_next_90_days, "90-Day Action Plan"),
       ...textToRows(data.kpis, "Measurement & Tracking"),
       ...textToRows(data.risks_and_safety_nets, "Risks & Safety Nets"),
@@ -603,7 +762,12 @@ const downloadExcel = (data) => {
         ["Budget Band:", data.budget.band || ""],
         [""],
         ["Allocation Details:"],
-        ...(data.budget.allocation ? data.budget.allocation.split('\n').filter(line => line.trim()).map(line => [line.trim()]) : [])
+        ...(data.budget.allocation
+          ? data.budget.allocation
+              .split("\n")
+              .filter((line) => line.trim())
+              .map((line) => [line.trim()])
+          : []),
       ];
       const budgetSheet = XLSX.utils.aoa_to_sheet(budgetData);
       XLSX.utils.book_append_sheet(workbook, budgetSheet, "Budget");
@@ -611,13 +775,16 @@ const downloadExcel = (data) => {
 
     // Add channel playbook sheet if available
     if (data.channel_playbook && Array.isArray(data.channel_playbook)) {
-      const channelData = [["Channel Playbook"], ["Channel", "Role", "Budget %", "Summary"]];
-      data.channel_playbook.forEach(channel => {
+      const channelData = [
+        ["Channel Playbook"],
+        ["Channel", "Role", "Budget %", "Summary"],
+      ];
+      data.channel_playbook.forEach((channel) => {
         channelData.push([
           channel.channel || "",
           channel.role || "",
           channel.budget_percent ? `${channel.budget_percent}%` : "",
-          channel.summary || ""
+          channel.summary || "",
         ]);
       });
       const channelSheet = XLSX.utils.aoa_to_sheet(channelData);
@@ -636,45 +803,46 @@ const downloadWord = async (data) => {
     // Helper function to convert text sections to Word paragraphs
     const textToParagraphs = (text, sectionTitle) => {
       if (!text) return [];
-      
+
       const paragraphs = [
         new Paragraph({
-          children: [
-            new TextRun({ text: sectionTitle, bold: true, size: 28 }),
-          ],
+          children: [new TextRun({ text: sectionTitle, bold: true, size: 28 })],
           heading: HeadingLevel.HEADING_1,
         }),
         new Paragraph({ text: "" }),
       ];
-      
-      const lines = text.split('\n').filter(line => line.trim());
-      lines.forEach(line => {
+
+      const lines = text.split("\n").filter((line) => line.trim());
+      lines.forEach((line) => {
         const cleanLine = line.trim();
-        
+
         // Check if it's a bullet point heading
         const isBulletHeading = /^•\s+/.test(cleanLine);
-        
+
         if (isBulletHeading) {
-          const headingText = cleanLine.replace(/^•\s+/, '');
+          const headingText = cleanLine.replace(/^•\s+/, "");
           paragraphs.push(
             new Paragraph({
               children: [
-                new TextRun({ text: "• ", bold: true, size: 24, color: "0066CC" }),
+                new TextRun({
+                  text: "• ",
+                  bold: true,
+                  size: 24,
+                  color: "0066CC",
+                }),
                 new TextRun({ text: headingText, bold: true, size: 24 }),
               ],
-            })
+            }),
           );
         } else if (cleanLine.length > 0) {
           paragraphs.push(
             new Paragraph({
-              children: [
-                new TextRun({ text: cleanLine, size: 22 }),
-              ],
-            })
+              children: [new TextRun({ text: cleanLine, size: 22 })],
+            }),
           );
         }
       });
-      
+
       paragraphs.push(new Paragraph({ text: "" }));
       return paragraphs;
     };
@@ -732,11 +900,23 @@ const downloadWord = async (data) => {
             ...textToParagraphs(data.strategy_pillars, "Strategy Pillars"),
             ...textToParagraphs(data.personas, "Target Personas"),
             ...textToParagraphs(data.competitors_brief, "Competitor Analysis"),
-            ...textToParagraphs(data.differentiators || data.differentiation_moves, "Key Differentiators"),
-            ...textToParagraphs(data.seven_ps || data.marketing_mix_7ps, "Marketing Mix (7 Ps)"),
-            ...textToParagraphs(data.calendar_next_90_days, "90-Day Action Plan"),
+            ...textToParagraphs(
+              data.differentiators || data.differentiation_moves,
+              "Key Differentiators",
+            ),
+            ...textToParagraphs(
+              data.seven_ps || data.marketing_mix_7ps,
+              "Marketing Mix (7 Ps)",
+            ),
+            ...textToParagraphs(
+              data.calendar_next_90_days,
+              "90-Day Action Plan",
+            ),
             ...textToParagraphs(data.kpis, "Measurement & Tracking"),
-            ...textToParagraphs(data.risks_and_safety_nets, "Risks & Safety Nets"),
+            ...textToParagraphs(
+              data.risks_and_safety_nets,
+              "Risks & Safety Nets",
+            ),
           ],
         },
       ],

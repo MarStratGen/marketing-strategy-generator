@@ -286,9 +286,11 @@ export default function App() {
     // Small delay to ensure any pending blur events complete first
     await new Promise(resolve => setTimeout(resolve, 10));
 
-    // Flush any pending input to pills before validation
-    flushPendingInput(segInp, setSeg, setSegInp, 3);
-    flushPendingInput(compInp, setComp, setCompInp, 3);
+    // Flush any pending input to pills before validation (synchronously)
+    flushSync(() => {
+      flushPendingInput(segInp, setSeg, setSegInp, 3);
+      flushPendingInput(compInp, setComp, setCompInp, 3);
+    });
 
     // Basic validation
     const finalCountry =
