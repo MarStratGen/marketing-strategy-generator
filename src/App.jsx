@@ -397,9 +397,19 @@ export default function App() {
         console.log("Received data:", data);
         if (data.market_foundation) {
           console.log("Market foundation content:", data.market_foundation);
+          // Check if competitors appear anywhere in market foundation
+          const foundCompetitors = competitors.filter(comp => 
+            data.market_foundation.toLowerCase().includes(comp.toLowerCase())
+          );
+          console.log("Competitors found in market foundation:", foundCompetitors);
         }
         if (data.competitors_brief) {
           console.log("Competitors brief content:", data.competitors_brief);
+          // Check if competitors appear in competitors_brief
+          const foundInBrief = competitors.filter(comp => 
+            data.competitors_brief.toLowerCase().includes(comp.toLowerCase())
+          );
+          console.log("Competitors found in brief:", foundInBrief);
         }
 
         setResult(data);
