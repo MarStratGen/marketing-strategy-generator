@@ -332,14 +332,8 @@ function OptimizedContent({ data, title }) {
       return (
         <div>
           {data.map((channel, i) => (
-            <div key={i} style={{ marginTop: i > 0 ? "32px" : "0px" }}>
-              <h6
-                className="font-bold text-slate-900 text-base flex items-center"
-                style={{ marginTop: "0px", marginBottom: "8px" }}
-              >
-                <span className="text-blue-600 font-bold text-lg mr-3">•</span>
-                <span>{channel.channel}</span>
-              </h6>
+            <div key={i}>
+              <h4>{channel.channel}</h4>
 
               {channel.summary && (
                 <p
@@ -412,22 +406,16 @@ function OptimizedContent({ data, title }) {
       );
     }
 
-    // Default array renderer (with bullets)
+    // Semantic array renderer 
     return (
-      <ul className="space-y-2 list-none">
+      <ul>
         {data.map((item, i) => (
-          <li
-            key={i}
-            className="flex items-baseline gap-3 text-slate-700 leading-relaxed"
-          >
-            <span className="text-blue-600 font-bold">•</span>
-            <div className="flex-1">
-              {typeof item === "object" ? (
-                <OptimizedContent data={item} title={title} />
-              ) : (
-                <FormattedText text={String(item)} sectionType={sectionType} />
-              )}
-            </div>
+          <li key={i}>
+            {typeof item === "object" ? (
+              <OptimizedContent data={item} title={title} />
+            ) : (
+              <FormattedText text={String(item)} sectionType={sectionType} />
+            )}
           </li>
         ))}
       </ul>
@@ -652,67 +640,113 @@ function parseTextToAst(text) {
   return blocks;
 }
 
-/* UNIFIED CONTENT RENDERER - Renders AST with consistent formatting */
+/* SEMANTIC CONTENT RENDERER - Clean HTML for Tailwind Typography */
 function ContentRenderer({ ast }) {
   return (
-    <div className="space-y-4">
+    <>
       {ast.map((block, index) => {
         switch (block.type) {
           case 'heading':
-            return (
-              <h6 
-                key={index} 
-                className="font-bold text-slate-900 text-base flex items-center" 
-                style={{ marginTop: index > 0 ? "24px" : "0px", marginBottom: "8px" }}
-              >
-                <span className="text-blue-600 font-bold text-lg mr-3">•</span>
-                <span>{block.content}</span>
-              </h6>
-            );
+            return <h4 key={index}>{block.content}</h4>;
             
           case 'unordered_list':
-            return (
-              <ul key={index} className="space-y-2 list-none">
-                {block.items.map((item, i) => (
-                  <li 
-                    key={i} 
-                    className="flex items-start gap-3 text-slate-700 leading-relaxed"
-                    style={{ marginLeft: `${item.level * 20}px` }}
-                  >
-                    <span className="text-blue-600 font-bold">•</span>
-                    <span>{item.content}</span>
+            // Build nested list structure based on item.level
+            const buildNestedUL = (items) => {
+              const result = [];
+              let currentLevel = 0;
+              let stack = [result];
+              
+              for (const item of items) {
+                const level = item.level || 0;
+                
+                while (level > currentLevel) {
+                  const newUL = [];
+                  const lastItem = stack[stack.length - 1][stack[stack.length - 1].length - 1];
+                  if (!lastItem) {
+                    stack[stack.length - 1].push({ content: '', children: newUL });
+                  } else {
+                    lastItem.children = newUL;
+                  }
+                  stack.push(newUL);
+                  currentLevel++;
+                }
+                
+                while (level < currentLevel) {
+                  stack.pop();
+                  currentLevel--;
+                }
+                
+                stack[stack.length - 1].push({ content: item.content, children: null });
+              }
+              
+              return result;
+            };
+            
+            const renderNestedUL = (items) => (
+              <ul>
+                {items.map((item, i) => (
+                  <li key={i}>
+                    {item.content}
+                    {item.children && renderNestedUL(item.children)}
                   </li>
                 ))}
               </ul>
             );
             
+            return <div key={index}>{renderNestedUL(buildNestedUL(block.items))}</div>;
+            
           case 'ordered_list':
-            return (
-              <ol key={index} className="space-y-2 list-none">
-                {block.items.map((item, i) => (
-                  <li 
-                    key={i} 
-                    className="flex items-start gap-3 text-slate-700 leading-relaxed"
-                    style={{ marginLeft: `${item.level * 20}px` }}
-                  >
-                    <span className="text-blue-600 font-bold">{item.marker}.</span>
-                    <span>{item.content}</span>
+            // Similar nested structure for ordered lists
+            const buildNestedOL = (items) => {
+              const result = [];
+              let currentLevel = 0;
+              let stack = [result];
+              
+              for (const item of items) {
+                const level = item.level || 0;
+                
+                while (level > currentLevel) {
+                  const newOL = [];
+                  const lastItem = stack[stack.length - 1][stack[stack.length - 1].length - 1];
+                  if (!lastItem) {
+                    stack[stack.length - 1].push({ content: '', children: newOL });
+                  } else {
+                    lastItem.children = newOL;
+                  }
+                  stack.push(newOL);
+                  currentLevel++;
+                }
+                
+                while (level < currentLevel) {
+                  stack.pop();
+                  currentLevel--;
+                }
+                
+                stack[stack.length - 1].push({ content: item.content, children: null });
+              }
+              
+              return result;
+            };
+            
+            const renderNestedOL = (items) => (
+              <ol>
+                {items.map((item, i) => (
+                  <li key={i}>
+                    {item.content}
+                    {item.children && renderNestedOL(item.children)}
                   </li>
                 ))}
               </ol>
             );
             
+            return <div key={index}>{renderNestedOL(buildNestedOL(block.items))}</div>;
+            
           case 'definition':
             return (
-              <div key={index} className="mb-4">
-                <h6 className="font-bold text-slate-900 text-base flex items-center mb-2">
-                  <span className="text-blue-600 font-bold text-lg mr-3">•</span>
-                  <span>{block.label}</span>
-                </h6>
-                <p className="text-slate-700 ml-6" style={{ lineHeight: "1.6" }}>
-                  {block.content}
-                </p>
-              </div>
+              <dl key={index}>
+                <dt>{block.label}</dt>
+                <dd>{block.content}</dd>
+              </dl>
             );
             
           case 'paragraph':
@@ -720,28 +754,21 @@ function ContentRenderer({ ast }) {
             if (block.content.includes('•') && (block.content.match(/•/g) || []).length > 1) {
               const items = block.content.split('•').filter(item => item.trim()).map(item => item.trim());
               return (
-                <ul key={index} className="space-y-2 list-none">
+                <ul key={index}>
                   {items.map((item, i) => (
-                    <li key={i} className="flex items-start gap-3 text-slate-700 leading-relaxed">
-                      <span className="text-blue-600 font-bold">•</span>
-                      <span>{item}</span>
-                    </li>
+                    <li key={i}>{item}</li>
                   ))}
                 </ul>
               );
             }
             
-            return (
-              <p key={index} className="text-slate-700" style={{ lineHeight: "1.6", marginBottom: "12px" }}>
-                {block.content}
-              </p>
-            );
+            return <p key={index}>{block.content}</p>;
             
           default:
             return null;
         }
       })}
-    </div>
+    </>
   );
 }
 
@@ -779,20 +806,14 @@ function renderPersonas(ast) {
   if (current) personas.push(current);
   
   return (
-    <div className="space-y-6">
+    <>
       {personas.map((persona, index) => (
         <div key={index}>
-          <h6 className="font-bold text-slate-900 text-base flex items-center" 
-              style={{ marginTop: index > 0 ? "24px" : "0px", marginBottom: "8px" }}>
-            <span className="text-blue-600 font-bold text-lg mr-3">•</span>
-            <span>{persona.title}</span>
-          </h6>
-          <div style={{ marginLeft: "20px" }}>
-            <ContentRenderer ast={persona.content} />
-          </div>
+          <h4>{persona.title}</h4>
+          <ContentRenderer ast={persona.content} />
         </div>
       ))}
-    </div>
+    </>
   );
 }
 
@@ -847,20 +868,14 @@ function renderMarketingMix(ast) {
   }
   
   return (
-    <div className="space-y-6">
+    <>
       {sections.map((section, index) => (
         <div key={index}>
-          <h6 className="font-bold text-slate-900 text-base flex items-center" 
-              style={{ marginTop: index > 0 ? "24px" : "0px", marginBottom: "8px" }}>
-            <span className="text-blue-600 font-bold text-lg mr-3">•</span>
-            <span>{section.title}</span>
-          </h6>
-          <div style={{ marginLeft: "20px" }}>
-            <ContentRenderer ast={section.content} />
-          </div>
+          <h4>{section.title}</h4>
+          <ContentRenderer ast={section.content} />
         </div>
       ))}
-    </div>
+    </>
   );
 }
 
