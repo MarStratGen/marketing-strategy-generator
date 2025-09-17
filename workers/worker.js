@@ -120,7 +120,7 @@ Respond with valid JSON only. Use this exact structure:
     "market_opportunities": "text"${competitorText ? ',\n    "competitor_analysis": {\n      "name": "' + competitorText + '",\n      "positioning": "text",\n      "strengths": "text",\n      "weaknesses": "text",\n      "differentiation_opportunities": "text"\n    }' : ''}
   },
   "strategy_pillars": "dense content with bullet points for 3 specific strategic pillars",
-  "personas": "detailed primary, secondary, tertiary personas with realistic names",
+  "personas": "detailed primary, secondary, tertiary personas with realistic names, demographics, behaviours, pain points and motivations for ${form.product_type} customers",
   "differentiators": "core differentiation, value proposition, positioning statement",
   "seven_ps": "detailed analysis of Product, Price, Place, Promotion, People, Process, Physical Evidence",
   "calendar_next_90_days": "realistic 90-day implementation timeline with specific tasks",
@@ -136,7 +136,11 @@ Respond with valid JSON only. Use this exact structure:
   }
 }
 
-Generate comprehensive, business-specific content for ${form.product_type} in ${form.country}. No markdown formatting.` 
+Generate comprehensive, business-specific content for ${form.product_type} in ${form.country}. 
+
+CRITICAL: Ensure the "personas" field contains detailed customer profiles with names, ages, backgrounds, and specific behaviours. Do not leave personas empty. Create 3 distinct personas for ${audienceText} customers in the ${form.country} market.
+
+No markdown formatting.` 
             }
           ]
         }),
