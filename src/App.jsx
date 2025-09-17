@@ -53,7 +53,7 @@ const Field = ({ label, children, tooltip, required, id }) => (
 const LoadingSpinner = () => (
   <div className="inline-flex items-center">
     <div className="animate-spin rounded-full h-5 w-5 border-2 border-white/30 border-t-white mr-3"></div>
-    <span>Creating your marketing strategy…</span>
+    <span>Generating Marketing Strategy</span>
   </div>
 );
 
