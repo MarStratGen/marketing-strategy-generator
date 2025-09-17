@@ -805,7 +805,7 @@ export default function App() {
                   src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" 
                   alt="Buy Me A Coffee" 
                   className="transition-transform duration-200 hover:scale-105"
-                  style={{height: '60px', width: '217px'}} 
+                  style={{height: '48px', width: '174px'}} 
                 />
               </a>
             </div>
