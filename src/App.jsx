@@ -344,7 +344,7 @@ export default function App() {
     console.log("Attempting to submit form with data:", body);
 
     // Create fetch with timeout helper
-    const fetchWithTimeout = async (url, options, timeout = 20000) => {
+    const fetchWithTimeout = async (url, options, timeout = 90000) => {
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), timeout);
       
@@ -358,7 +358,7 @@ export default function App() {
       } catch (error) {
         clearTimeout(timeoutId);
         if (error.name === 'AbortError') {
-          throw new Error('Request timed out after 20 seconds');
+          throw new Error('Request timed out after 90 seconds');
         }
         throw error;
       }

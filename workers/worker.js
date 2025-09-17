@@ -89,7 +89,7 @@ export default {
       
       // Create abort controller for 28-second deadline
       const abortController = new AbortController();
-      const timeoutId = setTimeout(() => abortController.abort(), 18000);
+      const timeoutId = setTimeout(() => abortController.abort(), 80000);
       
       // Single optimized GPT-4o request with strict structured output
       const aiResponse = await fetch("https://api.openai.com/v1/chat/completions", {
