@@ -39,7 +39,7 @@ export default {
       'https://localhost:5000',
       'http://127.0.0.1:5000', 
       'https://127.0.0.1:5000',
-      'https://4ed238b6-44fe-47f0-8f40-754dbed6c70c-00-y3il5bpx45gx.sisko.replit.dev'
+      'https://4ed238b6-44fe-47f0-8f40-754dbed6c70c-00-31bwxps5rwfru.worf.replit.dev'
     ];
     
     if (origin && !allowedOrigins.includes(origin)) {
@@ -398,15 +398,31 @@ Generate detailed JSON with structured format:
       return new Response(JSON.stringify(json), cors(200, origin));
 
     } catch (e) {
-      console.error('Worker error:', e.message);
+      console.error('Worker error details:', {
+        name: e.name,
+        message: e.message,
+        stack: e.stack
+      });
+      
       if (e.name === 'TimeoutError' || e.message.includes('timeout') || e.message.includes('aborted')) {
         return new Response(
           JSON.stringify({ error: "AI service is taking longer than expected. Please try again." }),
           cors(408, origin)
         );
       }
+      
+      if (e.message.includes('API key') || e.message.includes('unauthorized')) {
+        return new Response(
+          JSON.stringify({ error: "API configuration issue. Please contact support." }),
+          cors(500, origin)
+        );
+      }
+      
       return new Response(
-        JSON.stringify({ error: "internal_server_error" }),
+        JSON.stringify({ 
+          error: "internal_server_error",
+          details: e.message 
+        }),
         cors(500, origin)
       );
     }
@@ -471,7 +487,7 @@ function cors(status = 200, origin = null) {
     'https://localhost:5000', 
     'http://127.0.0.1:5000',
     'https://127.0.0.1:5000',
-    'https://4ed238b6-44fe-47f0-8f40-754dbed6c70c-00-y3il5bpx45gx.sisko.replit.dev'
+    'https://4ed238b6-44fe-47f0-8f40-754dbed6c70c-00-31bwxps5rwfru.worf.replit.dev'
   ];
   
   const corsOrigin = origin && allowedOrigins.includes(origin) ? origin : null;
