@@ -144,8 +144,7 @@ export default function App() {
   const [offering, setOffering] = useState("");
   const [segments, setSeg] = useState([]);
   const [segInp, setSegInp] = useState("");
-  const [competitors, setComp] = useState([]);
-  const [compInp, setCompInp] = useState("");
+  const [competitor, setComp] = useState("");
   const [motion, setMotion] = useState("ecom_checkout");
   const [customMotion, setCustomMotion] = useState("");
   const [budgetBand, setBudgetBand] = useState("low");
@@ -289,7 +288,6 @@ export default function App() {
     // Flush any pending input to pills before validation (synchronously)
     flushSync(() => {
       flushPendingInput(segInp, setSeg, setSegInp, 3);
-      flushPendingInput(compInp, setComp, setCompInp, 3);
     });
 
     // Basic validation
@@ -333,7 +331,7 @@ export default function App() {
       sector: finalSector,
       product_type: offering,
       audiences: currentSegments,
-      competitors,
+      competitor: competitor.trim(),
 
       motion: motion === "__custom_motion" ? "custom" : motion,
       action_custom: motion === "__custom_motion" ? customMotion : undefined,
@@ -471,7 +469,7 @@ export default function App() {
     } finally {
       setLoading(false);
     }
-  }, [country, customCountry, sector, customSector, offering, segments, segInp, competitors, compInp, motion, customMotion, budgetBand]);
+  }, [country, customCountry, sector, customSector, offering, segments, segInp, competitor, motion, customMotion, budgetBand]);
 
   /* ─────────────────────────────────────────── render ─── */
   return (
@@ -622,9 +620,11 @@ export default function App() {
                     <Pill
                       key={i}
                       text={s}
-                      onRemove={() =>
-                        setSeg(segments.filter((_, j) => j !== i))
-                      }
+                      onRemove={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        setSeg(segments.filter((_, j) => j !== i));
+                      }}
                     />
                   ))}
                 </div>
@@ -700,29 +700,16 @@ export default function App() {
 
               {/* competitors */}
               <Field
-                label="Top competitors"
-                tooltip="Add competitors by typing and pressing comma or Enter (max 3)."
-                id="competitors"
+                label="Top competitor"
+                tooltip="Your main competitor in this market."
+                id="competitor"
               >
-                <div className="mb-1">
-                  {competitors.map((c, i) => (
-                    <Pill
-                      key={i}
-                      text={c}
-                      onRemove={() =>
-                        setComp(competitors.filter((_, j) => j !== i))
-                      }
-                    />
-                  ))}
-                </div>
                 <input
-                  id="competitors"
-                  value={compInp}
-                  onChange={(e) => handlePillInputChange(e, setComp, setCompInp, 3)}
-                  onKeyDown={(e) => handlePillInputKeyDown(e, setComp, setCompInp, 3)}
-                  onBlur={(e) => handlePillInputBlur(e, setComp, setCompInp, 3)}
-                  aria-describedby="competitors-help"
-                  className="w-full px-4 py-3 rounded-lg border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-200 text-gray-900 min-h-[44px]"
+                  id="competitor"
+                  value={competitor}
+                  onChange={(e) => setComp(e.target.value)}
+                  aria-describedby="competitor-help"
+                  className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-white/80 focus:outline-none focus:ring-2 focus:ring-blue-400/50 focus:border-blue-300 focus:bg-white transition-all duration-200 text-gray-700 min-h-[44px]"
                   placeholder="e.g. Amazon, Local garden centre"
                 />
               </Field>

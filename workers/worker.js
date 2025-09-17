@@ -84,7 +84,7 @@ export default {
 
     /* 7. SINGLE OPTIMIZED REQUEST FOR 20-SECOND GENERATION */
     try {
-      const competitorText = form.competitors?.length ? form.competitors.join(", ") : "market competitors";
+      const competitorText = form.competitor?.trim() ? form.competitor.trim() : null;
       const audienceText = form.audiences?.join(", ") || "target customers";
       
       // Create abort controller for 28-second deadline
@@ -116,23 +116,20 @@ export default {
                       market_overview: { type: "string" },
                       customer_behaviour: { type: "string" },
                       market_opportunities: { type: "string" },
-                      competitor_analyses: {
-                        type: "array",
-                        items: {
-                          type: "object",
-                          properties: {
-                            name: { type: "string" },
-                            positioning: { type: "string" },
-                            strengths: { type: "string" },
-                            weaknesses: { type: "string" },
-                            differentiation_opportunities: { type: "string" }
-                          },
-                          required: ["name", "positioning", "strengths", "weaknesses", "differentiation_opportunities"],
-                          additionalProperties: false
-                        }
+                      competitor_analysis: {
+                        type: "object",
+                        properties: {
+                          name: { type: "string" },
+                          positioning: { type: "string" },
+                          strengths: { type: "string" },
+                          weaknesses: { type: "string" },
+                          differentiation_opportunities: { type: "string" }
+                        },
+                        required: ["name", "positioning", "strengths", "weaknesses", "differentiation_opportunities"],
+                        additionalProperties: false
                       }
                     },
-                    required: ["market_overview", "customer_behaviour", "market_opportunities", "competitor_analyses"],
+                    required: ["market_overview", "customer_behaviour", "market_opportunities"],
                     additionalProperties: false
                   },
                   strategy_pillars: { type: "string" },
@@ -169,16 +166,14 @@ export default {
           messages: [
             { 
               role: "system", 
-              content: "Expert marketing strategist. British English only. PLAIN TEXT ONLY - no markdown, no bold, no asterisks, no headings. Use bullet character '• ' only at start of list items. Never include percentage targets or specific numbers unless provided in form data. Write dense, specific, form-relevant content. CRITICAL: Each competitor name from the form must be used EXACTLY as provided in the competitor_analyses array - do not shorten, abbreviate, or modify competitor names." 
+              content: "Expert marketing strategist. British English only. PLAIN TEXT ONLY - no markdown, no bold, no asterisks, no headings. Use bullet character '• ' only at start of list items. Never include percentage targets or specific numbers unless provided in form data. Write dense, specific, form-relevant content." 
             },
             { 
               role: "user", 
-              content: `Generate marketing strategy for ${form.product_type} in ${form.country} ${form.sector}. Target: ${audienceText}. Competitors that MUST each be individually analyzed using EXACT names: ${form.competitors?.join(", ")}. 
-
-CRITICAL: market_foundation.competitor_analyses array must contain exactly one object for each competitor with the "name" field using the EXACT competitor name as provided: ${form.competitors?.map(c => `"${c}"`).join(", ")}. Do not abbreviate or modify these names - use them exactly as listed. 
+              content: `Generate marketing strategy for ${form.product_type} in ${form.country} ${form.sector}. Target: ${audienceText}.${competitorText ? ` Main competitor to analyze: ${competitorText}` : ' No specific competitor provided - focus on general market positioning.'}
 
 Generate detailed JSON with structured format:
-- market_foundation: object with market_overview, customer_behaviour, market_opportunities, and competitor_analyses array where each competitor gets individual analysis
+- market_foundation: object with market_overview, customer_behaviour, market_opportunities${competitorText ? ', and competitor_analysis object with detailed analysis of the provided competitor' : ' (no competitor analysis required)'}
 - strategy_pillars: dense content with bullet points for 3 specific strategic pillars
 - personas: detailed primary, secondary, tertiary personas with realistic names and specific behaviours for ${form.product_type} customers
 - differentiators: core differentiation, value proposition, positioning statement with bullet points
@@ -210,34 +205,25 @@ Generate detailed JSON with structured format:
         throw new Error('Invalid AI response');
       }
       
-      // Validate competitor coverage with improved matching
-      if (form.competitors?.length && aiGenerated?.market_foundation?.competitor_analyses) {
-        const analyzedCompetitors = aiGenerated.market_foundation.competitor_analyses.map(c => c.name?.toLowerCase().trim());
-        const requiredCompetitors = form.competitors.map(c => c.toLowerCase().trim());
+      // Validate competitor coverage for single competitor
+      if (competitorText && aiGenerated?.market_foundation?.competitor_analysis) {
+        const analyzedName = aiGenerated.market_foundation.competitor_analysis.name?.toLowerCase().trim();
+        const requiredName = competitorText.toLowerCase().trim();
         
-        console.log('Required competitors:', requiredCompetitors);
-        console.log('Analyzed competitors:', analyzedCompetitors);
+        console.log('Required competitor:', requiredName);
+        console.log('Analyzed competitor:', analyzedName);
         
-        const missingCompetitors = requiredCompetitors.filter(req => {
-          // More flexible matching to handle cases like "Facebook Marketplace" vs "Facebook"
-          return !analyzedCompetitors.some(analyzed => {
-            // Exact match
-            if (analyzed === req) return true;
-            // Either contains the other (for partial matches)
-            if (analyzed.includes(req) || req.includes(analyzed)) return true;
-            // Handle common variations
-            const reqWords = req.split(/\s+/);
-            const analyzedWords = analyzed.split(/\s+/);
-            // If main keywords overlap significantly
-            return reqWords.some(word => word.length > 3 && analyzedWords.some(aWord => aWord.includes(word) || word.includes(aWord)));
-          });
-        });
+        // Check if names match (allowing some flexibility)
+        const matches = analyzedName === requiredName || 
+                       analyzedName?.includes(requiredName) || 
+                       requiredName.includes(analyzedName);
         
-        if (missingCompetitors.length > 0) {
-          console.error('Missing competitor analysis for:', missingCompetitors);
-          // Don't throw error, but log for debugging
-          console.warn('Proceeding with incomplete competitor analysis');
+        if (!matches) {
+          console.error('Competitor analysis name mismatch:', { required: requiredName, analyzed: analyzedName });
+          console.warn('Proceeding with competitor name mismatch');
         }
+      } else if (competitorText && !aiGenerated?.market_foundation?.competitor_analysis) {
+        console.warn('Competitor was provided but no analysis generated');
       }
       
       // Sanitize content to remove markdown and normalize formatting
@@ -370,9 +356,10 @@ Generate detailed JSON with structured format:
       }
 
       // Convert structured market foundation to legacy format for frontend compatibility
-      const market_foundation_legacy = `• Market Overview\n${aiGenerated.market_foundation.market_overview}\n\n• Customer Behaviour\n${aiGenerated.market_foundation.customer_behaviour}\n\n• Market Opportunities\n${aiGenerated.market_foundation.market_opportunities}\n\n• Competitor Analysis\n${aiGenerated.market_foundation.competitor_analyses.map(comp => 
-        `${comp.name}: ${comp.positioning} Strengths include ${comp.strengths} However, ${comp.weaknesses} This creates opportunities to ${comp.differentiation_opportunities}`
-      ).join('\n\n')}`;
+      const competitorSection = aiGenerated.market_foundation.competitor_analysis ? 
+        `\n\n• Competitor Analysis\n${aiGenerated.market_foundation.competitor_analysis.name}: ${aiGenerated.market_foundation.competitor_analysis.positioning} Strengths include ${aiGenerated.market_foundation.competitor_analysis.strengths} However, ${aiGenerated.market_foundation.competitor_analysis.weaknesses} This creates opportunities to ${aiGenerated.market_foundation.competitor_analysis.differentiation_opportunities}` : '';
+        
+      const market_foundation_legacy = `• Market Overview\n${aiGenerated.market_foundation.market_overview}\n\n• Customer Behaviour\n${aiGenerated.market_foundation.customer_behaviour}\n\n• Market Opportunities\n${aiGenerated.market_foundation.market_opportunities}${competitorSection}`;
 
       // Convert structured KPIs to legacy format
       const kpis_legacy = `• Measurement & Tracking\n${aiGenerated.kpis.measurement_and_tracking}\n\n• Performance Indicators\n${aiGenerated.kpis.performance_indicators}\n\n• Analytics Framework\n${aiGenerated.kpis.analytics_framework}`;
@@ -390,9 +377,9 @@ Generate detailed JSON with structured format:
         market_foundation: market_foundation_legacy,
         strategy_pillars: aiGenerated.strategy_pillars,
         personas: aiGenerated.personas,
-        competitors_brief: `• Competitor Analysis\n${aiGenerated.market_foundation.competitor_analyses.map(comp => 
-          `${comp.name}: ${comp.positioning} Strengths include ${comp.strengths} However, ${comp.weaknesses} This creates opportunities to ${comp.differentiation_opportunities}`
-        ).join('\n\n')}`,
+        competitors_brief: aiGenerated.market_foundation.competitor_analysis ? 
+          `• Competitor Analysis\n${aiGenerated.market_foundation.competitor_analysis.name}: ${aiGenerated.market_foundation.competitor_analysis.positioning} Strengths include ${aiGenerated.market_foundation.competitor_analysis.strengths} However, ${aiGenerated.market_foundation.competitor_analysis.weaknesses} This creates opportunities to ${aiGenerated.market_foundation.competitor_analysis.differentiation_opportunities}` : 
+          null,
         differentiators: aiGenerated.differentiators,
         seven_ps: aiGenerated.seven_ps,
         channel_playbook: motionChannels,
