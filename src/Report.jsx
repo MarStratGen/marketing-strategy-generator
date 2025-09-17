@@ -275,15 +275,18 @@ function ContentCard({ title, data, color }) {
         {title}
       </h4>
       <div className="prose prose-slate max-w-none text-slate-700 leading-relaxed">
-        <OptimizedContent data={data} />
+        <OptimizedContent data={data} title={title} />
       </div>
     </div>
   );
 }
 
 /* SUPER SIMPLE content renderer (NO CONFUSION) */
-function OptimizedContent({ data }) {
+function OptimizedContent({ data, title }) {
   if (!data) return <p className="text-slate-500 italic">No data available</p>;
+  
+  // Determine section type from title using registry
+  const sectionType = SECTION_RENDERERS[title] || 'default';
 
   // Special handling for budget band capitalization and context
   if (typeof data === "object" && data.band && data.allocation) {
@@ -310,7 +313,7 @@ function OptimizedContent({ data }) {
           tier for your marketing activities.
         </p>
         <div className="text-slate-700 leading-relaxed">
-          <FormattedText text={String(data.allocation)} />
+          <FormattedText text={String(data.allocation)} sectionType={sectionType} />
         </div>
       </div>
     );
@@ -420,9 +423,9 @@ function OptimizedContent({ data }) {
             <span className="text-blue-600 font-bold">•</span>
             <div className="flex-1">
               {typeof item === "object" ? (
-                <OptimizedContent data={item} />
+                <OptimizedContent data={item} title={title} />
               ) : (
-                <FormattedText text={String(item)} />
+                <FormattedText text={String(item)} sectionType={sectionType} />
               )}
             </div>
           </li>
@@ -539,7 +542,7 @@ function OptimizedContent({ data }) {
               {friendlyLabel(k)}
             </h5>
             <div className="text-slate-700" style={{ marginTop: "0px" }}>
-              <OptimizedContent data={v} />
+              <OptimizedContent data={v} title={title} />
             </div>
           </div>
         ))}
@@ -549,62 +552,333 @@ function OptimizedContent({ data }) {
 
   return (
     <div className="text-slate-700 leading-relaxed">
-      <FormattedText text={String(data)} />
+      <FormattedText text={String(data)} sectionType={sectionType} />
     </div>
   );
 }
 
-/* SIMPLE: Basic text formatter that handles bullets and subheadings properly */
-function FormattedText({ text }) {
-  if (!text || typeof text !== 'string') return null;
+/* ROBUST TEXT PARSER - Creates structured AST from marketing content */
+function parseTextToAst(text) {
+  if (!text || typeof text !== 'string') return [];
   
-  const cleanText = text.trim();
-  const paragraphs = cleanText.split(/\n\n+/).filter(p => p.trim());
+  const lines = text.split('\n').map(line => line.trimRight());
+  const blocks = [];
+  let currentBlock = null;
+  
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i];
+    const trimmed = line.trim();
+    
+    // Skip empty lines (used as separators)
+    if (!trimmed) {
+      if (currentBlock) {
+        blocks.push(currentBlock);
+        currentBlock = null;
+      }
+      continue;
+    }
+    
+    // Detect unordered list items (•, -, *)
+    const unorderedMatch = line.match(/^(\s*)([•\-\*])\s+(.+)$/);
+    if (unorderedMatch) {
+      const [, indent, bullet, content] = unorderedMatch;
+      const level = Math.floor(indent.length / 2);
+      
+      if (!currentBlock || currentBlock.type !== 'unordered_list') {
+        if (currentBlock) blocks.push(currentBlock);
+        currentBlock = { type: 'unordered_list', items: [] };
+      }
+      currentBlock.items.push({ content: content.trim(), level });
+      continue;
+    }
+    
+    // Detect ordered list items (1., 1), a., etc.)
+    const orderedMatch = line.match(/^(\s*)(\d+|[a-zA-Z]+)[.)]\s+(.+)$/);
+    if (orderedMatch) {
+      const [, indent, marker, content] = orderedMatch;
+      const level = Math.floor(indent.length / 2);
+      
+      if (!currentBlock || currentBlock.type !== 'ordered_list') {
+        if (currentBlock) blocks.push(currentBlock);
+        currentBlock = { type: 'ordered_list', items: [] };
+      }
+      currentBlock.items.push({ content: content.trim(), level, marker });
+      continue;
+    }
+    
+    // Detect definition items (Label: content)
+    const definitionMatch = line.match(/^(\s*)([^:]{2,40}):\s+(.+)$/);
+    if (definitionMatch && line.length < 120) {
+      const [, indent, label, content] = definitionMatch;
+      
+      if (currentBlock) blocks.push(currentBlock);
+      currentBlock = { 
+        type: 'definition', 
+        label: label.trim(), 
+        content: content.trim() 
+      };
+      blocks.push(currentBlock);
+      currentBlock = null;
+      continue;
+    }
+    
+    // Check if it's a heading (short line, starts with capital, followed by blank line or end)
+    const nextLine = lines[i + 1];
+    const isHeading = (
+      trimmed.length < 80 &&
+      trimmed.length > 3 &&
+      /^[A-Z]/.test(trimmed) &&
+      !trimmed.includes('.') &&
+      (!nextLine || !nextLine.trim() || i === lines.length - 1)
+    );
+    
+    if (isHeading) {
+      if (currentBlock) blocks.push(currentBlock);
+      blocks.push({ type: 'heading', content: trimmed });
+      currentBlock = null;
+      continue;
+    }
+    
+    // Regular paragraph content
+    if (!currentBlock || currentBlock.type !== 'paragraph') {
+      if (currentBlock) blocks.push(currentBlock);
+      currentBlock = { type: 'paragraph', content: trimmed };
+    } else {
+      currentBlock.content += ' ' + trimmed;
+    }
+  }
+  
+  if (currentBlock) blocks.push(currentBlock);
+  return blocks;
+}
 
+/* UNIFIED CONTENT RENDERER - Renders AST with consistent formatting */
+function ContentRenderer({ ast }) {
   return (
     <div className="space-y-4">
-      {paragraphs.map((para, index) => {
-        const trimmed = para.trim();
-        
-        // Check if this paragraph contains multiple bullet points
-        const bulletCount = (trimmed.match(/[•\-\*]/g) || []).length;
-        const lines = trimmed.split('\n').filter(l => l.trim());
-        
-        // If most lines start with bullets, render as a list
-        const bulletLines = lines.filter(l => /^\s*[•\-\*]\s+/.test(l));
-        if (bulletLines.length >= 2 && bulletLines.length >= lines.length * 0.6) {
-          return (
-            <ul key={index} className="space-y-2 list-none">
-              {bulletLines.map((line, i) => (
-                <li key={i} className="flex items-start gap-3 text-slate-700 leading-relaxed">
-                  <span className="text-blue-600 font-bold">•</span>
-                  <span>{line.replace(/^\s*[•\-\*]\s+/, '').trim()}</span>
-                </li>
-              ))}
-            </ul>
-          );
+      {ast.map((block, index) => {
+        switch (block.type) {
+          case 'heading':
+            return (
+              <h6 
+                key={index} 
+                className="font-bold text-slate-900 text-base flex items-center" 
+                style={{ marginTop: index > 0 ? "24px" : "0px", marginBottom: "8px" }}
+              >
+                <span className="text-blue-600 font-bold text-lg mr-3">•</span>
+                <span>{block.content}</span>
+              </h6>
+            );
+            
+          case 'unordered_list':
+            return (
+              <ul key={index} className="space-y-2 list-none">
+                {block.items.map((item, i) => (
+                  <li 
+                    key={i} 
+                    className="flex items-start gap-3 text-slate-700 leading-relaxed"
+                    style={{ marginLeft: `${item.level * 20}px` }}
+                  >
+                    <span className="text-blue-600 font-bold">•</span>
+                    <span>{item.content}</span>
+                  </li>
+                ))}
+              </ul>
+            );
+            
+          case 'ordered_list':
+            return (
+              <ol key={index} className="space-y-2 list-none">
+                {block.items.map((item, i) => (
+                  <li 
+                    key={i} 
+                    className="flex items-start gap-3 text-slate-700 leading-relaxed"
+                    style={{ marginLeft: `${item.level * 20}px` }}
+                  >
+                    <span className="text-blue-600 font-bold">{item.marker}.</span>
+                    <span>{item.content}</span>
+                  </li>
+                ))}
+              </ol>
+            );
+            
+          case 'definition':
+            return (
+              <div key={index} className="mb-4">
+                <h6 className="font-bold text-slate-900 text-base flex items-center mb-2">
+                  <span className="text-blue-600 font-bold text-lg mr-3">•</span>
+                  <span>{block.label}</span>
+                </h6>
+                <p className="text-slate-700 ml-6" style={{ lineHeight: "1.6" }}>
+                  {block.content}
+                </p>
+              </div>
+            );
+            
+          case 'paragraph':
+            // Handle embedded bullets within paragraphs
+            if (block.content.includes('•') && (block.content.match(/•/g) || []).length > 1) {
+              const items = block.content.split('•').filter(item => item.trim()).map(item => item.trim());
+              return (
+                <ul key={index} className="space-y-2 list-none">
+                  {items.map((item, i) => (
+                    <li key={i} className="flex items-start gap-3 text-slate-700 leading-relaxed">
+                      <span className="text-blue-600 font-bold">•</span>
+                      <span>{item}</span>
+                    </li>
+                  ))}
+                </ul>
+              );
+            }
+            
+            return (
+              <p key={index} className="text-slate-700" style={{ lineHeight: "1.6", marginBottom: "12px" }}>
+                {block.content}
+              </p>
+            );
+            
+          default:
+            return null;
         }
-        
-        // Check if this looks like a subheading (short line without periods)
-        if (lines.length === 1 && trimmed.length < 80 && !trimmed.includes('.') && /^[A-Z]/.test(trimmed)) {
-          return (
-            <h6 key={index} className="font-bold text-slate-900 text-base flex items-center" 
-                style={{ marginTop: index > 0 ? "24px" : "0px", marginBottom: "8px" }}>
-              <span className="text-blue-600 font-bold text-lg mr-3">•</span>
-              <span>{trimmed}</span>
-            </h6>
-          );
-        }
-        
-        // Regular paragraph
-        return (
-          <p key={index} className="text-slate-700" style={{ lineHeight: "1.6", marginBottom: "12px" }}>
-            {trimmed}
-          </p>
-        );
       })}
     </div>
   );
+}
+
+/* SECTION REGISTRY - Maps content types to specialized renderers */
+const SECTION_RENDERERS = {
+  'Personas': 'personas',
+  'Target Personas': 'personas', 
+  'Strategy Pillars': 'strategy_pillars',
+  'Differentiation Moves': 'differentiation',
+  'Key Differentiators': 'differentiation',
+  'Marketing Mix (7 Ps)': 'marketing_mix',
+  'Next 90 Days Action Plan': 'action_plan',
+  '90-Day Action Plan': 'action_plan',
+  'Channel Playbook': 'channels',
+  'Budget Allocation': 'budget',
+  'Key Performance Indicators': 'kpis',
+  'Risks and Safety Nets': 'risks',
+  'Risks & Safety Nets': 'risks'
+};
+
+/* SPECIALIZED SECTION RENDERERS */
+function renderPersonas(ast) {
+  // Group consecutive heading+paragraph pairs
+  const personas = [];
+  let current = null;
+  
+  for (const block of ast) {
+    if (block.type === 'heading') {
+      if (current) personas.push(current);
+      current = { title: block.content, content: [] };
+    } else if (current) {
+      current.content.push(block);
+    }
+  }
+  if (current) personas.push(current);
+  
+  return (
+    <div className="space-y-6">
+      {personas.map((persona, index) => (
+        <div key={index}>
+          <h6 className="font-bold text-slate-900 text-base flex items-center" 
+              style={{ marginTop: index > 0 ? "24px" : "0px", marginBottom: "8px" }}>
+            <span className="text-blue-600 font-bold text-lg mr-3">•</span>
+            <span>{persona.title}</span>
+          </h6>
+          <div style={{ marginLeft: "20px" }}>
+            <ContentRenderer ast={persona.content} />
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function renderMarketingMix(ast) {
+  const sevenPs = ['Product', 'Price', 'Place', 'Promotion', 'People', 'Process', 'Physical Evidence'];
+  const sections = [];
+  
+  // Work directly on AST to preserve structure
+  let currentSection = null;
+  let currentBlocks = [];
+  
+  for (const block of ast) {
+    // Check if this block is a heading that matches one of the 7 Ps
+    const isP = block.type === 'heading' && sevenPs.some(p => 
+      block.content.toLowerCase().includes(p.toLowerCase())
+    );
+    
+    // Check if this is a definition block that matches a P (e.g., "Product: ...")
+    const isPDefinition = block.type === 'definition' && sevenPs.some(p => 
+      block.label.toLowerCase().includes(p.toLowerCase())
+    );
+    
+    if (isP || isPDefinition) {
+      // Save previous section if exists
+      if (currentSection && currentBlocks.length > 0) {
+        sections.push({ title: currentSection, content: currentBlocks });
+      }
+      
+      // Start new section
+      if (isP) {
+        currentSection = sevenPs.find(p => block.content.toLowerCase().includes(p.toLowerCase()));
+        currentBlocks = [];
+      } else if (isPDefinition) {
+        currentSection = sevenPs.find(p => block.label.toLowerCase().includes(p.toLowerCase()));
+        // Include the definition content as first block
+        currentBlocks = [{ type: 'paragraph', content: block.content }];
+      }
+    } else if (currentSection) {
+      // Add block to current section
+      currentBlocks.push(block);
+    }
+  }
+  
+  // Save final section
+  if (currentSection && currentBlocks.length > 0) {
+    sections.push({ title: currentSection, content: currentBlocks });
+  }
+  
+  // If no 7 Ps structure detected, use fallback
+  if (sections.length === 0) {
+    return <ContentRenderer ast={ast} />;
+  }
+  
+  return (
+    <div className="space-y-6">
+      {sections.map((section, index) => (
+        <div key={index}>
+          <h6 className="font-bold text-slate-900 text-base flex items-center" 
+              style={{ marginTop: index > 0 ? "24px" : "0px", marginBottom: "8px" }}>
+            <span className="text-blue-600 font-bold text-lg mr-3">•</span>
+            <span>{section.title}</span>
+          </h6>
+          <div style={{ marginLeft: "20px" }}>
+            <ContentRenderer ast={section.content} />
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+/* MAIN TEXT FORMATTER - Uses section registry and AST rendering */
+function FormattedText({ text, sectionType }) {
+  if (!text || typeof text !== 'string') return null;
+  
+  const ast = parseTextToAst(text);
+  
+  // Use specialized renderer if available
+  switch (sectionType) {
+    case 'personas':
+      return renderPersonas(ast);
+    case 'marketing_mix':
+      return renderMarketingMix(ast);
+    default:
+      return <ContentRenderer ast={ast} />;
+  }
 }
 
 
