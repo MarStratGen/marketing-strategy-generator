@@ -1,0 +1,117 @@
+{
+  "source": {
+    "level": "info",
+    "message": "GET https://glow-api-lingering-queen-74b7.cloudflare-4up2f.workers.dev/generate"
+  },
+  "dataset": "cloudflare-workers",
+  "timestamp": "2025-09-17T23:17:07.822Z",
+  "$workers": {
+    "event": {
+      "request": {
+        "cf": {
+          "requestHeaderNames": {},
+          "isEUCountry": false,
+          "httpProtocol": "HTTP/3",
+          "clientAcceptEncoding": "gzip, deflate, br",
+          "requestPriority": "",
+          "colo": "MEL",
+          "asOrganization": "Aussie Broadband",
+          "country": "AU",
+          "city": "Melbourne",
+          "continent": "OC",
+          "region": "Victoria",
+          "regionCode": "VIC",
+          "timezone": "Australia/Melbourne",
+          "longitude": "144.96332",
+          "latitude": "-37.814",
+          "postalCode": "3000",
+          "tlsVersion": "TLSv1.3",
+          "tlsCipher": "AEAD-AES128-GCM-SHA256",
+          "tlsClientRandom": "o3Div2t22bn/+LPxRwL5DYE46HKGPnpSMOCf99vMlpk=",
+          "tlsClientCiphersSha1": "",
+          "tlsClientExtensionsSha1": "HkRJ7mp5wXdiw5LTjZjteVKdVjI=",
+          "tlsClientExtensionsSha1Le": "",
+          "tlsClientHelloLength": "1636",
+          "tlsClientAuth": {
+            "certPresented": "0",
+            "certVerified": "NONE",
+            "certRevoked": "0",
+            "certIssuerDN": "",
+            "certSubjectDN": "",
+            "certIssuerDNRFC2253": "",
+            "certSubjectDNRFC2253": "",
+            "certIssuerDNLegacy": "",
+            "certSubjectDNLegacy": "",
+            "certSerial": "",
+            "certIssuerSerial": "",
+            "certSKI": "",
+            "certIssuerSKI": "",
+            "certFingerprintSHA1": "",
+            "certFingerprintSHA256": "",
+            "certNotBefore": "",
+            "certNotAfter": ""
+          },
+          "verifiedBotCategory": "",
+          "edgeRequestKeepAliveStatus": 1,
+          "clientTcpRtt": 0,
+          "asn": 4764
+        },
+        "url": "https://glow-api-lingering-queen-74b7.cloudflare-4up2f.workers.dev/generate",
+        "method": "GET",
+        "headers": {
+          "accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+          "accept-encoding": "gzip, br",
+          "accept-language": "fi,en-US;q=0.7,en;q=0.3",
+          "cf-connecting-ip": "180.150.36.16",
+          "cf-ipcountry": "AU",
+          "cf-ray": "980c50b3c8d9e683",
+          "cf-visitor": "{\"scheme\":\"https\"}",
+          "connection": "Keep-Alive",
+          "dnt": "1",
+          "host": "glow-api-lingering-queen-74b7.cloudflare-4up2f.workers.dev",
+          "priority": "u=0, i",
+          "sec-fetch-dest": "document",
+          "sec-fetch-mode": "navigate",
+          "sec-fetch-site": "none",
+          "sec-fetch-user": "?1",
+          "sec-gpc": "1",
+          "upgrade-insecure-requests": "1",
+          "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:143.0) Gecko/20100101 Firefox/143.0",
+          "x-forwarded-proto": "https",
+          "x-real-ip": "180.150.36.16"
+        },
+        "path": "/generate"
+      },
+      "rayId": "980c50b3c8d9e683",
+      "response": {
+        "status": 405
+      }
+    },
+    "diagnosticsChannelEvents": [],
+    "truncated": false,
+    "scriptName": "glow-api-lingering-queen-74b7",
+    "outcome": "ok",
+    "eventType": "fetch",
+    "executionModel": "stateless",
+    "scriptVersion": {
+      "id": "bdf4ff45-90d9-4ca6-ac84-d703389d1a16"
+    },
+    "requestId": "980c50b3c8d9e683",
+    "cpuTimeMs": 0,
+    "wallTimeMs": 0
+  },
+  "$metadata": {
+    "id": "01K5CZFB3EFA1A2KBVEQY47YCE",
+    "requestId": "980c50b3c8d9e683",
+    "trigger": "GET /generate",
+    "service": "glow-api-lingering-queen-74b7",
+    "level": "info",
+    "message": "GET https://glow-api-lingering-queen-74b7.cloudflare-4up2f.workers.dev/generate",
+    "account": "e166b0efd9959b5288730bf8e78b03cc",
+    "type": "cf-worker-event",
+    "fingerprint": "7e4eb1d3bf18adec28586275ff79d0dc",
+    "origin": "fetch",
+    "messageTemplate": "GET https://glow-api-lingering-queen-74b7.cloudflare-4up2f.workers.dev/generate"
+  },
+  "links": []
+}
