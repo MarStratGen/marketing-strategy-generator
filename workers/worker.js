@@ -91,7 +91,7 @@ export default {
       const abortController = new AbortController();
       const timeoutId = setTimeout(() => abortController.abort(), 80000);
       
-      // Single optimized GPT-4o request with strict structured output
+      // Single optimized GPT-4o request - remove strict structured output for reliability
       const aiResponse = await fetch("https://api.openai.com/v1/chat/completions", {
         method: "POST",
         headers: {
@@ -102,67 +102,6 @@ export default {
           model: MODEL,
           temperature: 0.25,
           max_tokens: 2800,
-          response_format: {
-            type: "json_schema",
-            json_schema: {
-              name: "marketing_strategy",
-              strict: true,
-              schema: {
-                type: "object",
-                properties: {
-                  market_foundation: {
-                    type: "object",
-                    properties: {
-                      market_overview: { type: "string" },
-                      customer_behaviour: { type: "string" },
-                      market_opportunities: { type: "string" },
-                      competitor_analysis: {
-                        type: "object",
-                        properties: {
-                          name: { type: "string" },
-                          positioning: { type: "string" },
-                          strengths: { type: "string" },
-                          weaknesses: { type: "string" },
-                          differentiation_opportunities: { type: "string" }
-                        },
-                        required: ["name", "positioning", "strengths", "weaknesses", "differentiation_opportunities"],
-                        additionalProperties: false
-                      }
-                    },
-                    required: ["market_overview", "customer_behaviour", "market_opportunities"],
-                    additionalProperties: false
-                  },
-                  strategy_pillars: { type: "string" },
-                  personas: { type: "string" },
-                  differentiators: { type: "string" },
-                  seven_ps: { type: "string" },
-                  calendar_next_90_days: { type: "string" },
-                  kpis: {
-                    type: "object",
-                    properties: {
-                      measurement_and_tracking: { type: "string" },
-                      performance_indicators: { type: "string" },
-                      analytics_framework: { type: "string" }
-                    },
-                    required: ["measurement_and_tracking", "performance_indicators", "analytics_framework"],
-                    additionalProperties: false
-                  },
-                  risks_and_safety_nets: {
-                    type: "object",
-                    properties: {
-                      primary_risks: { type: "string" },
-                      mitigation_strategies: { type: "string" },
-                      contingency_plans: { type: "string" }
-                    },
-                    required: ["primary_risks", "mitigation_strategies", "contingency_plans"],
-                    additionalProperties: false
-                  }
-                },
-                required: ["market_foundation", "strategy_pillars", "personas", "differentiators", "seven_ps", "calendar_next_90_days", "kpis", "risks_and_safety_nets"],
-                additionalProperties: false
-              }
-            }
-          },
           messages: [
             { 
               role: "system", 
@@ -170,17 +109,34 @@ export default {
             },
             { 
               role: "user", 
-              content: `Generate marketing strategy for ${form.product_type} in ${form.country} ${form.sector}. Target: ${audienceText}.${competitorText ? ` Main competitor to analyze: ${competitorText}` : ' No specific competitor provided - focus on general market positioning.'}
+              content: `Generate marketing strategy for ${form.product_type} in ${form.country} ${form.sector ? `(${form.sector} sector)` : ''}. Target: ${audienceText}.${competitorText ? ` Main competitor to analyze: ${competitorText}` : ' No specific competitor provided - focus on general market positioning.'}
 
-Generate detailed JSON with structured format:
-- market_foundation: object with market_overview, customer_behaviour, market_opportunities${competitorText ? ', and competitor_analysis object with detailed analysis of the provided competitor' : ' (no competitor analysis required)'}
-- strategy_pillars: dense content with bullet points for 3 specific strategic pillars
-- personas: detailed primary, secondary, tertiary personas with realistic names and specific behaviours for ${form.product_type} customers
-- differentiators: core differentiation, value proposition, positioning statement with bullet points
-- seven_ps: detailed analysis of Product, Price, Place, Promotion, People, Process, Physical Evidence
-- calendar_next_90_days: realistic 90-day implementation timeline with specific actionable tasks
-- kpis: structured object with measurement_and_tracking, performance_indicators (no percentage targets), analytics_framework
-- risks_and_safety_nets: structured object with primary_risks, mitigation_strategies, contingency_plans specific to ${form.product_type} business in ${form.country}` 
+Respond with valid JSON only. Use this exact structure:
+
+{
+  "market_foundation": {
+    "market_overview": "text",
+    "customer_behaviour": "text", 
+    "market_opportunities": "text"${competitorText ? ',\n    "competitor_analysis": {\n      "name": "' + competitorText + '",\n      "positioning": "text",\n      "strengths": "text",\n      "weaknesses": "text",\n      "differentiation_opportunities": "text"\n    }' : ''}
+  },
+  "strategy_pillars": "dense content with bullet points for 3 specific strategic pillars",
+  "personas": "detailed primary, secondary, tertiary personas with realistic names",
+  "differentiators": "core differentiation, value proposition, positioning statement",
+  "seven_ps": "detailed analysis of Product, Price, Place, Promotion, People, Process, Physical Evidence",
+  "calendar_next_90_days": "realistic 90-day implementation timeline with specific tasks",
+  "kpis": {
+    "measurement_and_tracking": "text",
+    "performance_indicators": "text", 
+    "analytics_framework": "text"
+  },
+  "risks_and_safety_nets": {
+    "primary_risks": "text",
+    "mitigation_strategies": "text",
+    "contingency_plans": "text"
+  }
+}
+
+Generate comprehensive, business-specific content for ${form.product_type} in ${form.country}. No markdown formatting.` 
             }
           ]
         }),
@@ -190,19 +146,32 @@ Generate detailed JSON with structured format:
       clearTimeout(timeoutId);
       
       if (!aiResponse.ok) {
-        console.error('OpenAI API failed:', aiResponse.status);
-        throw new Error('AI service unavailable');
+        const errorText = await aiResponse.text();
+        console.error('OpenAI API failed:', aiResponse.status, errorText);
+        throw new Error(`AI service error: ${aiResponse.status}`);
       }
       
       const aiData = await aiResponse.json();
       const content = aiData.choices?.[0]?.message?.content;
       
+      if (!content) {
+        console.error('No content in AI response:', aiData);
+        throw new Error('Empty AI response');
+      }
+      
       let aiGenerated;
       try {
         aiGenerated = JSON.parse(content);
       } catch (e) {
-        console.error('Failed to parse AI response:', content);
-        throw new Error('Invalid AI response');
+        console.error('Failed to parse AI response as JSON:', content);
+        console.error('Parse error:', e.message);
+        throw new Error('Invalid JSON response from AI');
+      }
+      
+      // Validate required structure
+      if (!aiGenerated?.market_foundation || !aiGenerated?.kpis || !aiGenerated?.risks_and_safety_nets) {
+        console.error('AI response missing required sections:', Object.keys(aiGenerated || {}));
+        throw new Error('Incomplete AI response structure');
       }
       
       // Validate competitor coverage for single competitor
@@ -350,10 +319,7 @@ Generate detailed JSON with structured format:
             lead_capture: "Qualified leads"
           }[form.motion] || "Business growth";
       
-      // Assemble final response using structured AI output (no fallbacks)
-      if (!aiGenerated || !aiGenerated.market_foundation || !aiGenerated.kpis || !aiGenerated.risks_and_safety_nets) {
-        throw new Error('AI response missing required structured sections');
-      }
+      // Process the validated AI response
 
       // Convert structured market foundation to legacy format for frontend compatibility
       const competitorSection = aiGenerated.market_foundation.competitor_analysis ? 
