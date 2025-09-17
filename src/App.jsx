@@ -299,6 +299,9 @@ export default function App() {
       setLoading(true);
     });
 
+    // Small delay to ensure any pending blur events complete first
+    await new Promise(resolve => setTimeout(resolve, 10));
+
     // Flush any pending input to pills before validation
     flushPendingInput(segInp, setSeg, setSegInp, 3);
     flushPendingInput(compInp, setComp, setCompInp, 3);
@@ -703,6 +706,11 @@ export default function App() {
                   className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-white/80 focus:outline-none focus:ring-2 focus:ring-blue-400/50 focus:border-blue-300 focus:bg-white transition-all duration-200 text-gray-700 min-h-[44px]"
                   placeholder="e.g. Amazon, Local garden centre"
                 />
+                {compInp.trim() && (
+                  <div className="text-xs text-blue-600 mt-1 px-1">
+                    Will be included: "{compInp.trim()}"
+                  </div>
+                )}
               </Field>
 
               {/* submit */}
