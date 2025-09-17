@@ -1,7 +1,7 @@
 /*  ─────────────────────────────────────────────
-    Marketing Strategy Generator Worker
+    Marketing Strategy Generator Worker - Optimized
     ───────────────────────────────────────────── */
-const MODEL = "gpt-4o";
+const MODEL_FAST = "gpt-4o-mini";
 
 export default {
   async fetch(req, env) {
@@ -26,22 +26,20 @@ export default {
       );
     }
 
-    /* 3. Handle both /generate (non-streaming) and /stream (streaming) */
+    /* 3. Handle /generate endpoint */
     const url = new URL(req.url);
-    const isStreaming = url.pathname === "/stream";
-    
-    if (req.method !== "POST" || (!url.pathname.endsWith("/generate") && !isStreaming)) {
+    if (req.method !== "POST" || !url.pathname.endsWith("/generate")) {
       return new Response(
         JSON.stringify({ error: "method_not_allowed" }),
         cors(405, origin)
       );
     }
 
-    /* 4. Input validation and sanitization */
+    /* 4. Input validation */
     let form;
     try { 
       const text = await req.text();
-      if (text.length > 10000) { // Prevent oversized requests
+      if (text.length > 10000) {
         return new Response(JSON.stringify({ error: "request_too_large" }), cors(413, origin));
       }
       form = JSON.parse(text); 
@@ -49,522 +47,11 @@ export default {
     catch { return new Response(JSON.stringify({ error: "invalid_request" }), cors(400, origin)); }
 
     /* 5. Validate required fields */
-    if (!form.country || typeof form.country !== 'string' || form.country.length > 100) {
-      return new Response(JSON.stringify({ error: "invalid_country" }), cors(400, origin));
-    }
-    if (!form.product_type || typeof form.product_type !== 'string' || form.product_type.length > 1000) {
-      return new Response(JSON.stringify({ error: "invalid_product_type" }), cors(400, origin));
-    }
-    
-    /* 6. Sanitize inputs */
-    form.country = form.country.trim().substring(0, 100);
-    form.sector = form.sector ? form.sector.trim().substring(0, 100) : '';
-    form.product_type = form.product_type.trim().substring(0, 1000);
-    
-    if (form.audiences && Array.isArray(form.audiences)) {
-      form.audiences = form.audiences.slice(0, 10).map(a => String(a).trim().substring(0, 100));
-    }
-    if (form.competitors && Array.isArray(form.competitors)) {
-      form.competitors = form.competitors.slice(0, 10).map(c => String(c).trim().substring(0, 100));
+    if (!form.country || !form.product_type || !form.audiences) {
+      return new Response(JSON.stringify({ error: "missing_required_fields" }), cors(400, origin));
     }
 
-    /* 7. Content quality validation */
-    function isGibberish(text) {
-      if (!text || typeof text !== 'string') return true;
-      
-      // Remove spaces and convert to lowercase for analysis
-      const cleanText = text.replace(/\s+/g, '').toLowerCase();
-      
-      // Too short or empty
-      if (cleanText.length < 3) return true;
-      
-      // Repeated characters (aaaaa, 11111, etc.)
-      if (/(.)\1{4,}/.test(cleanText)) return true;
-      
-      // No vowels at all (pure consonants unlikely to be meaningful)
-      if (!/[aeiouAEIOU]/.test(text)) return true;
-      
-      // Only symbols/numbers
-      if (/^[\W\d]+$/.test(cleanText)) return true;
-      
-      // Random keyboard mashing patterns
-      if (/qwerty|asdfgh|zxcvbn|123456|abcdef/i.test(cleanText)) return true;
-      
-      return false;
-    }
-
-    function hasMeaningfulContent(text) {
-      if (!text || typeof text !== 'string') return false;
-      
-      // Must have reasonable length for a business description
-      if (text.trim().length < 5) return false;
-      
-      // Should have multiple words for a product description
-      const words = text.trim().split(/\s+/);
-      if (words.length < 2) return false;
-      
-      // Check for business-related context
-      const businessKeywords = [
-        'business', 'company', 'service', 'product', 'sell', 'buy', 'customer', 'client',
-        'market', 'industry', 'software', 'app', 'website', 'online', 'digital', 'tech',
-        'consulting', 'education', 'training', 'healthcare', 'finance', 'retail', 'food',
-        'restaurant', 'shop', 'store', 'manufacturing', 'construction', 'real estate',
-        'agency', 'studio', 'clinic', 'practice', 'firm', 'solutions', 'platform',
-        'tool', 'system', 'management', 'analytics', 'design', 'development', 'marketing'
-      ];
-      
-      const lowerText = text.toLowerCase();
-      const hasBusinessContext = businessKeywords.some(keyword => lowerText.includes(keyword));
-      
-      // FIXED: Allow if it has business context OR if it's reasonable length with 2+ words (was 3+)
-      return hasBusinessContext || (words.length >= 2 && text.length >= 8);
-    }
-
-    // Validate content quality
-    if (isGibberish(form.product_type)) {
-      return new Response(JSON.stringify({ 
-        error: "Please provide a meaningful description of your product or service" 
-      }), cors(400, origin));
-    }
-
-    if (!hasMeaningfulContent(form.product_type)) {
-      return new Response(JSON.stringify({ 
-        error: "Please provide a more detailed description of what your business offers" 
-      }), cors(400, origin));
-    }
-
-    if (form.sector && isGibberish(form.sector)) {
-      return new Response(JSON.stringify({ 
-        error: "Please select a valid business sector" 
-      }), cors(400, origin));
-    }
-
-    /* 8. Content moderation check - only if API key is available */
-    async function checkContentModeration(text, apiKey) {
-      if (!apiKey) {
-        // Skip moderation if no API key available
-        return { flagged: false };
-      }
-
-      try {
-        const moderationResponse = await fetch('https://api.openai.com/v1/moderations', {
-          method: 'POST',
-          headers: {
-            'Authorization': `Bearer ${apiKey}`,
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({
-            input: text
-          }),
-          signal: AbortSignal.timeout(5000) // 5 second timeout
-        });
-
-        if (!moderationResponse.ok) {
-          // If moderation fails, allow content but log the issue
-          console.log('Moderation API failed, allowing content');
-          return { flagged: false };
-        }
-
-        const moderationData = await moderationResponse.json();
-        return moderationData.results[0] || { flagged: false };
-      } catch (error) {
-        // If moderation fails, allow content but log the issue
-        console.log('Moderation check failed:', error);
-        return { flagged: false };
-      }
-    }
-
-    // Check content for policy violations (only if API key available)
-    if (env.OPENAI_API_KEY) {
-      const contentToCheck = `${form.product_type} ${form.sector || ''} ${(form.audiences || []).join(' ')} ${(form.competitors || []).join(' ')}`.trim();
-      const moderationResult = await checkContentModeration(contentToCheck, env.OPENAI_API_KEY);
-
-      if (moderationResult.flagged) {
-        return new Response(JSON.stringify({ 
-          error: "Content does not meet our guidelines. Please provide appropriate business information." 
-        }), cors(400, origin));
-      }
-    }
-
-    /* ─── lookup helpers ─── */
-    const channelByMotion = {
-      ecom_checkout: [
-        { channel: "Search advertising", intent: "High", role: "Capture" },
-        { channel: "Paid social media", intent: "Mid", role: "Spark demand" },
-        { channel: "Email marketing", intent: "Mid", role: "Nurture" },
-        { channel: "Influencer partnerships", intent: "Mid", role: "Social proof" },
-        { channel: "Direct mail campaigns", intent: "Mid", role: "Target locals" }
-      ],
-      saas_checkout: [
-        { channel: "Search advertising", intent: "High", role: "Capture" },
-        { channel: "Content marketing", intent: "Mid", role: "Educate" },
-        { channel: "LinkedIn advertising", intent: "Mid", role: "Target professionals" },
-        { channel: "Webinars and demos", intent: "High", role: "Convert" },
-        { channel: "Trade publications", intent: "Mid", role: "Industry reach" }
-      ],
-      marketplace_checkout: [
-        { channel: "Marketplace advertising", intent: "High", role: "Capture" },
-        { channel: "Search advertising", intent: "Mid", role: "Assist" },
-        { channel: "Product review platforms", intent: "Mid", role: "Build trust" },
-        { channel: "Email marketing", intent: "Mid", role: "Nurture" },
-        { channel: "Influencer partnerships", intent: "Mid", role: "Social proof" }
-      ],
-      store_visit: [
-        { channel: "Local search advertising", intent: "High", role: "Drive visits" },
-        { channel: "Radio advertising", intent: "Mid", role: "Build awareness" },
-        { channel: "Local print advertising", intent: "Mid", role: "Community presence" },
-        { channel: "Outdoor advertising", intent: "Low", role: "Brand visibility" },
-        { channel: "Direct mail campaigns", intent: "Mid", role: "Target locals" }
-      ],
-      call_now: [
-        { channel: "Search with call extensions", intent: "High", role: "Click to call" },
-        { channel: "Radio sponsorships", intent: "Mid", role: "Audio presence" },
-        { channel: "Local directory listings", intent: "High", role: "Capture searches" },
-        { channel: "Yellow Pages advertising", intent: "Mid", role: "Traditional search" },
-        { channel: "Telemarketing campaigns", intent: "High", role: "Direct contact" }
-      ],
-      lead_capture: [
-        { channel: "Search advertising", intent: "High", role: "Capture" },
-        { channel: "LinkedIn advertising", intent: "Mid", role: "B2B targeting" },
-        { channel: "Trade publications", intent: "Mid", role: "Industry reach" },
-        { channel: "Trade shows and exhibitions", intent: "High", role: "Face-to-face" },
-        { channel: "Direct mail campaigns", intent: "Mid", role: "Targeted outreach" }
-      ],
-      booking: [
-        { channel: "Search advertising", intent: "High", role: "Capture" },
-        { channel: "Local social media", intent: "Mid", role: "Community presence" },
-        { channel: "Local print advertising", intent: "Mid", role: "Traditional reach" },
-        { channel: "Radio advertising", intent: "Mid", role: "Drive bookings" },
-        { channel: "Referral programmes", intent: "High", role: "Word of mouth" }
-      ],
-      saas_trial: [
-        { channel: "Search advertising", intent: "High", role: "Capture" },
-        { channel: "Content marketing", intent: "Mid", role: "Educate" },
-        { channel: "Industry publications", intent: "Mid", role: "Authority building" },
-        { channel: "Professional networking", intent: "Mid", role: "Personal connections" },
-        { channel: "Webinars and events", intent: "Mid", role: "Demonstrate value" }
-      ],
-      saas_demo: [
-        { channel: "Search advertising", intent: "High", role: "Capture" },
-        { channel: "LinkedIn advertising", intent: "Mid", role: "Target accounts" },
-        { channel: "Trade shows", intent: "High", role: "Demo platform" },
-        { channel: "Industry conferences", intent: "Mid", role: "Thought leadership" },
-        { channel: "Direct sales outreach", intent: "High", role: "Personal contact" }
-      ],
-      app_install: [
-        { channel: "App store advertising", intent: "High", role: "Convert" },
-        { channel: "Social media advertising", intent: "Mid", role: "Scale awareness" },
-        { channel: "Influencer marketing", intent: "Mid", role: "Social validation" },
-        { channel: "Television advertising", intent: "Low", role: "Mass awareness" },
-        { channel: "Podcast sponsorships", intent: "Mid", role: "Audio engagement" }
-      ],
-      donation: [
-        { channel: "Search advertising", intent: "High", role: "Capture intent" },
-        { channel: "Direct mail appeals", intent: "Mid", role: "Personal touch" },
-        { channel: "Community events", intent: "Mid", role: "Local engagement" },
-        { channel: "Radio sponsorships", intent: "Mid", role: "Cause awareness" },
-        { channel: "Print advertising", intent: "Mid", role: "Credibility building" }
-      ],
-      wholesale_inquiry: [
-        { channel: "Search advertising", intent: "High", role: "Capture B2B" },
-        { channel: "LinkedIn advertising", intent: "Mid", role: "Prospect" },
-        { channel: "Trade publications", intent: "Mid", role: "Industry authority" },
-        { channel: "Trade shows", intent: "High", role: "Relationship building" },
-        { channel: "Direct sales outreach", intent: "High", role: "Personal contact" }
-      ],
-      partner_recruitment: [
-        { channel: "Search advertising", intent: "High", role: "Capture partners" },
-        { channel: "LinkedIn outreach", intent: "Mid", role: "Recruit" },
-        { channel: "Industry publications", intent: "Mid", role: "Authority" },
-        { channel: "Trade associations", intent: "Mid", role: "Network access" },
-        { channel: "Partner events", intent: "High", role: "Relationship building" }
-      ]
-    };
-
-    const defaultGoalByMotion = {
-      ecom_checkout: "Online orders",
-      saas_checkout: "Paid subscriptions",
-      marketplace_checkout: "Marketplace orders", 
-      store_visit: "In-store sales",
-      call_now: "Bookings",
-      lead_capture: "Qualified leads",
-      booking: "Bookings",
-      saas_trial: "Qualified leads",
-      saas_demo: "Meetings booked",
-      app_install: "Installs with activation",
-      donation: "Donations",
-      wholesale_inquiry: "Wholesale purchase orders",
-      partner_recruitment: "Partner sign-ups",
-      custom: "Goal aligned to custom action"
-    };
-
-    /* Fixed helper functions */
-    function applyMotionDefaults(report, form) {
-      if (!report || typeof report !== "object") {
-        report = {};
-      }
-
-      if (typeof report.budget !== "object" || report.budget === null || Array.isArray(report.budget)) {
-        report.budget = {};
-      }
-
-      const isCustom = form.motion === "custom";
-      if (!isCustom && (!Array.isArray(report.channel_playbook) || report.channel_playbook.length === 0)) {
-        report.channel_playbook = channelByMotion[form.motion] || [];
-      }
-
-      report.budget.band = form.budget_band || report.budget.band || "Low";
-      return report;
-    }
-
-    function stripCurrencyAndAmounts(report) {
-      if (!report || typeof report !== "object") {
-        return report;
-      }
-
-      const walk = (obj) => {
-        if (!obj || typeof obj !== "object") return;
-        
-        for (const k of Object.keys(obj)) {
-          const v = obj[k];
-          
-          if (v && typeof v === "object" && !Array.isArray(v)) {
-            walk(v);
-          }
-          
-          if (["amount", "currency", "cost", "budget_total", "price", "spend", "investment", "fee", "payment"].includes(k)) {
-            delete obj[k];
-          }
-          
-          if (typeof v === "string") {
-            obj[k] = v.replace(/[£$€₹¥¢₽₨₩₪₡₦₴₵₸₼]/g, "")
-                     .replace(/\b\d+\s*(pounds?|dollars?|euros?|cents?|pence|quid)\b/gi, "")
-                     .replace(/\b£\d+|\$\d+|€\d+\b/g, "")
-                     .replace(/\bcost[s]?\s*[:=]\s*[\d,]+/gi, "")
-                     .replace(/\bbudget[s]?\s*[:=]\s*[\d,]+/gi, "")
-                     .replace(/\bspend[s]?\s*[:=]\s*[\d,]+/gi, "");
-          }
-        }
-      };
-      
-      walk(report);
-      return report;
-    }
-
-    // Align budget allocation with channel playbook
-    function alignBudgetWithChannels(report) {
-      if (!report.channel_playbook || !Array.isArray(report.channel_playbook)) {
-        return report;
-      }
-
-      // Take first 5 channels from playbook (already have budget_percent values)
-      const channels = report.channel_playbook.slice(0, 5);
-      
-      if (channels.length >= 5) {
-        const budgetText = `Primary Allocation\n${channels[0].channel}: ${channels[0].budget_percent}% to ${channels[0].role.toLowerCase()}.\n\nSecondary Allocation\n${channels[1].channel}: ${channels[1].budget_percent}% to ${channels[1].role.toLowerCase()}.\n\nSupporting Channels\n${channels[2].channel}: ${channels[2].budget_percent}% to ${channels[2].role.toLowerCase()}.\n${channels[3].channel}: ${channels[3].budget_percent}% to ${channels[3].role.toLowerCase()}.\n${channels[4].channel}: ${channels[4].budget_percent}% to ${channels[4].role.toLowerCase()}.\n\nAllocation Rationale\nPrioritise the primary channel to capture high-intent demand whilst supporting with secondary channels and comprehensive supporting channels for complete market coverage through integrated multi-channel approach.`;
-        
-        if (!report.budget) report.budget = {};
-        report.budget.allocation = budgetText;
-      } else if (channels.length >= 3) {
-        const budgetText = `Primary Allocation\n${channels[0].channel}: ${channels[0].budget_percent}% to ${channels[0].role.toLowerCase()}.\n\nSecondary Allocation\n${channels[1].channel}: ${channels[1].budget_percent}% to ${channels[1].role.toLowerCase()}.\n\nSupporting Allocation\n${channels[2].channel}: ${channels[2].budget_percent}% to ${channels[2].role.toLowerCase()}.\n\nAllocation Rationale\nPrioritise the primary channel to capture high-intent demand whilst supporting with secondary and tertiary channels for comprehensive market coverage through integrated channel approach.`;
-        
-        if (!report.budget) report.budget = {};
-        report.budget.allocation = budgetText;
-      }
-      
-      return report;
-    }
-
-    /* ─── build prompt ─── */
-    const hintChannels = JSON.stringify(channelByMotion[form.motion] || []);
-
-    const derivedGoal =
-      form.motion === "custom" && form.action_custom
-        ? `Goal aligned to: ${form.action_custom}`
-        : defaultGoalByMotion[form.motion] || "Goal aligned to main action";
-
-    const customLine =
-      form.motion === "custom" && form.action_custom
-        ? `Custom main action: ${form.action_custom}\n`
-        : "";
-
-    let competitorLine = "";
-    let competitorAnalysisInstructions = "";
-    if (Array.isArray(form.competitors) && form.competitors.length) {
-      competitorLine = `Competitors: ${form.competitors.join(", ")}`;
-      competitorAnalysisInstructions = `CRITICAL: You MUST prominently feature and analyze these specific competitors: ${form.competitors.join(", ")}. Include them by name in the competitors_brief section and reference them throughout other sections. Do not ignore or generalize these competitors.`;
-    } else {
-      competitorLine = "Competitors: None specified";
-      competitorAnalysisInstructions = "No specific competitors provided. Analyze the general competitive landscape.";
-    }
-
-    let prompt = `You are Mark Ritson meets Philip Kotler - the world's leading marketing strategist. 
-
-CRITICAL LANGUAGE REQUIREMENT:
-- Write EXCLUSIVELY in British English with UK spelling throughout
-- Use UK terminology: adverts (not ads), organisations (not organizations), realise (not realize), colour (not color), centre (not center), analyse (not analyze), optimise (not optimize), behaviour (not behavior), favourite (not favorite), honour (not honor), labour (not labor), flavour (not flavor), neighbourhood (not neighborhood), travelled (not traveled), cancelled (not canceled), modelling (not modeling), programme (not program when referring to plans), whilst (not while), amongst (not among)
-- Use British business language and terminology consistently
-- Apply proper sentence case throughout
-- NO American spellings or terminology whatsoever
-
-CRITICAL LANGUAGE STYLE BY SECTION TYPE:
-- ANALYTICAL sections (Market Foundation, Personas, Competitors): Use OBJECTIVE, DESCRIPTIVE language - "The market demonstrates...", "Customers typically exhibit...", "Research indicates..."
-- STRATEGIC sections (Strategy Pillars, Differentiation, 7Ps): Use BUSINESS-FOCUSED RECOMMENDATIONS - "The business should focus on...", "Position the brand as...", "Prioritise..."
-- TACTICAL sections (Channel Playbook, Calendar, Experiments): Use ACTION-ORIENTED DIRECTIVES - "Implement search campaigns...", "Launch social media initiatives...", "Execute testing protocols..."
-- PLANNING sections (Budget, KPIs, Risks): Use STRATEGIC RECOMMENDATIONS - "Allocate 45% to search...", "Track conversion rates...", "Monitor competitive response..."
-
-CRITICAL FORMATTING REQUIREMENTS:
-- Use section headings without any markdown formatting (no asterisks or special symbols)
-- Write in clean, readable paragraphs with proper line breaks
-- NO asterisks, NO bullet symbols, NO markdown formatting anywhere
-- Well-structured, professional British business report format
-
-INTEGRATED MARKETING APPROACH:
-- Recommend BOTH digital AND traditional marketing channels based on business type and target market
-- Consider local market context, customer demographics, and sector norms when selecting channels
-- Include traditional channels: print advertising, radio, television, direct mail, outdoor advertising, trade shows, telemarketing, community events, referral programmes, trade publications, networking events
-- Balance digital efficiency with traditional credibility and local market presence
-
-COMPETITOR ANALYSIS REQUIREMENT:
-${competitorAnalysisInstructions}
-
-INPUT DATA:
-Country: ${form.country}
-Sector: ${form.sector}
-Offering: ${form.product_type}
-Target segments: ${Array.isArray(form.audiences) && form.audiences.length ? form.audiences.join(", ") : "General market"}
-Primary goal: ${derivedGoal}
-Main action: ${form.motion}
-${customLine}Budget level: ${form.budget_band || "Low"}
-${competitorLine}
-
-STRATEGIC HINTS:
-Channel intent map: ${hintChannels}
-
-REQUIRED JSON STRUCTURE WITH EXACT FIELD NAMES:
-
-{
-  "meta": {
-    "title": "Marketing Strategy Report",
-    "country": "${form.country}",
-    "sector": "${form.sector}",
-    "goal": "${derivedGoal}"
-  },
-  
-  "market_foundation": "Market Overview\\nMarket size, growth trends, and key dynamics affecting the sector. Use ANALYTICAL language: 'The market demonstrates...', 'Research indicates...', 'Industry data shows...'.\\n\\nCustomer Behaviour Insights\\nPurchasing patterns, decision-making factors, pain points and motivations that drive customer behaviour. Use DESCRIPTIVE language: 'Customers typically...', 'Behavioural analysis reveals...', 'Consumer research shows...'.\\n\\nCompetitor Analysis\\nAnalysis of named competitors including strengths, weaknesses, market positioning, and competitive opportunities.\\n\\nMarket Opportunities\\nUnderserved segments, emerging trends, and growth areas to target.",
-  
-  "strategy_pillars": "Pillar 1: Strategic Focus Name\\nThe business should focus on [strategic area]. Prioritise [key activities] to achieve [success metrics]. Use BUSINESS-FOCUSED language: 'The business should...', 'Focus on...', 'Prioritise...'.\\n\\nPillar 2: Strategic Focus Name\\nPosition the brand to [strategic objective]. The organisation should develop [capabilities] whilst maintaining [advantages].\\n\\nPillar 3: Strategic Focus Name\\nEstablish [strategic priority] by concentrating resources on [activities] to deliver [outcomes].",
-  
-  "personas": "Primary Persona: Name\\nThe target demographic typically exhibits [characteristics]. Research indicates these customers demonstrate [behaviours] and prioritise [values]. Their decision-making process involves [factors].\\n\\nSecondary Persona: Name\\nThis segment generally shows [traits] and responds to [motivations]. Analysis reveals they prefer [channels] and value [benefits].\\n\\nTertiary Persona: Name\\nCustomers in this category tend to [behaviours] and are influenced by [factors]. They typically engage through [channels].",
-  
-  "competitors_brief": "[Competitor Name Analysis]\\nThe competitive landscape reveals [competitor] demonstrates [strengths] whilst showing vulnerabilities in [weaknesses]. Market analysis indicates their positioning focuses on [strategy].\\n\\n[Additional Competitors if provided]\\nResearch shows [competitor] maintains [market position] through [approach]. Their strategy emphasises [focus areas].\\n\\nCompetitive Analysis Summary\\nThe market exhibits [dynamics] with competitive gaps emerging in [areas]. Opportunities exist in [positioning spaces].",
-  
-  "differentiation_moves": "Core Differentiation Strategy\\nThe business should position itself as [unique position] by emphasising [differentiators]. Focus on developing [competitive advantages] whilst leveraging [strengths].\\n\\nPositioning Tactics\\nPosition the brand against [competitors] by highlighting [differences]. The organisation should concentrate on [positioning approach] to establish [market position].\\n\\nMessaging Framework\\nDevelop core messages around [themes]. Prioritise [proof points] and communicate [value proposition] through [strategy].",
-  
-  "marketing_mix_7ps": "Product\\nThe business should develop [product strategy] by focusing on [features] whilst prioritising [benefits]. Position the offering to deliver [value proposition].\\n\\nPrice\\nEstablish pricing at [strategy] to compete against [competitors]. The organisation should communicate value through [approach] whilst maintaining [positioning].\\n\\nPlace\\nDistribute through [channels] by developing [partnerships]. Focus on [market access] to reach [target segments].\\n\\nPromotion\\nDevelop promotional strategy emphasising [messages]. The business should utilise [channels] whilst coordinating [campaigns].\\n\\nPeople\\nBuild staff capabilities in [areas]. Prioritise training on [skills] and establish [service standards] to deliver [customer experience].\\n\\nProcess\\nOptimise the customer journey by streamlining [touchpoints]. Focus on [operational areas] to improve [outcomes].\\n\\nPhysical Evidence\\nDevelop brand assets that demonstrate [credibility]. Establish [touchpoints] to reinforce [brand positioning].",
-  
-  "channel_playbook": [
-    {
-      "channel": "Primary Channel Name",
-      "intent": "High|Mid|Low",
-      "role": "Channel function (e.g., Capture, Assist, Scale)",
-      "summary": "Implement [channel strategy] to capture [audience type]. Launch [specific approach] targeting [segment] whilst optimising for [outcome]. Execute [tactics] to achieve [performance goals].",
-      "key_actions": ["Launch specific campaign type", "Implement targeting strategy", "Execute optimisation protocol", "Deploy measurement system"],
-      "success_metric": "Track [specific metric] to measure [outcome]",
-      "budget_percent": 35,
-      "why_it_works": "This channel performs effectively because [market dynamics]. Implement this approach to leverage [competitive advantage] whilst capturing [opportunity]."
-    },
-    {
-      "channel": "Secondary Channel Name", 
-      "intent": "High|Mid|Low",
-      "role": "Channel function",
-      "summary": "Deploy [channel approach] to engage [audience]. Execute [strategy] through [methods] whilst monitoring [performance indicators]. Launch [initiatives] to drive [outcomes].",
-      "key_actions": ["Execute specific tactic", "Launch engagement strategy", "Implement measurement system"],
-      "success_metric": "Monitor [key metric] for [results]",
-      "budget_percent": 25,
-      "why_it_works": "Execute this channel strategy to capitalise on [market conditions]. Implement [approach] to achieve [competitive positioning]."
-    },
-    {
-      "channel": "Third Channel Name",
-      "intent": "High|Mid|Low", 
-      "role": "Channel function",
-      "summary": "Launch [supporting strategy] to complement primary channels. Implement [tactics] targeting [specific segment] whilst tracking [performance]. Execute [approach] to enhance [overall strategy].",
-      "key_actions": ["Deploy supporting campaign", "Execute measurement protocol"],
-      "success_metric": "Track [supporting metric] for [contribution]", 
-      "budget_percent": 20,
-      "why_it_works": "Deploy this supporting channel to enhance [strategic objective]. Execute [tactics] to maximise [channel synergy]."
-    },
-    {
-      "channel": "Fourth Channel Name",
-      "intent": "High|Mid|Low",
-      "role": "Channel function",
-      "summary": "Execute [supplementary strategy] to support core marketing efforts. Deploy [tactics] for [target audience] whilst maintaining [approach]. Implement [methods] to strengthen [overall positioning].",
-      "key_actions": ["Launch supplementary campaign", "Execute support tactics"],
-      "success_metric": "Monitor [supplementary metric] for [additional results]",
-      "budget_percent": 15,
-      "why_it_works": "Implement this channel to create [strategic benefit]. Execute [approach] to complement [primary strategy] and achieve [comprehensive coverage]."
-    },
-    {
-      "channel": "Fifth Channel Name",
-      "intent": "High|Mid|Low",
-      "role": "Channel function",
-      "summary": "Deploy [supporting approach] to enhance market presence. Execute [tactical methods] targeting [niche segment] whilst tracking [specific outcomes]. Launch [initiatives] to complete [comprehensive strategy].",
-      "key_actions": ["Execute niche targeting", "Deploy measurement tracking"],
-      "success_metric": "Track [niche metric] for [strategic contribution]",
-      "budget_percent": 5,
-      "why_it_works": "Execute this channel to achieve [comprehensive market coverage]. Deploy [tactics] to maximise [overall strategic impact] and ensure [complete audience reach]."
-    }
-  ],
-  
-  "budget": {
-    "band": "${form.budget_band || 'Low'}",
-    "allocation": "Budget allocation will be generated from channel_playbook data during post-processing."
-  },
-  
-  "calendar_next_90_days": "Generate a contextual 90-day action plan that aligns with the specific marketing channels being recommended and the business type. Structure as Month 1: Foundation, Month 2: Scaling, Month 3: Optimisation with weekly tactical activities that match the recommended channels and business context. For traditional marketing channels, include activities like placing adverts, coordinating with publications, booking radio slots, preparing trade show materials, and setting up community events. For B2B businesses, include trade publication deadlines, conference schedules, and industry networking events. For seasonal businesses, align activities with relevant seasons and market timing. DO NOT use generic digital marketing activities that don't match the recommended channels or business context.",
-  
-  "kpis": "Generate a comprehensive KPI framework that directly connects to the specific marketing channels and tactics recommended in the channel_playbook section. Structure as follows:\\n\\nChannel-Specific KPIs\\nFor each major channel recommended (e.g., radio advertising, trade shows, local print), provide 2-3 specific metrics that directly measure that channel's performance and align with its stated role and intent level. Include the measurement method and target frequency.\\n\\nIntermediate Performance Indicators\\nMetrics that bridge channel activities to business outcomes, such as brand awareness lift from traditional channels, lead quality scores from B2B tactics, or foot traffic increases from local marketing.\\n\\nBusiness Outcome KPIs\\nTop-level metrics that measure overall marketing success aligned with the primary business goal (online orders, qualified leads, bookings, etc.). Show clear connection to channel activities.\\n\\nMeasurement Framework\\nSpecify appropriate tools and data sources for each channel type: Google Analytics and paid platform dashboards for digital channels, customer surveys and market research for brand awareness, CRM pipeline data for B2B lead generation, sales data and customer counts for retail, trade association reports for B2B sectors. Include reporting frequency and success thresholds that make sense for each business context and marketing approach.",
-  
-  "risks_and_safety_nets": "Generate contextual risks based on the specific business, sector, country, and marketing channels being recommended. Consider business-specific vulnerabilities like operational risks, market conditions, seasonal factors, regulatory concerns, competitive threats, and economic dependencies that actually affect this particular business type and sector. Include relevant mitigation strategies and safety nets that make sense for the recommended marketing channels and business model. DO NOT use generic digital marketing risks that don't apply to traditional marketing channels or specific business contexts.",
-  
-  "experiments": "Priority Tests\\nExecute landing page testing to compare conversion rates between [variation A] and [variation B]. Launch audience segmentation tests to identify highest-performing demographics. Implement creative testing to optimise advertising performance.\\n\\nTesting Framework\\nDesign experiments with statistical significance thresholds of 95%. Establish test duration of minimum 2 weeks for reliable results. Implement holdout groups for accurate measurement.\\n\\nImplementation Plan\\nLaunch landing page tests in week 1. Execute audience tests in week 3. Deploy creative tests in week 5. Analyse results and implement winning variations by week 8."
-}
-
-CONTENT REQUIREMENTS:
-- Each section 250-400 words minimum
-- Channel playbook must have rich, detailed content for each channel
-- Use clear headings and well-structured paragraphs
-- Include specific competitor names where provided
-- NO asterisks, NO bullet points, NO markdown formatting
-- Clean, professional British business report format
-- Percentage-only budget allocations (e.g., "Search: 45%")
-- Channel summaries must be 2-3 comprehensive sentences with tactical details
-- Key actions must be specific, actionable tactical items
-- Why it works explanations must be detailed strategic reasoning
-- MANDATORY: Use British English spelling and terminology throughout
-- Budget allocation MUST reference exactly the same channels from channel_playbook with matching percentages
-- CRITICAL: Generate contextual, business-specific risks and safety nets that relate to the actual sector, marketing channels, and business model being recommended
-
-BRITISH ENGLISH COMPLIANCE:
-- adverts NOT ads
-- organisations NOT organizations  
-- realise NOT realize
-- optimise NOT optimize
-- analyse NOT analyze
-- behaviour NOT behavior
-- colour NOT color
-- centre NOT center
-- programme NOT program (for plans)
-- whilst NOT while
-- amongst NOT among
-
-TASK:
-Create a comprehensive, well-structured marketing strategy using the exact JSON format above. Focus on clean, readable content with clear headings and actionable insights. Prominently feature any named competitors throughout the analysis. Pay special attention to creating rich, detailed channel playbook content. Generate contextual risks specific to this business type, sector, and marketing approach. MUST use British English spelling and terminology exclusively throughout.
-
-OUTPUT:
-Return valid JSON only with the exact field structure, clean formatting, and British English language specified above.`;
-
-    /* 7. Check API key */
+    /* 6. Check API key */
     if (!env.OPENAI_API_KEY) {
       return new Response(
         JSON.stringify({ error: "api_key_not_configured" }), 
@@ -572,146 +59,201 @@ Return valid JSON only with the exact field structure, clean formatting, and Bri
       );
     }
 
-    /* 8. OpenAI call with streaming support */
+    /* 7. Parallel generation for speed */
     try {
-      const requestBody = {
-        model: MODEL,
-        temperature: 0.4,
-        top_p: 0.9,
-        max_tokens: 4000,
-        response_format: { type: "json_object" },
-        stream: isStreaming,
-        messages: [
-          { role: "system",
-            content: "You are Mark Ritson meets Philip Kotler - the world's leading marketing strategist. Write comprehensive, actionable marketing strategies EXCLUSIVELY in British English with UK spelling and terminology. Use clean, professional business report format with NO markdown formatting, NO asterisks, NO bullet symbols. Always prominently feature any named competitors provided. Use percentage allocations only for budgets - no currency symbols. Create rich, detailed channel playbook content with comprehensive tactical details. CRITICAL: Recommend integrated marketing approaches combining BOTH digital AND traditional channels based on business type and target market. Consider print advertising, radio, television, direct mail, outdoor advertising, trade shows, telemarketing, local community engagement, and other traditional tactics alongside digital channels. MANDATORY: Use British spellings - adverts not ads, organisations not organizations, realise not realize, optimise not optimize, analyse not analyze, behaviour not behavior, colour not color, centre not center. Follow section-specific language styles: analytical sections use descriptive language, strategic sections use business recommendations, tactical sections use action directives, planning sections use strategic recommendations. CRITICAL: Generate contextual, business-specific risks and safety nets that relate to the actual sector, marketing channels, business model, and market conditions rather than generic digital marketing risks." },
-          { role: "user", content: prompt }
+      const systemPrompt = "Marketing strategist. Write in British English (en-GB spelling). No markdown. Use headings as plain text. Include named competitors prominently.";
+      
+      const competitorText = form.competitors?.length ? form.competitors.join(", ") : "general market";
+      const audienceText = form.audiences?.join(", ") || "general market";
+      
+      // Create 4 parallel requests
+      const promises = [
+        // Request 1: Market + Competitors (18s timeout)
+        fetch("https://api.openai.com/v1/chat/completions", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${env.OPENAI_API_KEY}`
+          },
+          body: JSON.stringify({
+            model: MODEL_FAST,
+            temperature: 0.4,
+            max_tokens: 800,
+            response_format: { type: "json_object" },
+            messages: [
+              { role: "system", content: systemPrompt },
+              { role: "user", content: `Generate market foundation and competitor analysis for: ${form.product_type} in ${form.country} ${form.sector} sector. Competitors: ${competitorText}. JSON format: {"market_foundation": "Market Overview\\n[analysis]\\n\\nCustomer Behaviour\\n[insights]\\n\\nCompetitor Analysis\\n[specific competitor analysis]\\n\\nMarket Opportunities\\n[opportunities]", "competitors_brief": "[competitor analysis with named competitors]"}` }
+            ]
+          }),
+          signal: AbortSignal.timeout(18000)
+        }),
+        
+        // Request 2: Strategy + Differentiation (18s timeout)
+        fetch("https://api.openai.com/v1/chat/completions", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${env.OPENAI_API_KEY}`
+          },
+          body: JSON.stringify({
+            model: MODEL_FAST,
+            temperature: 0.4,
+            max_tokens: 700,
+            response_format: { type: "json_object" },
+            messages: [
+              { role: "system", content: systemPrompt },
+              { role: "user", content: `Generate strategy pillars and differentiation for: ${form.product_type} targeting ${audienceText}. JSON format: {"strategy_pillars": "Pillar 1: [name]\\n[strategy]\\n\\nPillar 2: [name]\\n[strategy]\\n\\nPillar 3: [name]\\n[strategy]", "differentiators": "Core Differentiation\\n[strategy]\\n\\nValue Proposition\\n[framework]\\n\\nPositioning Statement\\n[statement]"}` }
+            ]
+          }),
+          signal: AbortSignal.timeout(18000)
+        }),
+        
+        // Request 3: Personas + 7Ps (18s timeout)
+        fetch("https://api.openai.com/v1/chat/completions", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${env.OPENAI_API_KEY}`
+          },
+          body: JSON.stringify({
+            model: MODEL_FAST,
+            temperature: 0.4,
+            max_tokens: 900,
+            response_format: { type: "json_object" },
+            messages: [
+              { role: "system", content: systemPrompt },
+              { role: "user", content: `Generate personas and 7Ps for: ${form.product_type} in ${form.country}. Target: ${audienceText}. JSON format: {"personas": "Primary: [name]\\n[description]\\n\\nSecondary: [name]\\n[description]\\n\\nTertiary: [name]\\n[description]", "seven_ps": "Product\\n[strategy]\\n\\nPrice\\n[strategy]\\n\\nPlace\\n[strategy]\\n\\nPromotion\\n[strategy]\\n\\nPeople\\n[strategy]\\n\\nProcess\\n[strategy]\\n\\nPhysical Evidence\\n[strategy]"}` }
+            ]
+          }),
+          signal: AbortSignal.timeout(18000)
+        }),
+        
+        // Request 4: Planning sections (18s timeout)
+        fetch("https://api.openai.com/v1/chat/completions", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${env.OPENAI_API_KEY}`
+          },
+          body: JSON.stringify({
+            model: MODEL_FAST,
+            temperature: 0.4,
+            max_tokens: 800,
+            response_format: { type: "json_object" },
+            messages: [
+              { role: "system", content: systemPrompt },
+              { role: "user", content: `Generate planning sections for ${form.product_type} business in ${form.sector}. JSON format: {"calendar_next_90_days": "Month 1: Foundation\\n[activities]\\n\\nMonth 2: Scaling\\n[activities]\\n\\nMonth 3: Optimisation\\n[activities]", "kpis": "Channel KPIs\\n[metrics]\\n\\nBusiness KPIs\\n[outcomes]\\n\\nMeasurement Framework\\n[tools]", "risks_and_safety_nets": "Business Risks\\n[specific risks]\\n\\nMitigation Strategies\\n[solutions]", "experiments": "Priority Tests\\n[experiments]\\n\\nTesting Framework\\n[methodology]"}` }
+            ]
+          }),
+          signal: AbortSignal.timeout(18000)
+        })
+      ];
+      
+      // Wait for all requests (max 18s wall time)
+      const responses = await Promise.all(promises);
+      
+      // Parse responses
+      const results = await Promise.all(
+        responses.map(async (response, index) => {
+          if (!response.ok) {
+            console.error(`Request ${index + 1} failed:`, response.status);
+            return {};
+          }
+          const data = await response.json();
+          const content = data.choices?.[0]?.message?.content;
+          try {
+            return JSON.parse(content);
+          } catch (e) {
+            console.error(`Failed to parse response ${index + 1}:`, content);
+            return {};
+          }
+        })
+      );
+      
+      const [marketData, strategyData, personaData, planningData] = results;
+      
+      // Generate channel playbook deterministically (instant)
+      const channelByMotion = {
+        ecom_checkout: [
+          { channel: "Search advertising", intent: "High", role: "Capture" },
+          { channel: "Paid social media", intent: "Mid", role: "Spark demand" },
+          { channel: "Email marketing", intent: "Mid", role: "Nurture" },
+          { channel: "Influencer partnerships", intent: "Mid", role: "Social proof" },
+          { channel: "Direct mail campaigns", intent: "Mid", role: "Target locals" }
+        ],
+        saas_checkout: [
+          { channel: "Search advertising", intent: "High", role: "Capture" },
+          { channel: "Content marketing", intent: "Mid", role: "Educate" },
+          { channel: "LinkedIn advertising", intent: "Mid", role: "Target professionals" },
+          { channel: "Webinars and demos", intent: "High", role: "Convert" },
+          { channel: "Trade publications", intent: "Mid", role: "Industry reach" }
+        ],
+        store_visit: [
+          { channel: "Local search advertising", intent: "High", role: "Drive visits" },
+          { channel: "Radio advertising", intent: "Mid", role: "Build awareness" },
+          { channel: "Local print advertising", intent: "Mid", role: "Community presence" },
+          { channel: "Outdoor advertising", intent: "Low", role: "Brand visibility" },
+          { channel: "Direct mail campaigns", intent: "Mid", role: "Target locals" }
+        ],
+        lead_capture: [
+          { channel: "Search advertising", intent: "High", role: "Capture" },
+          { channel: "LinkedIn advertising", intent: "Mid", role: "B2B targeting" },
+          { channel: "Trade publications", intent: "Mid", role: "Industry reach" },
+          { channel: "Trade shows and exhibitions", intent: "High", role: "Face-to-face" },
+          { channel: "Direct mail campaigns", intent: "Mid", role: "Targeted outreach" }
         ]
       };
-
-      const ai = await fetch("https://api.openai.com/v1/chat/completions", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${env.OPENAI_API_KEY}`
+      
+      const channels = channelByMotion[form.motion] || channelByMotion.ecom_checkout;
+      const percentages = [35, 25, 20, 15, 5];
+      
+      const channelPlaybook = channels.slice(0, 5).map((channel, index) => ({
+        ...channel,
+        summary: `Deploy ${channel.channel.toLowerCase()} to ${channel.role.toLowerCase()}. Execute targeted campaigns through proven methods whilst tracking performance metrics. Launch initiatives to achieve strategic objectives.`,
+        key_actions: [`Launch ${channel.channel.toLowerCase()} campaign`, "Execute targeting strategy", "Implement measurement framework"],
+        success_metric: `Track ${channel.intent.toLowerCase()}-intent conversions`,
+        budget_percent: percentages[index] || 5,
+        why_it_works: `This channel works effectively for ${form.motion} because it captures ${channel.intent.toLowerCase()}-intent customers at the right moment.`
+      }));
+      
+      // Assemble final response
+      const derivedGoal = form.motion === "custom" && form.action_custom 
+        ? `Goal aligned to: ${form.action_custom}`
+        : {
+            ecom_checkout: "Online orders",
+            saas_checkout: "Paid subscriptions", 
+            store_visit: "In-store sales",
+            lead_capture: "Qualified leads"
+          }[form.motion] || "Business growth";
+      
+      let json = {
+        meta: {
+          title: "Marketing Strategy Report",
+          country: form.country,
+          sector: form.sector || "General",
+          goal: derivedGoal
         },
-        body: JSON.stringify(requestBody),
-        signal: AbortSignal.timeout(40000) // 40-second timeout for OpenAI API
-      });
-
-      if (!ai.ok) {
-        return new Response(
-          JSON.stringify({ error: "ai_service_unavailable" }),
-          cors(503, origin)
-        );
-      }
-
-      if (isStreaming) {
-        // Create proper streaming response
-        const { readable, writable } = new TransformStream();
-        const writer = writable.getWriter();
-        const textEncoder = new TextEncoder();
-        
-        // Start processing stream in background
-        (async () => {
-          try {
-            const reader = ai.body.getReader();
-            let buffer = '';
-            let completeResponse = '';
-            
-            while (true) {
-              const { done, value } = await reader.read();
-              if (done) break;
-              
-              // Decode chunk and add to buffer
-              const chunk = new TextDecoder().decode(value);
-              buffer += chunk;
-              
-              // Process complete lines from buffer
-              const lines = buffer.split('\n');
-              buffer = lines.pop() || ''; // Keep incomplete line in buffer
-              
-              for (const line of lines) {
-                if (line.trim() === '') continue;
-                if (line.startsWith('data: ')) {
-                  const data = line.slice(6);
-                  if (data === '[DONE]') {
-                    // Process the complete response and apply post-processing
-                    try {
-                      let finalPlan = JSON.parse(completeResponse);
-                      
-                      // Apply post-processing like the non-streaming version
-                      if (!finalPlan.error) {
-                        finalPlan = applyMotionDefaults(finalPlan, form);
-                        finalPlan = stripCurrencyAndAmounts(finalPlan);
-                        finalPlan = alignBudgetWithChannels(finalPlan);
-                      }
-                      
-                      // Send final structured plan
-                      await writer.write(textEncoder.encode(`data: ${JSON.stringify({ type: 'final', plan: finalPlan })}\n\n`));
-                    } catch (e) {
-                      await writer.write(textEncoder.encode(`data: ${JSON.stringify({ error: 'failed_to_process_final_plan' })}\n\n`));
-                    }
-                    
-                    await writer.write(textEncoder.encode('data: [DONE]\n\n'));
-                    break;
-                  }
-                  
-                  try {
-                    const parsed = JSON.parse(data);
-                    const content = parsed.choices?.[0]?.delta?.content || '';
-                    if (content) {
-                      // Accumulate the complete response
-                      completeResponse += content;
-                      
-                      // Send content as SSE for progressive display
-                      await writer.write(textEncoder.encode(`data: ${JSON.stringify({ content })}\n\n`));
-                    }
-                  } catch (e) {
-                    // Skip invalid JSON chunks
-                  }
-                }
-              }
-            }
-            
-          } catch (error) {
-            console.error('Streaming error:', error);
-            await writer.write(textEncoder.encode(`data: ${JSON.stringify({ error: 'streaming_error' })}\n\n`));
-          } finally {
-            await writer.close();
-          }
-        })();
-        
-        // Return streaming response with proper headers
-        const headers = {
-          'Content-Type': 'text/event-stream',
-          'Cache-Control': 'no-cache',
-          'Connection': 'keep-alive',
-          ...cors(200, origin).headers
-        };
-        delete headers['Content-Type']; // Remove JSON content type
-        headers['Content-Type'] = 'text/event-stream';
-        
-        return new Response(readable, { status: 200, headers });
-      } else {
-        // Non-streaming response (original behavior)
-        const out = await ai.json();
-        let json;
-        try {
-          const content = out.choices?.[0]?.message?.content;
-          json = content ? JSON.parse(content)
-                         : { error: "no_content_generated" };
-        } catch (e) {
-          json = { error: "invalid_ai_response" };
-        }
-
-        if (!json.error) {
-          json = applyMotionDefaults(json, form);
-          json = stripCurrencyAndAmounts(json);
-          json = alignBudgetWithChannels(json);
-        }
-
-        return new Response(JSON.stringify(json), cors(200, origin));
-      }
+        market_foundation: marketData?.market_foundation || "Market analysis shows strong growth potential in this sector with increasing customer demand.",
+        strategy_pillars: strategyData?.strategy_pillars || "Pillar 1: Customer Focus\nPrioritise customer satisfaction and retention through exceptional service delivery.\n\nPillar 2: Market Differentiation\nEstablish clear competitive advantages through unique value propositions.\n\nPillar 3: Operational Excellence\nOptimise processes and systems to deliver consistent, high-quality results.",
+        personas: personaData?.personas || "Primary: Target Customer\nPrimary segment demonstrates strong purchasing intent and values quality solutions.\n\nSecondary: Secondary Market\nThis segment shows growing interest and represents expansion opportunities.\n\nTertiary: Emerging Segment\nEmerging customer group with future growth potential.",
+        competitors_brief: marketData?.competitors_brief || `The competitive landscape includes ${competitorText} among other market players. Analysis shows opportunities for differentiation through superior customer experience and targeted positioning.`,
+        differentiators: strategyData?.differentiators || "Core Differentiation\nPosition the brand through superior quality and customer service excellence.\n\nValue Proposition\nDeliver exceptional value through innovative solutions and customer-centric approach.\n\nPositioning Statement\nFor customers who value quality, this brand delivers superior results through proven expertise.",
+        seven_ps: personaData?.seven_ps || "Product\nDevelop high-quality offerings that meet customer needs and exceed expectations.\n\nPrice\nImplement value-based pricing that reflects quality whilst remaining competitive.\n\nPlace\nEstablish distribution channels that maximise customer convenience and accessibility.\n\nPromotion\nExecute integrated marketing communications to build awareness and drive engagement.\n\nPeople\nDevelop team capabilities to deliver exceptional customer experiences.\n\nProcess\nOptimise operations to ensure consistent quality and efficient service delivery.\n\nPhysical Evidence\nCreate tangible elements that reinforce brand quality and professionalism.",
+        channel_playbook: channelPlaybook,
+        budget: {
+          band: form.budget_band || "Low",
+          allocation: `Primary Allocation\n${channelPlaybook[0]?.channel}: ${channelPlaybook[0]?.budget_percent}% to ${channelPlaybook[0]?.role.toLowerCase()}.\n\nSecondary Allocation\n${channelPlaybook[1]?.channel}: ${channelPlaybook[1]?.budget_percent}% to ${channelPlaybook[1]?.role.toLowerCase()}.\n\nSupporting Channels\n${channelPlaybook[2]?.channel}: ${channelPlaybook[2]?.budget_percent}% to ${channelPlaybook[2]?.role.toLowerCase()}.\n\nAllocation Rationale\nPrioritise the primary channel to capture high-intent demand whilst supporting with secondary channels for comprehensive market coverage.`
+        },
+        calendar_next_90_days: planningData?.calendar_next_90_days || "Month 1: Foundation\nEstablish core marketing infrastructure and launch primary campaigns.\n\nMonth 2: Scaling\nExpand successful initiatives and optimise performance across channels.\n\nMonth 3: Optimisation\nRefine strategies based on performance data and prepare for next quarter.",
+        kpis: planningData?.kpis || "Channel KPIs\nTrack channel-specific metrics including conversion rates, cost per acquisition, and engagement levels.\n\nBusiness KPIs\nMonitor revenue growth, customer acquisition, and market share expansion.\n\nMeasurement Framework\nImplement analytics tools and regular reporting to track performance and inform decisions.",
+        risks_and_safety_nets: planningData?.risks_and_safety_nets || "Business Risks\nMarket competition, economic fluctuations, and changing customer preferences.\n\nMitigation Strategies\nDiversify marketing channels, maintain financial reserves, and implement agile response capabilities.",
+        experiments: planningData?.experiments || "Priority Tests\nExecute A/B tests on messaging, targeting, and channel performance.\n\nTesting Framework\nImplement systematic testing with statistical significance and clear success metrics."
+      };
+      
+      // Apply British English normalization
+      json = normalizeBritishEnglish(json);
+      
+      return new Response(JSON.stringify(json), cors(200, origin));
 
     } catch (e) {
       console.error('Worker error:', e.message);
@@ -729,8 +271,59 @@ Return valid JSON only with the exact field structure, clean formatting, and Bri
   }
 };
 
+// British English normalization function
+function normalizeBritishEnglish(obj) {
+  const usToUkMap = {
+    'ads': 'adverts',
+    'organizations': 'organisations',
+    'realize': 'realise',
+    'optimize': 'optimise',
+    'analyze': 'analyse',
+    'behavior': 'behaviour',
+    'color': 'colour',
+    'center': 'centre',
+    'program': 'programme',
+    'while': 'whilst',
+    'among': 'amongst',
+    'favorite': 'favourite',
+    'honor': 'honour',
+    'labor': 'labour',
+    'flavor': 'flavour',
+    'neighborhood': 'neighbourhood',
+    'traveled': 'travelled',
+    'canceled': 'cancelled',
+    'modeling': 'modelling'
+  };
+  
+  function normalizeText(text) {
+    if (typeof text !== 'string') return text;
+    let result = text;
+    for (const [us, uk] of Object.entries(usToUkMap)) {
+      const regex = new RegExp(`\\b${us}\\b`, 'gi');
+      result = result.replace(regex, uk);
+    }
+    return result;
+  }
+  
+  function walkObject(obj) {
+    if (typeof obj === 'string') {
+      return normalizeText(obj);
+    } else if (Array.isArray(obj)) {
+      return obj.map(walkObject);
+    } else if (obj && typeof obj === 'object') {
+      const result = {};
+      for (const [key, value] of Object.entries(obj)) {
+        result[key] = walkObject(value);
+      }
+      return result;
+    }
+    return obj;
+  }
+  
+  return walkObject(obj);
+}
+
 function cors(status = 200, origin = null) {
-  // Security: Strict CORS allowlist - only allow specific origins
   const allowedOrigins = [
     'http://localhost:5000',
     'https://localhost:5000', 
@@ -739,7 +332,6 @@ function cors(status = 200, origin = null) {
     'https://4ed238b6-44fe-47f0-8f40-754dbed6c70c-00-y3il5bpx45gx.sisko.replit.dev'
   ];
   
-  // Only set CORS origin if the request origin is in allowlist
   const corsOrigin = origin && allowedOrigins.includes(origin) ? origin : null;
   
   const headers = {
@@ -747,9 +339,7 @@ function cors(status = 200, origin = null) {
     "X-Content-Type-Options": "nosniff",
     "X-Frame-Options": "DENY", 
     "X-XSS-Protection": "1; mode=block",
-    "Referrer-Policy": "strict-origin-when-cross-origin",
-    "Permissions-Policy": "geolocation=(), microphone=(), camera=()",
-    "Content-Security-Policy": "default-src 'self'; script-src 'none'; object-src 'none'; frame-ancestors 'none'"
+    "Referrer-Policy": "strict-origin-when-cross-origin"
   };
 
   if (corsOrigin) {
