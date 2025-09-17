@@ -118,7 +118,6 @@ function ContentSections({ data }) {
       priority: "high",
       items: [
         { title: "Market Foundation", data: data.market_foundation },
-        { title: "Competitor Analysis", data: data.competitors_brief },
         {
           title: "Differentiation Moves",
           data: data.differentiators || data.differentiation_moves,
@@ -128,13 +127,14 @@ function ContentSections({ data }) {
     },
     {
       id: "strategy",
-      title: "Strategic Framework",
+      title: "Strategic Framework", 
       description: "Marketing mix and channel plan",
       icon: "⚡",
       color: "purple",
       priority: "high",
       items: [
         { title: "Strategy Pillars", data: data.strategy_pillars },
+        { title: "Competitor Analysis", data: data.competitors_brief },
         {
           title: "Marketing Mix (7 Ps)",
           data: data.seven_ps || data.marketing_mix_7ps,
@@ -337,16 +337,17 @@ function OptimizedContent({ data }) {
           {data.map((channel, i) => (
             <div key={i} style={{ marginTop: i > 0 ? "32px" : "0px" }}>
               <h6
-                className="font-bold text-slate-900 text-base"
-                style={{ marginTop: "0px", marginBottom: "0px" }}
+                className="font-bold text-slate-900 text-base flex items-center"
+                style={{ marginTop: "0px", marginBottom: "8px" }}
               >
-                {channel.channel}
+                <span className="text-blue-600 font-bold text-lg mr-3">•</span>
+                <span>{channel.channel}</span>
               </h6>
 
               {channel.summary && (
                 <p
                   className="text-slate-700 leading-relaxed"
-                  style={{ marginTop: "12px", marginBottom: "12px" }}
+                  style={{ marginTop: "0px", marginBottom: "12px", marginLeft: "20px" }}
                 >
                   {channel.summary}
                 </p>
@@ -355,46 +356,28 @@ function OptimizedContent({ data }) {
               {channel.why_it_works && (
                 <p
                   className="text-slate-700 leading-relaxed"
-                  style={{ marginTop: "0px", marginBottom: "12px" }}
+                  style={{ marginTop: "0px", marginBottom: "12px", marginLeft: "20px" }}
                 >
                   {channel.why_it_works}
                 </p>
               )}
 
-              {channel.key_actions && channel.key_actions.length > 0 && (
-                <div style={{ marginTop: "12px", marginBottom: "12px" }}>
-                  <h6
-                    className="font-semibold text-slate-900 text-sm"
-                    style={{ marginBottom: "4px" }}
-                  >
-                    Key Actions
-                  </h6>
-                  <ul className="text-slate-700 text-sm space-y-1 ml-4">
-                    {channel.key_actions.map((action, actionIndex) => (
-                      <li key={actionIndex} className="list-disc">
-                        {action}
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              )}
-
               <p
                 className="text-slate-700"
-                style={{ marginTop: "0px", marginBottom: "4px" }}
+                style={{ marginTop: "0px", marginBottom: "4px", marginLeft: "20px" }}
               >
                 Purchase intent level: {channel.intent}
               </p>
               <p
                 className="text-slate-700"
-                style={{ marginTop: "0px", marginBottom: "4px" }}
+                style={{ marginTop: "0px", marginBottom: "4px", marginLeft: "20px" }}
               >
                 Funnel job: {channel.role}
               </p>
               {channel.success_metric && (
                 <p
                   className="text-slate-700"
-                  style={{ marginTop: "0px", marginBottom: "4px" }}
+                  style={{ marginTop: "0px", marginBottom: "4px", marginLeft: "20px" }}
                 >
                   Success metric: {channel.success_metric}
                 </p>
@@ -402,10 +385,29 @@ function OptimizedContent({ data }) {
               {channel.budget_percent !== undefined && (
                 <p
                   className="text-slate-700"
-                  style={{ marginTop: "0px", marginBottom: "4px" }}
+                  style={{ marginTop: "0px", marginBottom: "4px", marginLeft: "20px" }}
                 >
                   Budget percent: {channel.budget_percent}%
                 </p>
+              )}
+
+              {/* FIXED: Key Actions moved to END with normalized font sizes */}
+              {channel.key_actions && channel.key_actions.length > 0 && (
+                <div style={{ marginTop: "16px", marginBottom: "12px", marginLeft: "20px" }}>
+                  <h6
+                    className="font-bold text-slate-900 text-base"
+                    style={{ marginBottom: "8px" }}
+                  >
+                    Key Actions
+                  </h6>
+                  <ul className="text-slate-700 text-base space-y-2 ml-4">
+                    {channel.key_actions.map((action, actionIndex) => (
+                      <li key={actionIndex} className="list-disc">
+                        {action}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
               )}
             </div>
           ))}
@@ -479,24 +481,6 @@ function OptimizedContent({ data }) {
             </p>
           )}
 
-          {data.key_actions && data.key_actions.length > 0 && (
-            <div style={{ marginTop: "12px", marginBottom: "12px" }}>
-              <h6
-                className="font-semibold text-slate-900 text-sm"
-                style={{ marginBottom: "4px" }}
-              >
-                Key Actions
-              </h6>
-              <ul className="text-slate-700 text-sm space-y-1 ml-4">
-                {data.key_actions.map((action, actionIndex) => (
-                  <li key={actionIndex} className="list-disc">
-                    {action}
-                  </li>
-                ))}
-              </ul>
-            </div>
-          )}
-
           <p
             className="text-slate-700"
             style={{ marginTop: "0px", marginBottom: "4px" }}
@@ -524,6 +508,25 @@ function OptimizedContent({ data }) {
             >
               Budget percent: {data.budget_percent}%
             </p>
+          )}
+
+          {/* FIXED: Key Actions moved to END with normalized font sizes */}
+          {data.key_actions && data.key_actions.length > 0 && (
+            <div style={{ marginTop: "16px", marginBottom: "12px" }}>
+              <h6
+                className="font-bold text-slate-900 text-base"
+                style={{ marginBottom: "8px" }}
+              >
+                Key Actions
+              </h6>
+              <ul className="text-slate-700 text-base space-y-2 ml-4">
+                {data.key_actions.map((action, actionIndex) => (
+                  <li key={actionIndex} className="list-disc">
+                    {action}
+                  </li>
+                ))}
+              </ul>
+            </div>
           )}
         </div>
       );
@@ -557,14 +560,29 @@ function OptimizedContent({ data }) {
   );
 }
 
-/* text splitter with subheading detection */
+/* FIXED: text formatter with proper subheading detection and bullet point handling */
 function FormattedText({ text }) {
+  // Handle 90-day action plan special case
+  if (text.includes('Week 1-2:') || text.includes('Foundation Phase')) {
+    return <ActionPlan90Days text={text} />;
+  }
+
   const paras = text.split("\n\n").filter((p) => p.trim());
 
   return (
     <div className="space-y-1">
       {paras.map((p, i) => {
         const trimmed = p.trim();
+        
+        // Skip Executive Summary and redundant standalone "Allocation"
+        if (trimmed === "Executive Summary" || trimmed === "Allocation") {
+          return null;
+        }
+
+        // Check if this paragraph contains embedded bullet points
+        if (containsEmbeddedBullets(trimmed)) {
+          return <EmbeddedBulletList key={i} text={trimmed} />;
+        }
 
         // Split on single line breaks to catch inline subheadings
         const lines = trimmed.split("\n").filter((line) => line.trim());
@@ -573,14 +591,6 @@ function FormattedText({ text }) {
           <div key={i}>
             {lines.map((line, lineIndex) => {
               const cleanLine = line.trim();
-
-              // Skip Executive Summary and redundant standalone "Allocation"
-              if (
-                cleanLine === "Executive Summary" ||
-                cleanLine === "Allocation"
-              ) {
-                return null;
-              }
 
               // Detect bullet point subheadings (lines starting with •)
               const isBulletHeading = /^•\s+/.test(cleanLine);
@@ -593,8 +603,8 @@ function FormattedText({ text }) {
                   !cleanLine.includes(".") && // No periods (usually not in headings)
                   !cleanLine.includes("http") && // Not a URL
                   !cleanLine.match(/\d{2,}/)) || // No long numbers
-                /^Month \d+:/.test(cleanLine) || // OR month headers like "Month 1: Foundation"
-                /^Pillar \d+:/.test(cleanLine); // OR pillar headers like "Pillar 1: Market Penetration"
+                /^(Month|Week|Day|Pillar|Phase|Stage) \d+[:-]/.test(cleanLine) || // Time/phase headers
+                /^(First|Next|Final|Last) \d+/.test(cleanLine); // Period headers
 
               if (isBulletHeading) {
                 const headingText = cleanLine.replace(/^•\s+/, ""); // Remove bullet point
@@ -623,9 +633,9 @@ function FormattedText({ text }) {
                 return (
                   <h6
                     key={lineIndex}
-                    className="font-bold text-slate-900 text-base"
+                    className="font-bold text-slate-900 text-base flex items-center"
                     style={{
-                      marginTop: "32px",
+                      marginTop: "24px",
                       marginBottom: "8px",
                       marginLeft: "0px",
                       marginRight: "0px",
@@ -633,59 +643,15 @@ function FormattedText({ text }) {
                       paddingBottom: "0px",
                     }}
                   >
-                    {cleanLine}
+                    <span className="text-blue-600 font-bold text-lg mr-3">
+                      •
+                    </span>
+                    <span>{cleanLine}</span>
                   </h6>
                 );
               }
 
-              // Check for multiple definitions/KPIs/weeks/milestones that should be on separate lines
-              // Pattern 1: Comma + space + uppercase abbreviation + colon (e.g., "KPI: definition, CTR: definition")
-              // Pattern 2: Period + space + words + colon (e.g., "sentence. New Term: definition")
-              // Pattern 3: Period + Week (for action plans like "adverts.Week 3-4:")
-              // Pattern 4: Period + space + Capital letter (for milestones like "day 7. Complete initial")
-              if (
-                (cleanLine.includes(":") &&
-                  (cleanLine.match(/, [A-Z]{2,}:/g) ||
-                    cleanLine.match(/\. [A-Z][a-zA-Z\s]+:/g))) ||
-                cleanLine.match(/\.\s*Week \d/g) ||
-                cleanLine.match(/\. [A-Z][a-z]/g)
-              ) {
-                // Split on:
-                // - comma before abbreviations
-                // - period before terms with colons
-                // - period before "Week"
-                // - period before capital letters (for milestones)
-                let parts = cleanLine
-                  .split(
-                    /, (?=[A-Z]{2,}:)|(?<=\.) (?=[A-Z][a-zA-Z\s]+:)|(?<=\.)\s*(?=Week \d)|(?<=\.)\s+(?=[A-Z][a-z])/,
-                  )
-                  .map((part) => part.trim())
-                  .filter((part) => part.length > 0);
-
-                return (
-                  <div
-                    key={lineIndex}
-                    style={{ marginTop: "0px", marginBottom: "12px" }}
-                  >
-                    {parts.map((part, partIndex) => (
-                      <p
-                        key={partIndex}
-                        className="text-slate-700"
-                        style={{
-                          marginTop: "0px",
-                          marginBottom: "4px",
-                          paddingTop: "0px",
-                          paddingBottom: "0px",
-                          lineHeight: "1.6",
-                        }}
-                      >
-                        {part}
-                      </p>
-                    ))}
-                  </div>
-                );
-              }
-
+              // Regular body text with proper indentation
               return (
                 <p
                   key={lineIndex}
@@ -693,6 +659,7 @@ function FormattedText({ text }) {
                   style={{
                     marginTop: "0px",
                     marginBottom: "12px",
+                    marginLeft: "20px", // FIXED: Add indentation for body text
                     paddingTop: "0px",
                     paddingBottom: "0px",
                     lineHeight: "1.6",
@@ -706,6 +673,98 @@ function FormattedText({ text }) {
         );
       })}
     </div>
+  );
+}
+
+/* FIXED: Handler for 90-day action plans */
+function ActionPlan90Days({ text }) {
+  // Split into sections and identify phases
+  const sections = text.split(/Week \d+-\d+:|Foundation Phase|Launch Phase|Scaling Phase|Optimisation Phase/i)
+    .filter(s => s.trim());
+  
+  const phases = [
+    { title: "First 30 days", content: sections[0] || "" },
+    { title: "Next 30 days", content: sections[1] || "" },
+    { title: "Final 30 days", content: sections[2] || "" }
+  ];
+
+  return (
+    <div className="space-y-6">
+      {phases.map((phase, index) => (
+        <div key={index}>
+          <h6
+            className="font-bold text-slate-900 text-base flex items-center"
+            style={{
+              marginTop: index > 0 ? "24px" : "0px",
+              marginBottom: "8px",
+              marginLeft: "0px",
+              marginRight: "0px",
+              paddingTop: "0px",
+              paddingBottom: "0px",
+            }}
+          >
+            <span className="text-blue-600 font-bold text-lg mr-3">•</span>
+            <span>{phase.title}</span>
+          </h6>
+          <p
+            className="text-slate-700"
+            style={{
+              marginTop: "0px",
+              marginBottom: "12px",
+              marginLeft: "20px",
+              paddingTop: "0px",
+              paddingBottom: "0px",
+              lineHeight: "1.6",
+            }}
+          >
+            {phase.content.trim()}
+          </p>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+/* FIXED: Check if text contains embedded bullet points */
+function containsEmbeddedBullets(text) {
+  // Look for patterns like "• Item 1 content • Item 2 content"
+  const bulletCount = (text.match(/•/g) || []).length;
+  return bulletCount > 1 && !text.startsWith('•');
+}
+
+/* FIXED: Handler for embedded bullet point lists */
+function EmbeddedBulletList({ text }) {
+  // Split on bullet points and process each item
+  const items = text.split('•').filter(item => item.trim()).map(item => item.trim());
+  
+  return (
+    <ul className="space-y-2 list-none" style={{ marginLeft: "0px" }}>
+      {items.map((item, index) => (
+        <li
+          key={index}
+          className="flex items-start gap-3 text-slate-700 leading-relaxed"
+          style={{
+            marginTop: "0px",
+            marginBottom: "8px",
+            paddingTop: "0px",
+            paddingBottom: "0px",
+          }}
+        >
+          <span className="text-blue-600 font-bold text-lg flex-shrink-0 mt-0">•</span>
+          <div className="flex-1">
+            {/* Check if item has a heading pattern */}
+            {item.includes(':') && item.split(':')[0].length < 40 ? (
+              <>
+                <span className="font-semibold text-slate-900">{item.split(':')[0]}:</span>
+                <span className="ml-1">{item.split(':').slice(1).join(':')}</span>
+              </>
+            ) : (
+              item
+            )}
+          </div>
+        </li>
+      ))}
+    </ul>
   );
 }
 
