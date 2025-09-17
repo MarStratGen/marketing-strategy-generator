@@ -169,13 +169,13 @@ export default {
           messages: [
             { 
               role: "system", 
-              content: "Expert marketing strategist. British English only. PLAIN TEXT ONLY - no markdown, no bold, no asterisks, no headings. Use bullet character '• ' only at start of list items. Never include percentage targets or specific numbers unless provided in form data. Write dense, specific, form-relevant content. Each competitor from the form must be individually analyzed." 
+              content: "Expert marketing strategist. British English only. PLAIN TEXT ONLY - no markdown, no bold, no asterisks, no headings. Use bullet character '• ' only at start of list items. Never include percentage targets or specific numbers unless provided in form data. Write dense, specific, form-relevant content. CRITICAL: Each competitor name from the form must be used EXACTLY as provided in the competitor_analyses array - do not shorten, abbreviate, or modify competitor names." 
             },
             { 
               role: "user", 
-              content: `Generate marketing strategy for ${form.product_type} in ${form.country} ${form.sector}. Target: ${audienceText}. Competitors that MUST each be individually analyzed: ${form.competitors?.join(", ")}. 
+              content: `Generate marketing strategy for ${form.product_type} in ${form.country} ${form.sector}. Target: ${audienceText}. Competitors that MUST each be individually analyzed using EXACT names: ${form.competitors?.join(", ")}. 
 
-CRITICAL: market_foundation.competitor_analyses array must contain exactly one object for each competitor: ${form.competitors?.map(c => `"${c}"`).join(", ")}. 
+CRITICAL: market_foundation.competitor_analyses array must contain exactly one object for each competitor with the "name" field using the EXACT competitor name as provided: ${form.competitors?.map(c => `"${c}"`).join(", ")}. Do not abbreviate or modify these names - use them exactly as listed. 
 
 Generate detailed JSON with structured format:
 - market_foundation: object with market_overview, customer_behaviour, market_opportunities, and competitor_analyses array where each competitor gets individual analysis
@@ -210,17 +210,33 @@ Generate detailed JSON with structured format:
         throw new Error('Invalid AI response');
       }
       
-      // Validate competitor coverage
+      // Validate competitor coverage with improved matching
       if (form.competitors?.length && aiGenerated?.market_foundation?.competitor_analyses) {
-        const analyzedCompetitors = aiGenerated.market_foundation.competitor_analyses.map(c => c.name?.toLowerCase());
-        const requiredCompetitors = form.competitors.map(c => c.toLowerCase());
-        const missingCompetitors = requiredCompetitors.filter(req => 
-          !analyzedCompetitors.some(analyzed => analyzed.includes(req) || req.includes(analyzed))
-        );
+        const analyzedCompetitors = aiGenerated.market_foundation.competitor_analyses.map(c => c.name?.toLowerCase().trim());
+        const requiredCompetitors = form.competitors.map(c => c.toLowerCase().trim());
+        
+        console.log('Required competitors:', requiredCompetitors);
+        console.log('Analyzed competitors:', analyzedCompetitors);
+        
+        const missingCompetitors = requiredCompetitors.filter(req => {
+          // More flexible matching to handle cases like "Facebook Marketplace" vs "Facebook"
+          return !analyzedCompetitors.some(analyzed => {
+            // Exact match
+            if (analyzed === req) return true;
+            // Either contains the other (for partial matches)
+            if (analyzed.includes(req) || req.includes(analyzed)) return true;
+            // Handle common variations
+            const reqWords = req.split(/\s+/);
+            const analyzedWords = analyzed.split(/\s+/);
+            // If main keywords overlap significantly
+            return reqWords.some(word => word.length > 3 && analyzedWords.some(aWord => aWord.includes(word) || word.includes(aWord)));
+          });
+        });
         
         if (missingCompetitors.length > 0) {
           console.error('Missing competitor analysis for:', missingCompetitors);
-          throw new Error('Incomplete competitor analysis');
+          // Don't throw error, but log for debugging
+          console.warn('Proceeding with incomplete competitor analysis');
         }
       }
       

@@ -101,7 +101,6 @@ function ContentSections({ data }) {
       priority: "high",
       items: [
         { title: "Strategy Pillars", data: data.strategy_pillars },
-        { title: "Competitor Analysis", data: data.competitors_brief },
         {
           title: "Marketing Mix (7 Ps)",
           data: data.seven_ps || data.marketing_mix_7ps,
