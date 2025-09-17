@@ -594,40 +594,53 @@ function FormattedText({ text }) {
 
 /* Handler for personas content */
 function PersonasContent({ text }) {
-  // Split by persona indicators
-  const personas = text.split(/Persona \d+:|Customer Persona \d+:|Target \d+:|Demographic \d+:/i).filter(s => s.trim());
+  // Use regex to capture actual subheadings from the content
+  const matches = Array.from(text.matchAll(/(?:^|\n)(?:Persona|Customer Persona|Target)\s*\d*\s*:?\s*([^\n:]{2,80})\s*[:\-–—]?\s*\n?([\s\S]*?)(?=(?:\n(?:Persona|Customer Persona|Target)\s*\d*\s*:)|$)/gi));
   
-  if (personas.length < 2) {
-    // Fallback: try to split by common persona names or patterns
-    const altSplit = text.split(/(?=Age:|(?=Income:)|(?=Location:)|(?=Behaviour:))/i).filter(s => s.trim() && s.length > 50);
-    if (altSplit.length >= 2) {
-      return (
-        <div className="space-y-6">
-          {altSplit.slice(0, 3).map((persona, index) => (
+  if (matches.length > 0) {
+    return (
+      <div className="space-y-6">
+        {matches.map((match, index) => {
+          const title = match[1]?.trim() || `Persona ${index + 1}`;
+          const body = match[2]?.trim() || '';
+          
+          return (
             <div key={index}>
               <h6 className="font-bold text-slate-900 text-base flex items-center" style={{ marginTop: index > 0 ? "24px" : "0px", marginBottom: "8px" }}>
                 <span className="text-blue-600 font-bold text-lg mr-3">•</span>
-                <span>Persona {index + 1}</span>
+                <span>{title}</span>
               </h6>
-              <p className="text-slate-700" style={{ marginLeft: "20px", lineHeight: "1.6" }}>{persona.trim()}</p>
+              <div style={{ marginLeft: "20px" }}>
+                <EnhancedTextContent text={body} />
+              </div>
             </div>
-          ))}
-        </div>
-      );
-    }
+          );
+        })}
+      </div>
+    );
   }
 
+  // Fallback: split by paragraphs and use first line as heading
+  const paragraphs = text.split(/\n\n+/).filter(p => p.trim() && p.length > 50);
   return (
     <div className="space-y-6">
-      {personas.map((persona, index) => (
-        <div key={index}>
-          <h6 className="font-bold text-slate-900 text-base flex items-center" style={{ marginTop: index > 0 ? "24px" : "0px", marginBottom: "8px" }}>
-            <span className="text-blue-600 font-bold text-lg mr-3">•</span>
-            <span>Persona {index + 1}</span>
-          </h6>
-          <p className="text-slate-700" style={{ marginLeft: "20px", lineHeight: "1.6" }}>{persona.trim()}</p>
-        </div>
-      ))}
+      {paragraphs.slice(0, 3).map((para, index) => {
+        const lines = para.trim().split('\n');
+        const title = lines[0]?.split(':')[0]?.trim() || `Persona ${index + 1}`;
+        const body = lines.slice(0).join('\n').replace(/^[^:]*:?\s*/, '').trim();
+        
+        return (
+          <div key={index}>
+            <h6 className="font-bold text-slate-900 text-base flex items-center" style={{ marginTop: index > 0 ? "24px" : "0px", marginBottom: "8px" }}>
+              <span className="text-blue-600 font-bold text-lg mr-3">•</span>
+              <span>{title}</span>
+            </h6>
+            <div style={{ marginLeft: "20px" }}>
+              <EnhancedTextContent text={body} />
+            </div>
+          </div>
+        );
+      })}
     </div>
   );
 }
@@ -661,76 +674,106 @@ function MarketingMixContent({ text }) {
 
 /* Handler for strategy pillars content */
 function StrategyPillarsContent({ text }) {
-  // Split by pillar indicators
-  const pillars = text.split(/Pillar \d+:|Strategic Pillar \d+:/i).filter(s => s.trim());
+  // Use regex to capture actual subheadings from the content
+  const matches = Array.from(text.matchAll(/(?:^|\n)(?:Strategic\s*)?Pillar\s*\d*\s*:?\s*([^\n:]{2,80})\s*[:\-–—]?\s*\n?([\s\S]*?)(?=(?:\n(?:Strategic\s*)?Pillar\s*\d*\s*:)|$)/gi));
   
-  if (pillars.length < 2) {
-    // Fallback: split by other patterns
-    const sections = text.split(/\n\n+/).filter(s => s.trim() && s.length > 50);
+  if (matches.length > 0) {
     return (
       <div className="space-y-6">
-        {sections.map((section, index) => (
-          <div key={index}>
-            <h6 className="font-bold text-slate-900 text-base flex items-center" style={{ marginTop: index > 0 ? "24px" : "0px", marginBottom: "8px" }}>
-              <span className="text-blue-600 font-bold text-lg mr-3">•</span>
-              <span>Strategy Element {index + 1}</span>
-            </h6>
-            <p className="text-slate-700" style={{ marginLeft: "20px", lineHeight: "1.6" }}>{section.trim()}</p>
-          </div>
-        ))}
+        {matches.map((match, index) => {
+          const title = match[1]?.trim() || `Strategy Pillar ${index + 1}`;
+          const body = match[2]?.trim() || '';
+          
+          return (
+            <div key={index}>
+              <h6 className="font-bold text-slate-900 text-base flex items-center" style={{ marginTop: index > 0 ? "24px" : "0px", marginBottom: "8px" }}>
+                <span className="text-blue-600 font-bold text-lg mr-3">•</span>
+                <span>{title}</span>
+              </h6>
+              <div style={{ marginLeft: "20px" }}>
+                <EnhancedTextContent text={body} />
+              </div>
+            </div>
+          );
+        })}
       </div>
     );
   }
 
+  // Fallback: split by paragraphs and use first line as heading
+  const paragraphs = text.split(/\n\n+/).filter(p => p.trim() && p.length > 50);
   return (
     <div className="space-y-6">
-      {pillars.map((pillar, index) => (
-        <div key={index}>
-          <h6 className="font-bold text-slate-900 text-base flex items-center" style={{ marginTop: index > 0 ? "24px" : "0px", marginBottom: "8px" }}>
-            <span className="text-blue-600 font-bold text-lg mr-3">•</span>
-            <span>Strategy Pillar {index + 1}</span>
-          </h6>
-          <p className="text-slate-700" style={{ marginLeft: "20px", lineHeight: "1.6" }}>{pillar.trim()}</p>
-        </div>
-      ))}
+      {paragraphs.map((para, index) => {
+        const lines = para.trim().split('\n');
+        const title = lines[0]?.split(':')[0]?.trim() || `Strategy Element ${index + 1}`;
+        const body = lines.slice(0).join('\n').replace(/^[^:]*:?\s*/, '').trim();
+        
+        return (
+          <div key={index}>
+            <h6 className="font-bold text-slate-900 text-base flex items-center" style={{ marginTop: index > 0 ? "24px" : "0px", marginBottom: "8px" }}>
+              <span className="text-blue-600 font-bold text-lg mr-3">•</span>
+              <span>{title}</span>
+            </h6>
+            <div style={{ marginLeft: "20px" }}>
+              <EnhancedTextContent text={body} />
+            </div>
+          </div>
+        );
+      })}
     </div>
   );
 }
 
 /* Handler for differentiation moves content */
 function DifferentiationContent({ text }) {
-  // Split by differentiation indicators or numbered points
-  const moves = text.split(/\d+\.|Move \d+:|Differentiation \d+:/i).filter(s => s.trim());
+  // Use regex to capture actual subheadings from the content
+  const matches = Array.from(text.matchAll(/(?:^|\n)(?:(?:Move|Differentiation)\s*\d*\s*:|\d+\.)\s*([^\n:–—-]{2,80})(?:[:–—-]\s*)?([\s\S]*?)(?=(?:\n(?:(?:Move|Differentiation)\s*\d*\s*:|\d+\.))|$)/gi));
   
-  if (moves.length < 2) {
-    // Fallback: split by paragraphs
-    const sections = text.split(/\n\n+/).filter(s => s.trim() && s.length > 30);
+  if (matches.length > 0) {
     return (
       <div className="space-y-6">
-        {sections.map((section, index) => (
-          <div key={index}>
-            <h6 className="font-bold text-slate-900 text-base flex items-center" style={{ marginTop: index > 0 ? "24px" : "0px", marginBottom: "8px" }}>
-              <span className="text-blue-600 font-bold text-lg mr-3">•</span>
-              <span>Differentiation Move {index + 1}</span>
-            </h6>
-            <p className="text-slate-700" style={{ marginLeft: "20px", lineHeight: "1.6" }}>{section.trim()}</p>
-          </div>
-        ))}
+        {matches.map((match, index) => {
+          const title = match[1]?.trim() || `Differentiation Move ${index + 1}`;
+          const body = match[2]?.trim() || '';
+          
+          return (
+            <div key={index}>
+              <h6 className="font-bold text-slate-900 text-base flex items-center" style={{ marginTop: index > 0 ? "24px" : "0px", marginBottom: "8px" }}>
+                <span className="text-blue-600 font-bold text-lg mr-3">•</span>
+                <span>{title}</span>
+              </h6>
+              <div style={{ marginLeft: "20px" }}>
+                <EnhancedTextContent text={body} />
+              </div>
+            </div>
+          );
+        })}
       </div>
     );
   }
 
+  // Fallback: split by paragraphs and use first line as heading
+  const paragraphs = text.split(/\n\n+/).filter(p => p.trim() && p.length > 30);
   return (
     <div className="space-y-6">
-      {moves.map((move, index) => (
-        <div key={index}>
-          <h6 className="font-bold text-slate-900 text-base flex items-center" style={{ marginTop: index > 0 ? "24px" : "0px", marginBottom: "8px" }}>
-            <span className="text-blue-600 font-bold text-lg mr-3">•</span>
-            <span>Differentiation Move {index + 1}</span>
-          </h6>
-          <p className="text-slate-700" style={{ marginLeft: "20px", lineHeight: "1.6" }}>{move.trim()}</p>
-        </div>
-      ))}
+      {paragraphs.map((para, index) => {
+        const lines = para.trim().split('\n');
+        const title = lines[0]?.split(/[:–—-]/)[0]?.trim() || `Differentiation Move ${index + 1}`;
+        const body = lines.slice(0).join('\n').replace(/^[^:–—-]*[:–—-]?\s*/, '').trim();
+        
+        return (
+          <div key={index}>
+            <h6 className="font-bold text-slate-900 text-base flex items-center" style={{ marginTop: index > 0 ? "24px" : "0px", marginBottom: "8px" }}>
+              <span className="text-blue-600 font-bold text-lg mr-3">•</span>
+              <span>{title}</span>
+            </h6>
+            <div style={{ marginLeft: "20px" }}>
+              <EnhancedTextContent text={body} />
+            </div>
+          </div>
+        );
+      })}
     </div>
   );
 }
