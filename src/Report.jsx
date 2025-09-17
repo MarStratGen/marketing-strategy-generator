@@ -119,7 +119,7 @@ function ContentSections({ data }) {
       items: [
         { title: "Market Foundation", data: data.market_foundation },
         { title: "Competitor Analysis", data: data.competitors_brief },
-        { title: "Differentiation Moves", data: data.differentiation_moves },
+        { title: "Differentiation Moves", data: data.differentiators || data.differentiation_moves },
         { title: "Risks and Safety Nets", data: data.risks_and_safety_nets },
       ],
     },
@@ -132,7 +132,7 @@ function ContentSections({ data }) {
       priority: "high",
       items: [
         { title: "Strategy Pillars", data: data.strategy_pillars },
-        { title: "Marketing Mix (7 Ps)", data: data.marketing_mix_7ps },
+        { title: "Marketing Mix (7 Ps)", data: data.seven_ps || data.marketing_mix_7ps },
         { title: "Channel Playbook", data: data.channel_playbook },
         { title: "Personas", data: data.personas },
       ],
@@ -458,7 +458,10 @@ function FormattedText({ text }) {
                 return null;
               }
               
-              // Detect subheadings (short lines that look like headers)
+              // Detect bullet point subheadings (lines starting with •)
+              const isBulletHeading = /^•\s+/.test(cleanLine);
+              
+              // Detect other subheadings (short lines that look like headers)
               const isSubheading = (
                 cleanLine.length < 60 && // Not too long
                 cleanLine.length > 3 && // Not too short
@@ -470,9 +473,19 @@ function FormattedText({ text }) {
                 /^Pillar \d+:/.test(cleanLine) // OR pillar headers like "Pillar 1: Market Penetration"
               );
               
+              if (isBulletHeading) {
+                const headingText = cleanLine.replace(/^•\s+/, ''); // Remove bullet point
+                return (
+                  <h6 key={lineIndex} className="font-bold text-slate-900 text-base flex items-center" style={{marginTop: '24px', marginBottom: '8px', marginLeft: '0px', marginRight: '0px', paddingTop: '0px', paddingBottom: '0px'}}>
+                    <span className="text-blue-600 font-bold text-lg mr-3">•</span>
+                    <span>{headingText}</span>
+                  </h6>
+                );
+              }
+              
               if (isSubheading) {
                 return (
-                  <h6 key={lineIndex} className="font-bold text-slate-900 text-base" style={{marginTop: '32px', marginBottom: '0px', marginLeft: '0px', marginRight: '0px', paddingTop: '0px', paddingBottom: '0px'}}>
+                  <h6 key={lineIndex} className="font-bold text-slate-900 text-base" style={{marginTop: '32px', marginBottom: '8px', marginLeft: '0px', marginRight: '0px', paddingTop: '0px', paddingBottom: '0px'}}>
                     {cleanLine}
                   </h6>
                 );
@@ -526,54 +539,67 @@ const downloadExcel = (data) => {
   try {
     const workbook = XLSX.utils.book_new();
 
-    // Create summary sheet
+    // Helper function to convert text sections to rows
+    const textToRows = (text, sectionTitle) => {
+      if (!text) return [];
+      const rows = [[sectionTitle], [""]];
+      const lines = text.split('\n').filter(line => line.trim());
+      lines.forEach(line => {
+        rows.push([line.trim()]);
+      });
+      rows.push([""]);
+      return rows;
+    };
+
+    // Create comprehensive summary sheet with all sections
     const summaryData = [
       ["Marketing Strategy Report"],
       ["Generated:", new Date().toLocaleDateString()],
+      ["Country:", data.meta?.country || ""],
+      ["Sector:", data.meta?.sector || ""],
+      ["Goal:", data.meta?.goal || ""],
       [""],
-      ["Overview"],
-      [""],
-      ["Strategy Pillars"],
-      ...(data.strategy_pillars || []).map((pillar, i) => [
-        `Pillar ${i + 1}`,
-        pillar,
-      ]),
-      [""],
-      ["Personas"],
-      ...(data.personas || []).map((persona, i) => [
-        `Persona ${i + 1}`,
-        `${persona.name}: ${persona.summary}`,
-      ]),
+      ...textToRows(data.market_foundation, "Market Foundation"),
+      ...textToRows(data.strategy_pillars, "Strategy Pillars"),
+      ...textToRows(data.personas, "Target Personas"),
+      ...textToRows(data.competitors_brief, "Competitor Analysis"),
+      ...textToRows(data.differentiators, "Key Differentiators"),
+      ...textToRows(data.seven_ps, "Marketing Mix (7 Ps)"),
+      ...textToRows(data.calendar_next_90_days, "90-Day Action Plan"),
+      ...textToRows(data.kpis, "Measurement & Tracking"),
+      ...textToRows(data.risks_and_safety_nets, "Risks & Safety Nets"),
     ];
 
     const worksheet = XLSX.utils.aoa_to_sheet(summaryData);
-    XLSX.utils.book_append_sheet(workbook, worksheet, "Strategy Summary");
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Marketing Strategy");
 
-    // Add detailed sheets for each section
-    if (data.marketing_mix_7ps) {
-      const mixData = [["Marketing Mix (7 Ps)"], ["Component", "Details"]];
-      Object.entries(data.marketing_mix_7ps).forEach(([key, value]) => {
-        mixData.push([
-          key,
-          typeof value === "object" ? JSON.stringify(value) : value,
-        ]);
-      });
-      const mixSheet = XLSX.utils.aoa_to_sheet(mixData);
-      XLSX.utils.book_append_sheet(workbook, mixSheet, "Marketing Mix");
+    // Add budget sheet if available
+    if (data.budget) {
+      const budgetData = [
+        ["Budget Allocation"],
+        [""],
+        ["Budget Band:", data.budget.band || ""],
+        [""],
+        ["Allocation Details:"],
+        ...(data.budget.allocation ? data.budget.allocation.split('\n').filter(line => line.trim()).map(line => [line.trim()]) : [])
+      ];
+      const budgetSheet = XLSX.utils.aoa_to_sheet(budgetData);
+      XLSX.utils.book_append_sheet(workbook, budgetSheet, "Budget");
     }
 
-    if (data.calendar_next_90_days) {
-      const calendarData = [["90-Day Calendar"], ["Timeline", "Activities"]];
-      Object.entries(data.calendar_next_90_days).forEach(
-        ([period, activities]) => {
-          calendarData.push([
-            period,
-            Array.isArray(activities) ? activities.join("; ") : activities,
-          ]);
-        },
-      );
-      const calendarSheet = XLSX.utils.aoa_to_sheet(calendarData);
-      XLSX.utils.book_append_sheet(workbook, calendarSheet, "90-Day Plan");
+    // Add channel playbook sheet if available
+    if (data.channel_playbook && Array.isArray(data.channel_playbook)) {
+      const channelData = [["Channel Playbook"], ["Channel", "Role", "Budget %", "Summary"]];
+      data.channel_playbook.forEach(channel => {
+        channelData.push([
+          channel.channel || "",
+          channel.role || "",
+          channel.budget_percent ? `${channel.budget_percent}%` : "",
+          channel.summary || ""
+        ]);
+      });
+      const channelSheet = XLSX.utils.aoa_to_sheet(channelData);
+      XLSX.utils.book_append_sheet(workbook, channelSheet, "Channels");
     }
 
     XLSX.writeFile(workbook, "marketing-strategy.xlsx");
@@ -585,6 +611,52 @@ const downloadExcel = (data) => {
 
 const downloadWord = async (data) => {
   try {
+    // Helper function to convert text sections to Word paragraphs
+    const textToParagraphs = (text, sectionTitle) => {
+      if (!text) return [];
+      
+      const paragraphs = [
+        new Paragraph({
+          children: [
+            new TextRun({ text: sectionTitle, bold: true, size: 28 }),
+          ],
+          heading: HeadingLevel.HEADING_1,
+        }),
+        new Paragraph({ text: "" }),
+      ];
+      
+      const lines = text.split('\n').filter(line => line.trim());
+      lines.forEach(line => {
+        const cleanLine = line.trim();
+        
+        // Check if it's a bullet point heading
+        const isBulletHeading = /^•\s+/.test(cleanLine);
+        
+        if (isBulletHeading) {
+          const headingText = cleanLine.replace(/^•\s+/, '');
+          paragraphs.push(
+            new Paragraph({
+              children: [
+                new TextRun({ text: "• ", bold: true, size: 24, color: "0066CC" }),
+                new TextRun({ text: headingText, bold: true, size: 24 }),
+              ],
+            })
+          );
+        } else if (cleanLine.length > 0) {
+          paragraphs.push(
+            new Paragraph({
+              children: [
+                new TextRun({ text: cleanLine, size: 22 }),
+              ],
+            })
+          );
+        }
+      });
+      
+      paragraphs.push(new Paragraph({ text: "" }));
+      return paragraphs;
+    };
+
     const doc = new Document({
       sections: [
         {
@@ -608,89 +680,41 @@ const downloadWord = async (data) => {
                 }),
               ],
             }),
-            new Paragraph({ text: "" }),
-
-
-            new Paragraph({
-              children: [
-                new TextRun({ text: "Strategy Pillars", bold: true, size: 28 }),
-              ],
-              heading: HeadingLevel.HEADING_1,
-            }),
-            ...(data.strategy_pillars || []).map(
-              (pillar, i) =>
-                new Paragraph({
-                  children: [
-                    new TextRun({ text: `${i + 1}. ${pillar}`, size: 22 }),
-                  ],
-                }),
-            ),
-            new Paragraph({ text: "" }),
-
-            new Paragraph({
-              children: [
-                new TextRun({ text: "Personas", bold: true, size: 28 }),
-              ],
-              heading: HeadingLevel.HEADING_1,
-            }),
-            ...(data.personas || []).flatMap((persona) => [
-              new Paragraph({
-                children: [
-                  new TextRun({
-                    text: persona.name || "Unnamed Persona",
-                    bold: true,
-                    size: 24,
-                  }),
-                ],
-                heading: HeadingLevel.HEADING_2,
-              }),
-              new Paragraph({
-                children: [
-                  new TextRun({
-                    text: persona.summary || "No summary provided.",
-                    size: 22,
-                  }),
-                ],
-              }),
-              new Paragraph({ text: "" }),
-            ]),
-
             new Paragraph({
               children: [
                 new TextRun({
-                  text: "Marketing Mix (7 Ps)",
-                  bold: true,
-                  size: 28,
+                  text: `Country: ${data.meta?.country || ""}`,
+                  size: 20,
                 }),
               ],
-              heading: HeadingLevel.HEADING_1,
             }),
-            ...Object.entries(data.marketing_mix_7ps || {}).flatMap(
-              ([key, value]) => [
-                new Paragraph({
-                  children: [
-                    new TextRun({
-                      text: key.replace(/_/g, " ").toUpperCase(),
-                      bold: true,
-                      size: 24,
-                    }),
-                  ],
-                  heading: HeadingLevel.HEADING_2,
+            new Paragraph({
+              children: [
+                new TextRun({
+                  text: `Sector: ${data.meta?.sector || ""}`,
+                  size: 20,
                 }),
-                new Paragraph({
-                  children: [
-                    new TextRun({
-                      text:
-                        typeof value === "object"
-                          ? JSON.stringify(value, null, 2)
-                          : value || "No details provided.",
-                      size: 22,
-                    }),
-                  ],
-                }),
-                new Paragraph({ text: "" }),
               ],
-            ),
+            }),
+            new Paragraph({
+              children: [
+                new TextRun({
+                  text: `Goal: ${data.meta?.goal || ""}`,
+                  size: 20,
+                }),
+              ],
+            }),
+            new Paragraph({ text: "" }),
+
+            ...textToParagraphs(data.market_foundation, "Market Foundation"),
+            ...textToParagraphs(data.strategy_pillars, "Strategy Pillars"),
+            ...textToParagraphs(data.personas, "Target Personas"),
+            ...textToParagraphs(data.competitors_brief, "Competitor Analysis"),
+            ...textToParagraphs(data.differentiators, "Key Differentiators"),
+            ...textToParagraphs(data.seven_ps, "Marketing Mix (7 Ps)"),
+            ...textToParagraphs(data.calendar_next_90_days, "90-Day Action Plan"),
+            ...textToParagraphs(data.kpis, "Measurement & Tracking"),
+            ...textToParagraphs(data.risks_and_safety_nets, "Risks & Safety Nets"),
           ],
         },
       ],
