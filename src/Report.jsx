@@ -83,12 +83,6 @@ export default function Report({ plan, loading, streaming, streamingContent }) {
         </div>
         <div className="flex flex-wrap gap-3 justify-center">
           <button
-            onClick={() => downloadExcel(data)}
-            className="bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-3 rounded-xl font-semibold transition-all duration-200 flex items-center gap-2"
-          >
-            📊 Excel Report
-          </button>
-          <button
             onClick={() => downloadWord(data)}
             className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-xl font-semibold transition-all duration-200 flex items-center gap-2"
           >
@@ -98,7 +92,7 @@ export default function Report({ plan, loading, streaming, streamingContent }) {
             onClick={() => window.print()}
             className="bg-slate-600 hover:bg-slate-700 text-white px-6 py-3 rounded-xl font-semibold transition-all duration-200 flex items-center gap-2"
           >
-            🖨️ Print PDF
+            🖨️ Print Text Only
           </button>
         </div>
       </div>

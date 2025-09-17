@@ -57,6 +57,44 @@
       content="Create a free marketing strategy for your business. No sign-up needed. No strings attached."
     />
     <title>Free Marketing Strategy Generator | No Sign-Up Needed</title>
+    
+    <!-- Print CSS for text-only printing -->
+    <style>
+      @media print {
+        /* Hide background images and graphics */
+        body::before, 
+        div[style*="background"], 
+        .bg-gradient-to-br,
+        .bg-gradient-to-r,
+        .bg-gradient-to-b,
+        [style*="background-image"] {
+          background-image: none !important;
+          background: white !important;
+        }
+        
+        /* Ensure text is black on white */
+        * {
+          color: black !important;
+          background: white !important;
+        }
+        
+        /* Hide gradients and decorative elements */
+        .bg-blue-50, .bg-purple-50, .bg-green-50, .bg-indigo-50 {
+          background: white !important;
+        }
+        
+        /* Make sure text is readable */
+        h1, h2, h3, h4, h5, h6 {
+          color: black !important;
+          font-weight: bold !important;
+        }
+        
+        /* Hide download buttons in print */
+        button {
+          display: none !important;
+        }
+      }
+    </style>
 
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website" />
