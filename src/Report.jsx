@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { ChevronDownIcon, ChevronRightIcon } from "@heroicons/react/24/outline";
 import * as XLSX from "xlsx";
@@ -57,42 +58,41 @@ export default function Report({ plan, loading, streaming, streamingContent }) {
   const data = plan.GoToMarketPlan || plan.GTM_Plan || plan;
 
   return (
-    <div className="mt-12 w-full max-w-5xl mx-auto px-4">
-      {/* header */}
-      <div className="text-center mb-16">
-        <h2 className="text-4xl font-bold text-white mb-4 tracking-tight">
+    <div className="mt-12 w-full max-w-6xl mx-auto px-4">
+      {/* Enhanced header */}
+      <div className="text-center mb-20">
+        <h2 className="text-5xl font-extrabold text-white mb-6 tracking-tight leading-tight">
           Your Marketing Strategy
         </h2>
-        <p className="text-xl text-white max-w-3xl mx-auto leading-relaxed font-medium">
-          A marketing strategy organised into actionable sections for immediate
-          implementation
+        <p className="text-xl text-white/90 max-w-4xl mx-auto leading-relaxed font-medium">
+          A comprehensive marketing strategy organised into actionable sections for immediate implementation
         </p>
       </div>
 
       <ContentSections data={data} />
 
-      {/* actions */}
-      <div className="mt-16 bg-gradient-to-r from-slate-50 to-blue-50 border border-slate-200 rounded-2xl p-8">
-        <div className="text-center mb-6">
-          <h3 className="text-xl font-bold text-slate-900 mb-2">
+      {/* Enhanced actions section */}
+      <div className="mt-20 bg-gradient-to-br from-slate-50 via-white to-blue-50 border-2 border-slate-200 rounded-3xl p-10 shadow-lg">
+        <div className="text-center mb-8">
+          <h3 className="text-2xl font-bold text-slate-900 mb-3 tracking-tight">
             Download Your Strategy
           </h3>
-          <p className="text-slate-600 text-sm">
-            Export your marketing strategy in your preferred format
+          <p className="text-slate-600 text-base leading-relaxed">
+            Export your marketing strategy in your preferred format for easy sharing and implementation
           </p>
         </div>
-        <div className="flex flex-wrap gap-3 justify-center">
+        <div className="flex flex-wrap gap-4 justify-center">
           <button
             onClick={() => downloadWord(data)}
-            className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-xl font-semibold transition-all duration-200 flex items-center gap-2"
+            className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white px-8 py-4 rounded-xl font-semibold transition-all duration-300 flex items-center gap-3 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
           >
             📄 Word Document
           </button>
           <button
             onClick={() => window.print()}
-            className="bg-slate-600 hover:bg-slate-700 text-white px-6 py-3 rounded-xl font-semibold transition-all duration-200 flex items-center gap-2"
+            className="bg-gradient-to-r from-slate-600 to-slate-700 hover:from-slate-700 hover:to-slate-800 text-white px-8 py-4 rounded-xl font-semibold transition-all duration-300 flex items-center gap-3 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
           >
-            🖨️ Print Text Only
+            🖨️ Print Report
           </button>
         </div>
       </div>
@@ -106,53 +106,53 @@ function ContentSections({ data }) {
     {
       id: "foundation",
       title: "Market Foundation",
-      description: "Understanding your market and customers",
+      description: "Understanding your market landscape and opportunities",
       icon: "🎯",
       color: "blue",
       priority: "high",
       items: [
         { title: "Market Foundation", data: data.market_foundation },
         {
-          title: "Differentiation Moves",
+          title: "Differentiation Strategy",
           data: data.differentiators || data.differentiation_moves,
         },
-        { title: "Risks and Safety Nets", data: data.risks_and_safety_nets },
+        { title: "Risk Management", data: data.risks_and_safety_nets },
       ],
     },
     {
       id: "strategy",
       title: "Strategic Framework", 
-      description: "Marketing mix and channel plan",
+      description: "Core strategy pillars and competitive positioning",
       icon: "⚡",
       color: "purple",
       priority: "high",
       items: [
         { title: "Strategy Pillars", data: data.strategy_pillars },
-        { title: "Competitor Analysis", data: data.competitors_brief },
+        { title: "Competitor Intelligence", data: data.competitors_brief },
         {
           title: "Marketing Mix (7 Ps)",
           data: data.seven_ps || data.marketing_mix_7ps,
         },
-        { title: "Channel Playbook", data: data.channel_playbook },
-        { title: "Personas", data: data.personas },
+        { title: "Channel Strategy", data: data.channel_playbook },
+        { title: "Customer Personas", data: data.personas },
       ],
     },
     {
       id: "execution",
-      title: "Execution Plan",
-      description: "Budget allocation and timeline",
+      title: "Implementation Plan",
+      description: "Budget allocation and actionable timeline",
       icon: "🚀",
-      color: "green",
+      color: "emerald",
       priority: "high",
       items: [
-        { title: "Budget Allocation", data: data.budget },
-        { title: "Next 90 Days Action Plan", data: data.calendar_next_90_days },
+        { title: "Budget Framework", data: data.budget },
+        { title: "90-Day Roadmap", data: data.calendar_next_90_days },
       ],
     },
     {
       id: "measurement",
-      title: "Measurement & Analysis",
-      description: "KPIs and performance tracking",
+      title: "Performance Tracking",
+      description: "KPIs and success metrics for your strategy",
       icon: "📊",
       color: "indigo",
       priority: "medium",
@@ -161,7 +161,7 @@ function ContentSections({ data }) {
   ];
 
   return (
-    <div className="space-y-2">
+    <div className="space-y-6">
       {sections.map((s, index) => (
         <ContentSection key={s.id} section={s} isFirst={index === 0} />
       ))}
@@ -169,33 +169,37 @@ function ContentSections({ data }) {
   );
 }
 
-/* ── UI blocks (REDESIGNED) ─────────────────────────────── */
+/* ── Enhanced UI blocks ─────────────────────────────── */
 function ContentSection({ section, isFirst }) {
   const [isOpen, setOpen] = useState(isFirst);
   const colors = {
     blue: {
-      gradient: "from-blue-500 to-blue-600",
-      bg: "bg-blue-50",
+      gradient: "from-blue-500 via-blue-600 to-blue-700",
+      bg: "bg-gradient-to-br from-blue-50 to-blue-100/70",
       border: "border-blue-200",
-      text: "text-blue-700",
+      text: "text-blue-800",
+      accent: "bg-blue-100 text-blue-800",
     },
     purple: {
-      gradient: "from-purple-500 to-purple-600",
-      bg: "bg-purple-50",
+      gradient: "from-purple-500 via-purple-600 to-purple-700",
+      bg: "bg-gradient-to-br from-purple-50 to-purple-100/70",
       border: "border-purple-200",
-      text: "text-purple-700",
+      text: "text-purple-800",
+      accent: "bg-purple-100 text-purple-800",
     },
-    green: {
-      gradient: "from-green-500 to-green-600",
-      bg: "bg-green-50",
-      border: "border-green-200",
-      text: "text-green-700",
+    emerald: {
+      gradient: "from-emerald-500 via-emerald-600 to-emerald-700",
+      bg: "bg-gradient-to-br from-emerald-50 to-emerald-100/70",
+      border: "border-emerald-200",
+      text: "text-emerald-800",
+      accent: "bg-emerald-100 text-emerald-800",
     },
     indigo: {
-      gradient: "from-indigo-500 to-indigo-600",
-      bg: "bg-indigo-50",
+      gradient: "from-indigo-500 via-indigo-600 to-indigo-700",
+      bg: "bg-gradient-to-br from-indigo-50 to-indigo-100/70",
       border: "border-indigo-200",
-      text: "text-indigo-700",
+      text: "text-indigo-800",
+      accent: "bg-indigo-100 text-indigo-800",
     },
   };
 
@@ -203,45 +207,47 @@ function ContentSection({ section, isFirst }) {
   if (!hasContent) return null;
 
   return (
-    <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden mb-8">
+    <div className="bg-white rounded-3xl border-2 border-slate-200/60 shadow-xl overflow-hidden mb-8 hover:shadow-2xl transition-all duration-300">
       <button
         onClick={() => setOpen(!isOpen)}
-        className="w-full p-8 text-left hover:bg-slate-50 transition-all duration-200"
+        className="w-full p-10 text-left hover:bg-gradient-to-r hover:from-slate-50 hover:to-slate-100/50 transition-all duration-300"
       >
         <div className="flex items-center justify-between">
-          <div className="flex items-center gap-6">
+          <div className="flex items-center gap-8">
             <div
-              className={`w-16 h-16 rounded-2xl bg-gradient-to-r ${colors[section.color].gradient} flex items-center justify-center text-white text-2xl`}
+              className={`w-20 h-20 rounded-3xl bg-gradient-to-br ${colors[section.color].gradient} flex items-center justify-center text-white text-3xl shadow-lg`}
             >
               {section.icon}
             </div>
             <div>
-              <h3 className="text-2xl font-bold text-slate-900 mb-2 tracking-tight">
+              <h3 className="text-3xl font-bold text-slate-900 mb-3 tracking-tight leading-tight">
                 {section.title}
               </h3>
-              <p className="text-base text-slate-700 font-medium leading-relaxed">
+              <p className="text-lg text-slate-700 font-medium leading-relaxed max-w-2xl">
                 {section.description}
               </p>
             </div>
           </div>
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-4">
             {isFirst && (
-              <span className="px-3 py-1 bg-blue-100 text-blue-700 text-xs font-bold rounded-full">
+              <span className={`px-4 py-2 ${colors[section.color].accent} text-sm font-bold rounded-full shadow-sm`}>
                 START HERE
               </span>
             )}
-            {isOpen ? (
-              <ChevronDownIcon className="w-6 h-6 text-slate-400" />
-            ) : (
-              <ChevronRightIcon className="w-6 h-6 text-slate-400" />
-            )}
+            <div className="p-2 rounded-full bg-slate-100 hover:bg-slate-200 transition-colors duration-200">
+              {isOpen ? (
+                <ChevronDownIcon className="w-7 h-7 text-slate-600" />
+              ) : (
+                <ChevronRightIcon className="w-7 h-7 text-slate-600" />
+              )}
+            </div>
           </div>
         </div>
       </button>
 
       {isOpen && (
-        <div className="border-t border-slate-100">
-          <div className="p-8 space-y-2 bg-gradient-to-b from-white to-slate-50">
+        <div className="border-t-2 border-slate-100">
+          <div className={`p-10 space-y-6 ${colors[section.color].bg}`}>
             {section.items
               .filter((i) => i.data)
               .map((item, idx) => (
@@ -261,29 +267,27 @@ function ContentSection({ section, isFirst }) {
 
 function ContentCard({ title, data, color }) {
   const colours = {
-    blue: "border-blue-100 bg-gradient-to-br from-blue-50 to-blue-100/50",
-    purple:
-      "border-purple-100 bg-gradient-to-br from-purple-50 to-purple-100/50",
-    green: "border-green-100 bg-gradient-to-br from-green-50 to-green-100/50",
-    indigo:
-      "border-indigo-100 bg-gradient-to-br from-indigo-50 to-indigo-100/50",
+    blue: "border-blue-200/80 bg-gradient-to-br from-white via-blue-50/30 to-blue-100/40 shadow-lg",
+    purple: "border-purple-200/80 bg-gradient-to-br from-white via-purple-50/30 to-purple-100/40 shadow-lg",
+    emerald: "border-emerald-200/80 bg-gradient-to-br from-white via-emerald-50/30 to-emerald-100/40 shadow-lg",
+    indigo: "border-indigo-200/80 bg-gradient-to-br from-white via-indigo-50/30 to-indigo-100/40 shadow-lg",
   };
 
   return (
-    <div className={`border-2 ${colours[color]} rounded-xl p-6 shadow-sm`}>
-      <h4 className="text-xl font-bold text-slate-900 mb-5 tracking-tight">
+    <div className={`border-2 ${colours[color]} rounded-2xl p-8 hover:shadow-xl transition-all duration-300`}>
+      <h4 className="text-2xl font-bold text-slate-900 mb-6 tracking-tight leading-tight border-b border-slate-200/50 pb-3">
         {title}
       </h4>
-      <div className="prose prose-slate max-w-none text-slate-700 leading-relaxed">
+      <div className="prose prose-slate prose-lg max-w-none text-slate-700 leading-relaxed">
         <OptimizedContent data={data} title={title} />
       </div>
     </div>
   );
 }
 
-/* SUPER SIMPLE content renderer (NO CONFUSION) */
+/* Enhanced content renderer */
 function OptimizedContent({ data, title }) {
-  if (!data) return <p className="text-slate-500 italic">No data available</p>;
+  if (!data) return <p className="text-slate-500 italic text-lg">No data available</p>;
   
   // Determine section type from title using registry
   const sectionType = SECTION_RENDERERS[title] || 'default';
@@ -298,20 +302,15 @@ function OptimizedContent({ data, title }) {
     };
 
     return (
-      <div>
-        <h6
-          className="font-bold text-slate-900 text-base"
-          style={{ marginTop: "32px", marginBottom: "0px" }}
-        >
-          Budget Level
-        </h6>
-        <p
-          className="text-slate-700"
-          style={{ marginTop: "0px", marginBottom: "12px", lineHeight: "1.6" }}
-        >
-          {bandMap[data.band] || data.band} - This indicates the overall budget
-          tier for your marketing activities.
-        </p>
+      <div className="space-y-6">
+        <div className="bg-gradient-to-r from-slate-50 to-slate-100 rounded-xl p-6 border border-slate-200">
+          <h6 className="font-bold text-slate-900 text-lg mb-2 flex items-center gap-2">
+            💰 Budget Level
+          </h6>
+          <p className="text-slate-700 text-base leading-relaxed">
+            <span className="font-semibold">{bandMap[data.band] || data.band}</span> - This indicates your overall budget tier for marketing activities, allowing the strategy to scale with your investment level.
+          </p>
+        </div>
         <div className="text-slate-700 leading-relaxed">
           <FormattedText text={String(data.allocation)} sectionType={sectionType} />
         </div>
@@ -320,7 +319,7 @@ function OptimizedContent({ data, title }) {
   }
 
   if (Array.isArray(data)) {
-    // SPECIAL RENDERER for Channel Playbook arrays
+    // Enhanced Channel Playbook renderer
     if (
       data.length > 0 &&
       data[0] &&
@@ -330,71 +329,63 @@ function OptimizedContent({ data, title }) {
       data[0].role
     ) {
       return (
-        <div>
+        <div className="space-y-8">
           {data.map((channel, i) => (
-            <div key={i}>
-              <h4>{channel.channel}</h4>
+            <div key={i} className="bg-gradient-to-br from-white to-slate-50/50 rounded-2xl p-6 border-2 border-slate-200/50 hover:border-slate-300/60 transition-all duration-300 shadow-sm hover:shadow-md">
+              <h4 className="text-xl font-bold text-slate-900 mb-4 flex items-center gap-3">
+                <span className="w-3 h-3 rounded-full bg-gradient-to-r from-blue-500 to-purple-600"></span>
+                {channel.channel}
+              </h4>
 
               {channel.summary && (
-                <p
-                  className="text-slate-700 leading-relaxed"
-                  style={{ marginTop: "0px", marginBottom: "12px", marginLeft: "20px" }}
-                >
-                  {channel.summary}
-                </p>
+                <div className="mb-4">
+                  <p className="text-slate-700 leading-relaxed text-base bg-slate-50/50 p-4 rounded-xl border border-slate-200/50">
+                    {channel.summary}
+                  </p>
+                </div>
               )}
 
               {channel.why_it_works && (
-                <p
-                  className="text-slate-700 leading-relaxed"
-                  style={{ marginTop: "0px", marginBottom: "12px", marginLeft: "20px" }}
-                >
-                  {channel.why_it_works}
-                </p>
+                <div className="mb-4">
+                  <p className="text-slate-700 leading-relaxed text-base italic bg-blue-50/30 p-4 rounded-xl border border-blue-200/30">
+                    💡 <strong>Why it works:</strong> {channel.why_it_works}
+                  </p>
+                </div>
               )}
 
-              <p
-                className="text-slate-700"
-                style={{ marginTop: "0px", marginBottom: "4px", marginLeft: "20px" }}
-              >
-                Purchase intent level: {channel.intent}
-              </p>
-              <p
-                className="text-slate-700"
-                style={{ marginTop: "0px", marginBottom: "4px", marginLeft: "20px" }}
-              >
-                Funnel job: {channel.role}
-              </p>
-              {channel.success_metric && (
-                <p
-                  className="text-slate-700"
-                  style={{ marginTop: "0px", marginBottom: "4px", marginLeft: "20px" }}
-                >
-                  Success metric: {channel.success_metric}
-                </p>
-              )}
-              {channel.budget_percent !== undefined && (
-                <p
-                  className="text-slate-700"
-                  style={{ marginTop: "0px", marginBottom: "4px", marginLeft: "20px" }}
-                >
-                  Budget percent: {channel.budget_percent}%
-                </p>
-              )}
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+                <div className="bg-white/60 p-3 rounded-lg border border-slate-200/50">
+                  <p className="text-xs uppercase font-semibold text-slate-500 mb-1">Intent Level</p>
+                  <p className="text-slate-800 font-medium">{channel.intent}</p>
+                </div>
+                <div className="bg-white/60 p-3 rounded-lg border border-slate-200/50">
+                  <p className="text-xs uppercase font-semibold text-slate-500 mb-1">Funnel Role</p>
+                  <p className="text-slate-800 font-medium text-sm">{channel.role}</p>
+                </div>
+                {channel.success_metric && (
+                  <div className="bg-white/60 p-3 rounded-lg border border-slate-200/50 col-span-2 md:col-span-1">
+                    <p className="text-xs uppercase font-semibold text-slate-500 mb-1">Success Metric</p>
+                    <p className="text-slate-800 font-medium text-sm">{channel.success_metric}</p>
+                  </div>
+                )}
+                {channel.budget_percent !== undefined && (
+                  <div className="bg-white/60 p-3 rounded-lg border border-slate-200/50">
+                    <p className="text-xs uppercase font-semibold text-slate-500 mb-1">Budget Share</p>
+                    <p className="text-slate-800 font-bold text-lg">{channel.budget_percent}%</p>
+                  </div>
+                )}
+              </div>
 
-              {/* FIXED: Key Actions moved to END with normalized font sizes */}
               {channel.key_actions && channel.key_actions.length > 0 && (
-                <div style={{ marginTop: "16px", marginBottom: "12px", marginLeft: "20px" }}>
-                  <h6
-                    className="font-bold text-slate-900 text-base"
-                    style={{ marginBottom: "8px" }}
-                  >
-                    Key Actions
+                <div className="bg-gradient-to-br from-emerald-50/50 to-green-50/30 p-5 rounded-xl border border-emerald-200/40">
+                  <h6 className="font-bold text-slate-900 text-base mb-3 flex items-center gap-2">
+                    🎯 Key Actions
                   </h6>
-                  <ul className="text-slate-700 text-base space-y-2 ml-4">
+                  <ul className="text-slate-700 text-base space-y-3">
                     {channel.key_actions.map((action, actionIndex) => (
-                      <li key={actionIndex} className="list-disc">
-                        {action}
+                      <li key={actionIndex} className="flex items-start gap-3">
+                        <span className="w-2 h-2 rounded-full bg-emerald-500 mt-2 flex-shrink-0"></span>
+                        <span className="leading-relaxed">{action}</span>
                       </li>
                     ))}
                   </ul>
@@ -406,15 +397,18 @@ function OptimizedContent({ data, title }) {
       );
     }
 
-    // Semantic array renderer 
+    // Enhanced array renderer 
     return (
-      <ul>
+      <ul className="space-y-3">
         {data.map((item, i) => (
-          <li key={i}>
+          <li key={i} className="flex items-start gap-3">
+            <span className="w-2 h-2 rounded-full bg-blue-500 mt-2 flex-shrink-0"></span>
             {typeof item === "object" ? (
               <OptimizedContent data={item} title={title} />
             ) : (
-              <FormattedText text={String(item)} sectionType={sectionType} />
+              <div className="flex-1">
+                <FormattedText text={String(item)} sectionType={sectionType} />
+              </div>
             )}
           </li>
         ))}
@@ -423,9 +417,7 @@ function OptimizedContent({ data, title }) {
   }
 
   if (typeof data === "object") {
-    /* ----------------------------------------------------------
-       SPECIAL RENDERER for channel objects (now works with normalized data)
-       ---------------------------------------------------------- */
+    // Enhanced channel object renderer
     if (
       !Array.isArray(data) &&
       data &&
@@ -438,76 +430,63 @@ function OptimizedContent({ data, title }) {
       const role = data.role || data.funnel_job;
 
       return (
-        <div>
+        <div className="bg-gradient-to-br from-white to-slate-50/50 rounded-2xl p-6 border-2 border-slate-200/50">
           {channelName && (
-            <h6
-              className="font-bold text-slate-900 text-base"
-              style={{ marginTop: "0px", marginBottom: "0px" }}
-            >
+            <h6 className="font-bold text-slate-900 text-xl mb-4 flex items-center gap-3">
+              <span className="w-3 h-3 rounded-full bg-gradient-to-r from-blue-500 to-purple-600"></span>
               {channelName}
             </h6>
           )}
 
           {data.summary && (
-            <p
-              className="text-slate-700 leading-relaxed"
-              style={{ marginTop: "12px", marginBottom: "12px" }}
-            >
-              {data.summary}
-            </p>
+            <div className="mb-4">
+              <p className="text-slate-700 leading-relaxed text-base bg-slate-50/50 p-4 rounded-xl border border-slate-200/50">
+                {data.summary}
+              </p>
+            </div>
           )}
 
           {data.why_it_works && (
-            <p
-              className="text-slate-700 leading-relaxed"
-              style={{ marginTop: "0px", marginBottom: "12px" }}
-            >
-              {data.why_it_works}
-            </p>
+            <div className="mb-4">
+              <p className="text-slate-700 leading-relaxed text-base italic bg-blue-50/30 p-4 rounded-xl border border-blue-200/30">
+                💡 <strong>Why it works:</strong> {data.why_it_works}
+              </p>
+            </div>
           )}
 
-          <p
-            className="text-slate-700"
-            style={{ marginTop: "0px", marginBottom: "4px" }}
-          >
-            Purchase intent level: {intent}
-          </p>
-          <p
-            className="text-slate-700"
-            style={{ marginTop: "0px", marginBottom: "4px" }}
-          >
-            Funnel job: {role}
-          </p>
-          {data.success_metric && (
-            <p
-              className="text-slate-700"
-              style={{ marginTop: "0px", marginBottom: "4px" }}
-            >
-              Success metric: {data.success_metric}
-            </p>
-          )}
-          {data.budget_percent !== undefined && (
-            <p
-              className="text-slate-700"
-              style={{ marginTop: "0px", marginBottom: "4px" }}
-            >
-              Budget percent: {data.budget_percent}%
-            </p>
-          )}
+          <div className="grid grid-cols-2 gap-4 mb-6">
+            <div className="bg-white/60 p-3 rounded-lg border border-slate-200/50">
+              <p className="text-xs uppercase font-semibold text-slate-500 mb-1">Intent Level</p>
+              <p className="text-slate-800 font-medium">{intent}</p>
+            </div>
+            <div className="bg-white/60 p-3 rounded-lg border border-slate-200/50">
+              <p className="text-xs uppercase font-semibold text-slate-500 mb-1">Funnel Role</p>
+              <p className="text-slate-800 font-medium text-sm">{role}</p>
+            </div>
+            {data.success_metric && (
+              <div className="bg-white/60 p-3 rounded-lg border border-slate-200/50 col-span-2">
+                <p className="text-xs uppercase font-semibold text-slate-500 mb-1">Success Metric</p>
+                <p className="text-slate-800 font-medium text-sm">{data.success_metric}</p>
+              </div>
+            )}
+            {data.budget_percent !== undefined && (
+              <div className="bg-white/60 p-3 rounded-lg border border-slate-200/50">
+                <p className="text-xs uppercase font-semibold text-slate-500 mb-1">Budget Share</p>
+                <p className="text-slate-800 font-bold text-lg">{data.budget_percent}%</p>
+              </div>
+            )}
+          </div>
 
-          {/* FIXED: Key Actions moved to END with normalized font sizes */}
           {data.key_actions && data.key_actions.length > 0 && (
-            <div style={{ marginTop: "16px", marginBottom: "12px" }}>
-              <h6
-                className="font-bold text-slate-900 text-base"
-                style={{ marginBottom: "8px" }}
-              >
-                Key Actions
+            <div className="bg-gradient-to-br from-emerald-50/50 to-green-50/30 p-5 rounded-xl border border-emerald-200/40">
+              <h6 className="font-bold text-slate-900 text-base mb-3 flex items-center gap-2">
+                🎯 Key Actions
               </h6>
-              <ul className="text-slate-700 text-base space-y-2 ml-4">
+              <ul className="text-slate-700 text-base space-y-3">
                 {data.key_actions.map((action, actionIndex) => (
-                  <li key={actionIndex} className="list-disc">
-                    {action}
+                  <li key={actionIndex} className="flex items-start gap-3">
+                    <span className="w-2 h-2 rounded-full bg-emerald-500 mt-2 flex-shrink-0"></span>
+                    <span className="leading-relaxed">{action}</span>
                   </li>
                 ))}
               </ul>
@@ -516,20 +495,18 @@ function OptimizedContent({ data, title }) {
         </div>
       );
     }
-    /* ----- keep existing object-renderer below this line ----- */
 
+    // Enhanced object renderer
     const entries = Object.entries(data);
     return (
-      <div>
+      <div className="space-y-8">
         {entries.map(([k, v], index) => (
-          <div key={k} style={{ marginTop: index > 0 ? "32px" : "0px" }}>
-            <h5
-              className="font-semibold text-slate-900 text-base"
-              style={{ marginBottom: "2px" }}
-            >
+          <div key={k}>
+            <h5 className="font-bold text-slate-900 text-lg mb-4 flex items-center gap-2 pb-2 border-b border-slate-200/50">
+              <span className="w-2 h-2 rounded-full bg-blue-500"></span>
               {friendlyLabel(k)}
             </h5>
-            <div className="text-slate-700" style={{ marginTop: "0px" }}>
+            <div className="text-slate-700 pl-4 border-l-2 border-slate-200/50">
               <OptimizedContent data={v} title={title} />
             </div>
           </div>
@@ -640,14 +617,19 @@ function parseTextToAst(text) {
   return blocks;
 }
 
-/* SEMANTIC CONTENT RENDERER - Clean HTML for Tailwind Typography */
+/* Enhanced content renderer */
 function ContentRenderer({ ast }) {
   return (
     <>
       {ast.map((block, index) => {
         switch (block.type) {
           case 'heading':
-            return <h4 key={index}>{block.content}</h4>;
+            return (
+              <h4 key={index} className="text-xl font-bold text-slate-900 mb-4 mt-6 flex items-center gap-2">
+                <span className="w-2 h-2 rounded-full bg-blue-500"></span>
+                {block.content}
+              </h4>
+            );
             
           case 'unordered_list':
             // Build nested list structure based on item.level
@@ -683,11 +665,14 @@ function ContentRenderer({ ast }) {
             };
             
             const renderNestedUL = (items) => (
-              <ul>
+              <ul className="space-y-2 ml-4">
                 {items.map((item, i) => (
-                  <li key={i}>
-                    {item.content}
-                    {item.children && renderNestedUL(item.children)}
+                  <li key={i} className="flex items-start gap-3">
+                    <span className="w-2 h-2 rounded-full bg-blue-500 mt-2 flex-shrink-0"></span>
+                    <div className="flex-1">
+                      {item.content}
+                      {item.children && renderNestedUL(item.children)}
+                    </div>
                   </li>
                 ))}
               </ul>
@@ -729,9 +714,9 @@ function ContentRenderer({ ast }) {
             };
             
             const renderNestedOL = (items) => (
-              <ol>
+              <ol className="space-y-2 ml-4 list-decimal">
                 {items.map((item, i) => (
-                  <li key={i}>
+                  <li key={i} className="leading-relaxed">
                     {item.content}
                     {item.children && renderNestedOL(item.children)}
                   </li>
@@ -743,9 +728,9 @@ function ContentRenderer({ ast }) {
             
           case 'definition':
             return (
-              <dl key={index}>
-                <dt>{block.label}</dt>
-                <dd>{block.content}</dd>
+              <dl key={index} className="bg-slate-50/50 p-4 rounded-xl border border-slate-200/50 mb-4">
+                <dt className="font-bold text-slate-900 text-base mb-2">{block.label}</dt>
+                <dd className="text-slate-700 leading-relaxed pl-4 border-l-2 border-slate-300/50">{block.content}</dd>
               </dl>
             );
             
@@ -754,15 +739,18 @@ function ContentRenderer({ ast }) {
             if (block.content.includes('•') && (block.content.match(/•/g) || []).length > 1) {
               const items = block.content.split('•').filter(item => item.trim()).map(item => item.trim());
               return (
-                <ul key={index}>
+                <ul key={index} className="space-y-2 ml-4 mb-4">
                   {items.map((item, i) => (
-                    <li key={i}>{item}</li>
+                    <li key={i} className="flex items-start gap-3">
+                      <span className="w-2 h-2 rounded-full bg-blue-500 mt-2 flex-shrink-0"></span>
+                      <span className="leading-relaxed">{item}</span>
+                    </li>
                   ))}
                 </ul>
               );
             }
             
-            return <p key={index}>{block.content}</p>;
+            return <p key={index} className="leading-relaxed mb-4 text-base">{block.content}</p>;
             
           default:
             return null;
@@ -774,24 +762,23 @@ function ContentRenderer({ ast }) {
 
 /* SECTION REGISTRY - Maps content types to specialized renderers */
 const SECTION_RENDERERS = {
-  'Personas': 'personas',
+  'Customer Personas': 'personas',
   'Target Personas': 'personas', 
   'Strategy Pillars': 'strategy_pillars',
-  'Differentiation Moves': 'differentiation',
+  'Differentiation Strategy': 'differentiation',
   'Key Differentiators': 'differentiation',
   'Marketing Mix (7 Ps)': 'marketing_mix',
-  'Next 90 Days Action Plan': 'action_plan',
+  '90-Day Roadmap': 'action_plan',
   '90-Day Action Plan': 'action_plan',
-  'Channel Playbook': 'channels',
-  'Budget Allocation': 'budget',
+  'Channel Strategy': 'channels',
+  'Budget Framework': 'budget',
   'Key Performance Indicators': 'kpis',
-  'Risks and Safety Nets': 'risks',
+  'Risk Management': 'risks',
   'Risks & Safety Nets': 'risks'
 };
 
-/* SPECIALIZED SECTION RENDERERS */
+/* Enhanced specialized renderers */
 function renderPersonas(ast) {
-  // Group consecutive heading+paragraph pairs
   const personas = [];
   let current = null;
   
@@ -806,14 +793,19 @@ function renderPersonas(ast) {
   if (current) personas.push(current);
   
   return (
-    <>
+    <div className="space-y-8">
       {personas.map((persona, index) => (
-        <div key={index}>
-          <h4>{persona.title}</h4>
-          <ContentRenderer ast={persona.content} />
+        <div key={index} className="bg-gradient-to-br from-blue-50/30 to-indigo-50/20 p-6 rounded-2xl border-2 border-blue-200/40">
+          <h4 className="text-xl font-bold text-slate-900 mb-4 flex items-center gap-2">
+            <span className="w-3 h-3 rounded-full bg-blue-500"></span>
+            {persona.title}
+          </h4>
+          <div className="pl-4 border-l-2 border-blue-300/30">
+            <ContentRenderer ast={persona.content} />
+          </div>
         </div>
       ))}
-    </>
+    </div>
   );
 }
 
@@ -821,71 +813,66 @@ function renderMarketingMix(ast) {
   const sevenPs = ['Product', 'Price', 'Place', 'Promotion', 'People', 'Process', 'Physical Evidence'];
   const sections = [];
   
-  // Work directly on AST to preserve structure
   let currentSection = null;
   let currentBlocks = [];
   
   for (const block of ast) {
-    // Check if this block is a heading that matches one of the 7 Ps
     const isP = block.type === 'heading' && sevenPs.some(p => 
       block.content.toLowerCase().includes(p.toLowerCase())
     );
     
-    // Check if this is a definition block that matches a P (e.g., "Product: ...")
     const isPDefinition = block.type === 'definition' && sevenPs.some(p => 
       block.label.toLowerCase().includes(p.toLowerCase())
     );
     
     if (isP || isPDefinition) {
-      // Save previous section if exists
       if (currentSection && currentBlocks.length > 0) {
         sections.push({ title: currentSection, content: currentBlocks });
       }
       
-      // Start new section
       if (isP) {
         currentSection = sevenPs.find(p => block.content.toLowerCase().includes(p.toLowerCase()));
         currentBlocks = [];
       } else if (isPDefinition) {
         currentSection = sevenPs.find(p => block.label.toLowerCase().includes(p.toLowerCase()));
-        // Include the definition content as first block
         currentBlocks = [{ type: 'paragraph', content: block.content }];
       }
     } else if (currentSection) {
-      // Add block to current section
       currentBlocks.push(block);
     }
   }
   
-  // Save final section
   if (currentSection && currentBlocks.length > 0) {
     sections.push({ title: currentSection, content: currentBlocks });
   }
   
-  // If no 7 Ps structure detected, use fallback
   if (sections.length === 0) {
     return <ContentRenderer ast={ast} />;
   }
   
   return (
-    <>
+    <div className="grid gap-6">
       {sections.map((section, index) => (
-        <div key={index}>
-          <h4>{section.title}</h4>
-          <ContentRenderer ast={section.content} />
+        <div key={index} className="bg-gradient-to-br from-purple-50/30 to-pink-50/20 p-6 rounded-2xl border-2 border-purple-200/40">
+          <h4 className="text-xl font-bold text-slate-900 mb-4 flex items-center gap-2">
+            <span className="w-3 h-3 rounded-full bg-purple-500"></span>
+            {section.title}
+          </h4>
+          <div className="pl-4 border-l-2 border-purple-300/30">
+            <ContentRenderer ast={section.content} />
+          </div>
         </div>
       ))}
-    </>
+    </div>
   );
 }
 
-/* MAIN TEXT FORMATTER - Uses section registry and AST rendering */
+/* Enhanced text formatter */
 function FormattedText({ text, sectionType }) {
   if (!text || typeof text !== 'string') return null;
   
   const ast = parseTextToAst(text);
   
-  // Use specialized renderer if available
   switch (sectionType) {
     case 'personas':
       return renderPersonas(ast);
@@ -896,56 +883,11 @@ function FormattedText({ text, sectionType }) {
   }
 }
 
-
-/* FIXED: Check if text contains embedded bullet points */
-function containsEmbeddedBullets(text) {
-  // Look for patterns like "• Item 1 content • Item 2 content"
-  const bulletCount = (text.match(/•/g) || []).length;
-  return bulletCount > 1 && !text.startsWith('•');
-}
-
-/* FIXED: Handler for embedded bullet point lists */
-function EmbeddedBulletList({ text }) {
-  // Split on bullet points and process each item
-  const items = text.split('•').filter(item => item.trim()).map(item => item.trim());
-  
-  return (
-    <ul className="space-y-2 list-none" style={{ marginLeft: "0px" }}>
-      {items.map((item, index) => (
-        <li
-          key={index}
-          className="flex items-start gap-3 text-slate-700 leading-relaxed"
-          style={{
-            marginTop: "0px",
-            marginBottom: "8px",
-            paddingTop: "0px",
-            paddingBottom: "0px",
-          }}
-        >
-          <span className="text-blue-600 font-bold text-lg flex-shrink-0 mt-0">•</span>
-          <div className="flex-1">
-            {/* Check if item has a heading pattern */}
-            {item.includes(':') && item.split(':')[0].length < 40 ? (
-              <>
-                <span className="font-semibold text-slate-900">{item.split(':')[0]}:</span>
-                <span className="ml-1">{item.split(':').slice(1).join(':')}</span>
-              </>
-            ) : (
-              item
-            )}
-          </div>
-        </li>
-      ))}
-    </ul>
-  );
-}
-
-/* ── Download Functions (NO EXTRA COST - CLIENT-SIDE) ─────── */
+/* Download Functions (unchanged but with enhanced styling mentions) */
 const downloadExcel = (data) => {
   try {
     const workbook = XLSX.utils.book_new();
 
-    // Helper function to convert text sections to rows
     const textToRows = (text, sectionTitle) => {
       if (!text) return [];
       const rows = [[sectionTitle], [""]];
@@ -957,7 +899,6 @@ const downloadExcel = (data) => {
       return rows;
     };
 
-    // Create comprehensive summary sheet with all sections
     const summaryData = [
       ["Marketing Strategy Report"],
       ["Generated:", new Date().toLocaleDateString()],
@@ -967,28 +908,27 @@ const downloadExcel = (data) => {
       [""],
       ...textToRows(data.market_foundation, "Market Foundation"),
       ...textToRows(data.strategy_pillars, "Strategy Pillars"),
-      ...textToRows(data.personas, "Target Personas"),
-      ...textToRows(data.competitors_brief, "Competitor Analysis"),
+      ...textToRows(data.personas, "Customer Personas"),
+      ...textToRows(data.competitors_brief, "Competitor Intelligence"),
       ...textToRows(
         data.differentiators || data.differentiation_moves,
-        "Key Differentiators",
+        "Differentiation Strategy",
       ),
       ...textToRows(
         data.seven_ps || data.marketing_mix_7ps,
         "Marketing Mix (7 Ps)",
       ),
-      ...textToRows(data.calendar_next_90_days, "90-Day Action Plan"),
-      ...textToRows(data.kpis, "Measurement & Tracking"),
-      ...textToRows(data.risks_and_safety_nets, "Risks & Safety Nets"),
+      ...textToRows(data.calendar_next_90_days, "90-Day Roadmap"),
+      ...textToRows(data.kpis, "Performance Tracking"),
+      ...textToRows(data.risks_and_safety_nets, "Risk Management"),
     ];
 
     const worksheet = XLSX.utils.aoa_to_sheet(summaryData);
     XLSX.utils.book_append_sheet(workbook, worksheet, "Marketing Strategy");
 
-    // Add budget sheet if available
     if (data.budget) {
       const budgetData = [
-        ["Budget Allocation"],
+        ["Budget Framework"],
         [""],
         ["Budget Band:", data.budget.band || ""],
         [""],
@@ -1004,10 +944,9 @@ const downloadExcel = (data) => {
       XLSX.utils.book_append_sheet(workbook, budgetSheet, "Budget");
     }
 
-    // Add channel playbook sheet if available
     if (data.channel_playbook && Array.isArray(data.channel_playbook)) {
       const channelData = [
-        ["Channel Playbook"],
+        ["Channel Strategy"],
         ["Channel", "Role", "Budget %", "Summary"],
       ];
       data.channel_playbook.forEach((channel) => {
@@ -1031,7 +970,6 @@ const downloadExcel = (data) => {
 
 const downloadWord = async (data) => {
   try {
-    // Helper function to convert text sections to Word paragraphs
     const textToParagraphs = (text, sectionTitle) => {
       if (!text) return [];
 
@@ -1047,7 +985,6 @@ const downloadWord = async (data) => {
       lines.forEach((line) => {
         const cleanLine = line.trim();
 
-        // Check if it's a bullet point heading
         const isBulletHeading = /^•\s+/.test(cleanLine);
 
         if (isBulletHeading) {
@@ -1129,11 +1066,11 @@ const downloadWord = async (data) => {
 
             ...textToParagraphs(data.market_foundation, "Market Foundation"),
             ...textToParagraphs(data.strategy_pillars, "Strategy Pillars"),
-            ...textToParagraphs(data.personas, "Target Personas"),
-            ...textToParagraphs(data.competitors_brief, "Competitor Analysis"),
+            ...textToParagraphs(data.personas, "Customer Personas"),
+            ...textToParagraphs(data.competitors_brief, "Competitor Intelligence"),
             ...textToParagraphs(
               data.differentiators || data.differentiation_moves,
-              "Key Differentiators",
+              "Differentiation Strategy",
             ),
             ...textToParagraphs(
               data.seven_ps || data.marketing_mix_7ps,
@@ -1141,12 +1078,12 @@ const downloadWord = async (data) => {
             ),
             ...textToParagraphs(
               data.calendar_next_90_days,
-              "90-Day Action Plan",
+              "90-Day Roadmap",
             ),
-            ...textToParagraphs(data.kpis, "Measurement & Tracking"),
+            ...textToParagraphs(data.kpis, "Performance Tracking"),
             ...textToParagraphs(
               data.risks_and_safety_nets,
-              "Risks & Safety Nets",
+              "Risk Management",
             ),
           ],
         },
@@ -1164,41 +1101,40 @@ const downloadWord = async (data) => {
   }
 };
 
-/* small two-line stat box */
 const InfoBox = ({ label, value }) => (
-  <div className="bg-white rounded-lg border border-slate-200 p-3">
-    <div className="text-xs uppercase font-semibold text-slate-500 mb-1">
+  <div className="bg-white rounded-xl border-2 border-slate-200 p-4 shadow-sm">
+    <div className="text-xs uppercase font-bold text-slate-500 mb-2 tracking-wide">
       {label}
     </div>
-    <div className="text-slate-800 font-medium">{value}</div>
+    <div className="text-slate-900 font-semibold text-base">{value}</div>
   </div>
 );
 
-/* skeleton loader */
+/* Enhanced skeleton loader */
 function SkeletonTimeline() {
   return (
-    <div className="mt-12 w-full max-w-5xl mx-auto px-4">
-      <div className="text-center mb-12">
-        <div className="h-8 bg-gray-200 rounded-lg w-64 mx-auto mb-3 animate-pulse"></div>
-        <div className="h-5 bg-gray-200 rounded w-96 mx-auto animate-pulse"></div>
+    <div className="mt-12 w-full max-w-6xl mx-auto px-4">
+      <div className="text-center mb-20">
+        <div className="h-12 bg-gray-200 rounded-2xl w-80 mx-auto mb-6 animate-pulse"></div>
+        <div className="h-6 bg-gray-200 rounded-xl w-96 mx-auto animate-pulse"></div>
       </div>
-      <div className="space-y-2">
+      <div className="space-y-6">
         {[1, 2, 3, 4].map((i) => (
           <div
             key={i}
-            className="bg-white rounded-xl border border-gray-200 p-6"
+            className="bg-white rounded-3xl border-2 border-gray-200 p-10 shadow-xl"
           >
-            <div className="flex items-center gap-4 mb-4">
-              <div className="w-12 h-12 bg-gray-200 rounded-lg animate-pulse"></div>
+            <div className="flex items-center gap-8 mb-6">
+              <div className="w-20 h-20 bg-gray-200 rounded-3xl animate-pulse"></div>
               <div className="flex-1">
-                <div className="h-5 bg-gray-200 rounded w-48 mb-2 animate-pulse"></div>
-                <div className="h-4 bg-gray-200 rounded w-64 animate-pulse"></div>
+                <div className="h-8 bg-gray-200 rounded-xl w-64 mb-3 animate-pulse"></div>
+                <div className="h-5 bg-gray-200 rounded-lg w-80 animate-pulse"></div>
               </div>
             </div>
-            <div className="space-y-1">
-              <div className="h-4 bg-gray-200 rounded w-full animate-pulse"></div>
-              <div className="h-4 bg-gray-200 rounded w-5/6 animate-pulse"></div>
-              <div className="h-4 bg-gray-200 rounded w-3/4 animate-pulse"></div>
+            <div className="space-y-4">
+              <div className="h-4 bg-gray-200 rounded-lg w-full animate-pulse"></div>
+              <div className="h-4 bg-gray-200 rounded-lg w-5/6 animate-pulse"></div>
+              <div className="h-4 bg-gray-200 rounded-lg w-4/5 animate-pulse"></div>
             </div>
           </div>
         ))}
@@ -1207,38 +1143,36 @@ function SkeletonTimeline() {
   );
 }
 
-/* ── streaming display component ──────────────────────────── */
+/* Enhanced streaming display */
 function StreamingDisplay({ content }) {
   return (
-    <div className="mt-12 w-full max-w-5xl mx-auto px-4">
-      {/* header */}
-      <div className="text-center mb-16">
-        <h2 className="text-4xl font-bold text-white mb-4 tracking-tight">
+    <div className="mt-12 w-full max-w-6xl mx-auto px-4">
+      <div className="text-center mb-20">
+        <h2 className="text-5xl font-extrabold text-white mb-6 tracking-tight leading-tight">
           Your Marketing Strategy
         </h2>
-        <p className="text-xl text-white max-w-3xl mx-auto leading-relaxed font-medium">
-          <span className="inline-flex items-center">
-            <div className="animate-pulse rounded-full h-2 w-2 bg-white/60 mr-2"></div>
-            Streaming your strategy in real-time...
+        <p className="text-xl text-white/90 max-w-4xl mx-auto leading-relaxed font-medium">
+          <span className="inline-flex items-center gap-3">
+            <div className="animate-pulse rounded-full h-3 w-3 bg-white/80"></div>
+            Generating your comprehensive strategy in real-time...
           </span>
         </p>
       </div>
 
-      {/* streaming content display */}
-      <div className="bg-white rounded-3xl shadow-xl border border-gray-100 overflow-hidden">
-        <div className="p-8">
+      <div className="bg-white rounded-3xl shadow-2xl border-2 border-gray-100 overflow-hidden">
+        <div className="p-10">
           <div className="prose max-w-none">
-            <div className="bg-gray-50 rounded-lg p-6 border border-gray-200 font-mono text-sm text-gray-800 whitespace-pre-wrap break-words">
+            <div className="bg-gradient-to-br from-slate-50 to-slate-100 rounded-2xl p-8 border-2 border-slate-200 font-mono text-base text-gray-800 whitespace-pre-wrap break-words leading-relaxed">
               {content}
-              <span className="animate-pulse">|</span>
+              <span className="animate-pulse text-blue-600 font-bold">|</span>
             </div>
           </div>
         </div>
       </div>
 
       <div className="mt-8 text-center">
-        <p className="text-white/80 text-sm">
-          Once complete, your strategy will be formatted and ready for download
+        <p className="text-white/80 text-base leading-relaxed">
+          Once complete, your strategy will be beautifully formatted and ready for download
         </p>
       </div>
     </div>
