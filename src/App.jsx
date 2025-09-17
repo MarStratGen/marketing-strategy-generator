@@ -297,6 +297,10 @@ export default function App() {
       country === "__custom_country" ? customCountry : country;
     const finalSector = sector === "__custom_sector" ? customSector : sector;
 
+    // Debug logging
+    console.log("DEBUG: segments before validation:", segments);
+    console.log("DEBUG: segInp before validation:", segInp);
+
     if (!finalCountry.trim()) {
       flushSync(() => {
         setErr("Please select a country.");
@@ -313,7 +317,16 @@ export default function App() {
       return;
     }
 
-    if (!segments || segments.length === 0) {
+    // Get the most current segments, including any flushed input
+    const currentSegments = [...segments];
+    if (segInp.trim()) {
+      const result = processTokenizedInput(segInp.trim(), segments, 3);
+      currentSegments.push(...result.tokensAdded);
+    }
+
+    console.log("DEBUG: currentSegments after manual flush check:", currentSegments);
+
+    if (!currentSegments || currentSegments.length === 0) {
       flushSync(() => {
         setErr("Please add at least one target segment.");
         setLoading(false);
@@ -325,7 +338,7 @@ export default function App() {
       country: finalCountry,
       sector: finalSector,
       product_type: offering,
-      audiences: segments,
+      audiences: currentSegments,
       competitors,
 
       motion: motion === "__custom_motion" ? "custom" : motion,
