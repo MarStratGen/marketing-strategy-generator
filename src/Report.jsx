@@ -554,116 +554,216 @@ function OptimizedContent({ data }) {
   );
 }
 
-/* FIXED: text formatter with proper subheading detection and bullet point handling */
+/* COMPLETELY REWRITTEN: Smart text formatter for marketing strategy content */
 function FormattedText({ text }) {
-  // Handle 90-day action plan special case
-  if (text.includes('Week 1-2:') || text.includes('Foundation Phase')) {
-    return <ActionPlan90Days text={text} />;
+  if (!text || typeof text !== 'string') return null;
+  
+  // Clean the text first
+  const cleanText = text.trim();
+  
+  // Handle 90-day action plan special case - MUCH more aggressive detection
+  if (cleanText.includes('Week') || cleanText.includes('day') || cleanText.includes('Foundation') || cleanText.includes('Launch') || cleanText.includes('Month')) {
+    return <ActionPlan90Days text={cleanText} />;
+  }
+  
+  // Handle personas - detect if this looks like persona content
+  if (cleanText.includes('Persona') || (cleanText.includes('Age:') && cleanText.includes('Income:')) || (cleanText.length > 500 && cleanText.includes('demographic'))) {
+    return <PersonasContent text={cleanText} />;
+  }
+  
+  // Handle marketing mix - detect 7 Ps content
+  if (cleanText.includes('Product:') || cleanText.includes('Price:') || cleanText.includes('Promotion:') || cleanText.includes('Place:')) {
+    return <MarketingMixContent text={cleanText} />;
+  }
+  
+  // Handle strategy pillars - detect pillar content  
+  if (cleanText.includes('Pillar') || (cleanText.includes('brand') && cleanText.includes('customer') && cleanText.length > 300)) {
+    return <StrategyPillarsContent text={cleanText} />;
+  }
+  
+  // Handle differentiation moves - detect competitive differentiation
+  if (cleanText.includes('differentiat') || cleanText.includes('competi') || (cleanText.includes('advantage') && cleanText.includes('market'))) {
+    return <DifferentiationContent text={cleanText} />;
   }
 
-  const paras = text.split("\n\n").filter((p) => p.trim());
+  // For any other text, use enhanced paragraph processing
+  return <EnhancedTextContent text={cleanText} />;
+}
+
+/* SPECIALIZED CONTENT RENDERERS */
+
+/* Handler for personas content */
+function PersonasContent({ text }) {
+  // Split by persona indicators
+  const personas = text.split(/Persona \d+:|Customer Persona \d+:|Target \d+:|Demographic \d+:/i).filter(s => s.trim());
+  
+  if (personas.length < 2) {
+    // Fallback: try to split by common persona names or patterns
+    const altSplit = text.split(/(?=Age:|(?=Income:)|(?=Location:)|(?=Behaviour:))/i).filter(s => s.trim() && s.length > 50);
+    if (altSplit.length >= 2) {
+      return (
+        <div className="space-y-6">
+          {altSplit.slice(0, 3).map((persona, index) => (
+            <div key={index}>
+              <h6 className="font-bold text-slate-900 text-base flex items-center" style={{ marginTop: index > 0 ? "24px" : "0px", marginBottom: "8px" }}>
+                <span className="text-blue-600 font-bold text-lg mr-3">•</span>
+                <span>Persona {index + 1}</span>
+              </h6>
+              <p className="text-slate-700" style={{ marginLeft: "20px", lineHeight: "1.6" }}>{persona.trim()}</p>
+            </div>
+          ))}
+        </div>
+      );
+    }
+  }
 
   return (
-    <div className="space-y-1">
-      {paras.map((p, i) => {
-        const trimmed = p.trim();
+    <div className="space-y-6">
+      {personas.map((persona, index) => (
+        <div key={index}>
+          <h6 className="font-bold text-slate-900 text-base flex items-center" style={{ marginTop: index > 0 ? "24px" : "0px", marginBottom: "8px" }}>
+            <span className="text-blue-600 font-bold text-lg mr-3">•</span>
+            <span>Persona {index + 1}</span>
+          </h6>
+          <p className="text-slate-700" style={{ marginLeft: "20px", lineHeight: "1.6" }}>{persona.trim()}</p>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+/* Handler for marketing mix (7 Ps) content */
+function MarketingMixContent({ text }) {
+  const sevenPs = ['Product', 'Price', 'Place', 'Promotion', 'People', 'Process', 'Physical Evidence'];
+  
+  return (
+    <div className="space-y-6">
+      {sevenPs.map((p, index) => {
+        const regex = new RegExp(`${p}:(.*?)(?=${sevenPs[index + 1]}:|$)`, 'si');
+        const match = text.match(regex);
+        const content = match ? match[1].trim() : '';
         
-        // Skip Executive Summary and redundant standalone "Allocation"
-        if (trimmed === "Executive Summary" || trimmed === "Allocation") {
-          return null;
-        }
-
-        // Check if this paragraph contains embedded bullet points
-        if (containsEmbeddedBullets(trimmed)) {
-          return <EmbeddedBulletList key={i} text={trimmed} />;
-        }
-
-        // Split on single line breaks to catch inline subheadings
-        const lines = trimmed.split("\n").filter((line) => line.trim());
-
+        if (!content) return null;
+        
         return (
-          <div key={i}>
-            {lines.map((line, lineIndex) => {
-              const cleanLine = line.trim();
-
-              // Detect bullet point subheadings (lines starting with •)
-              const isBulletHeading = /^•\s+/.test(cleanLine);
-
-              // Detect other subheadings (short lines that look like headers)
-              const isSubheading =
-                (cleanLine.length < 60 && // Not too long
-                  cleanLine.length > 3 && // Not too short
-                  /^[A-Z][a-zA-Z\s&:-]+$/.test(cleanLine) && // Starts with capital, contains letters/spaces/basic punctuation
-                  !cleanLine.includes(".") && // No periods (usually not in headings)
-                  !cleanLine.includes("http") && // Not a URL
-                  !cleanLine.match(/\d{2,}/)) || // No long numbers
-                /^(Month|Week|Day|Pillar|Phase|Stage) \d+[:-]/.test(cleanLine) || // Time/phase headers
-                /^(First|Next|Final|Last) \d+/.test(cleanLine); // Period headers
-
-              if (isBulletHeading) {
-                const headingText = cleanLine.replace(/^•\s+/, ""); // Remove bullet point
-                return (
-                  <h6
-                    key={lineIndex}
-                    className="font-bold text-slate-900 text-base flex items-center"
-                    style={{
-                      marginTop: "24px",
-                      marginBottom: "8px",
-                      marginLeft: "0px",
-                      marginRight: "0px",
-                      paddingTop: "0px",
-                      paddingBottom: "0px",
-                    }}
-                  >
-                    <span className="text-blue-600 font-bold text-lg mr-3">
-                      •
-                    </span>
-                    <span>{headingText}</span>
-                  </h6>
-                );
-              }
-
-              if (isSubheading) {
-                return (
-                  <h6
-                    key={lineIndex}
-                    className="font-bold text-slate-900 text-base flex items-center"
-                    style={{
-                      marginTop: "24px",
-                      marginBottom: "8px",
-                      marginLeft: "0px",
-                      marginRight: "0px",
-                      paddingTop: "0px",
-                      paddingBottom: "0px",
-                    }}
-                  >
-                    <span className="text-blue-600 font-bold text-lg mr-3">
-                      •
-                    </span>
-                    <span>{cleanLine}</span>
-                  </h6>
-                );
-              }
-
-              // Regular body text with proper indentation
-              return (
-                <p
-                  key={lineIndex}
-                  className="text-slate-700"
-                  style={{
-                    marginTop: "0px",
-                    marginBottom: "12px",
-                    marginLeft: "20px", // FIXED: Add indentation for body text
-                    paddingTop: "0px",
-                    paddingBottom: "0px",
-                    lineHeight: "1.6",
-                  }}
-                >
-                  {cleanLine}
-                </p>
-              );
-            })}
+          <div key={index}>
+            <h6 className="font-bold text-slate-900 text-base flex items-center" style={{ marginTop: index > 0 ? "24px" : "0px", marginBottom: "8px" }}>
+              <span className="text-blue-600 font-bold text-lg mr-3">•</span>
+              <span>{p}</span>
+            </h6>
+            <p className="text-slate-700" style={{ marginLeft: "20px", lineHeight: "1.6" }}>{content}</p>
           </div>
+        );
+      }).filter(Boolean)}
+    </div>
+  );
+}
+
+/* Handler for strategy pillars content */
+function StrategyPillarsContent({ text }) {
+  // Split by pillar indicators
+  const pillars = text.split(/Pillar \d+:|Strategic Pillar \d+:/i).filter(s => s.trim());
+  
+  if (pillars.length < 2) {
+    // Fallback: split by other patterns
+    const sections = text.split(/\n\n+/).filter(s => s.trim() && s.length > 50);
+    return (
+      <div className="space-y-6">
+        {sections.map((section, index) => (
+          <div key={index}>
+            <h6 className="font-bold text-slate-900 text-base flex items-center" style={{ marginTop: index > 0 ? "24px" : "0px", marginBottom: "8px" }}>
+              <span className="text-blue-600 font-bold text-lg mr-3">•</span>
+              <span>Strategy Element {index + 1}</span>
+            </h6>
+            <p className="text-slate-700" style={{ marginLeft: "20px", lineHeight: "1.6" }}>{section.trim()}</p>
+          </div>
+        ))}
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-6">
+      {pillars.map((pillar, index) => (
+        <div key={index}>
+          <h6 className="font-bold text-slate-900 text-base flex items-center" style={{ marginTop: index > 0 ? "24px" : "0px", marginBottom: "8px" }}>
+            <span className="text-blue-600 font-bold text-lg mr-3">•</span>
+            <span>Strategy Pillar {index + 1}</span>
+          </h6>
+          <p className="text-slate-700" style={{ marginLeft: "20px", lineHeight: "1.6" }}>{pillar.trim()}</p>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+/* Handler for differentiation moves content */
+function DifferentiationContent({ text }) {
+  // Split by differentiation indicators or numbered points
+  const moves = text.split(/\d+\.|Move \d+:|Differentiation \d+:/i).filter(s => s.trim());
+  
+  if (moves.length < 2) {
+    // Fallback: split by paragraphs
+    const sections = text.split(/\n\n+/).filter(s => s.trim() && s.length > 30);
+    return (
+      <div className="space-y-6">
+        {sections.map((section, index) => (
+          <div key={index}>
+            <h6 className="font-bold text-slate-900 text-base flex items-center" style={{ marginTop: index > 0 ? "24px" : "0px", marginBottom: "8px" }}>
+              <span className="text-blue-600 font-bold text-lg mr-3">•</span>
+              <span>Differentiation Move {index + 1}</span>
+            </h6>
+            <p className="text-slate-700" style={{ marginLeft: "20px", lineHeight: "1.6" }}>{section.trim()}</p>
+          </div>
+        ))}
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-6">
+      {moves.map((move, index) => (
+        <div key={index}>
+          <h6 className="font-bold text-slate-900 text-base flex items-center" style={{ marginTop: index > 0 ? "24px" : "0px", marginBottom: "8px" }}>
+            <span className="text-blue-600 font-bold text-lg mr-3">•</span>
+            <span>Differentiation Move {index + 1}</span>
+          </h6>
+          <p className="text-slate-700" style={{ marginLeft: "20px", lineHeight: "1.6" }}>{move.trim()}</p>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+/* Handler for enhanced general text content */
+function EnhancedTextContent({ text }) {
+  const paragraphs = text.split(/\n\n+/).filter(p => p.trim());
+  
+  return (
+    <div className="space-y-4">
+      {paragraphs.map((para, index) => {
+        const trimmed = para.trim();
+        
+        // Check if paragraph contains multiple bullet points
+        if ((trimmed.match(/•/g) || []).length > 1) {
+          return <EmbeddedBulletList key={index} text={trimmed} />;
+        }
+        
+        // Check if this looks like a subheading
+        if (trimmed.length < 80 && !trimmed.includes('.') && /^[A-Z]/.test(trimmed)) {
+          return (
+            <h6 key={index} className="font-bold text-slate-900 text-base flex items-center" style={{ marginTop: index > 0 ? "24px" : "0px", marginBottom: "8px" }}>
+              <span className="text-blue-600 font-bold text-lg mr-3">•</span>
+              <span>{trimmed}</span>
+            </h6>
+          );
+        }
+        
+        // Regular paragraph
+        return (
+          <p key={index} className="text-slate-700" style={{ lineHeight: "1.6", marginBottom: "12px" }}>
+            {trimmed}
+          </p>
         );
       })}
     </div>
@@ -672,46 +772,66 @@ function FormattedText({ text }) {
 
 /* FIXED: Handler for 90-day action plans */
 function ActionPlan90Days({ text }) {
-  // Split into sections and identify phases
-  const sections = text.split(/Week \d+-\d+:|Foundation Phase|Launch Phase|Scaling Phase|Optimisation Phase/i)
-    .filter(s => s.trim());
+  // Much more aggressive splitting for 90-day plans
+  const phases = [];
   
-  const phases = [
-    { title: "First 30 days", content: sections[0] || "" },
-    { title: "Next 30 days", content: sections[1] || "" },
-    { title: "Final 30 days", content: sections[2] || "" }
-  ];
+  // Try to split by week patterns first
+  if (text.includes('Week')) {
+    const weekSections = text.split(/Week \d+-?\d*:?/i).filter(s => s.trim());
+    if (weekSections.length >= 3) {
+      phases.push(
+        { title: "First 30 days", content: weekSections[0]?.trim() || "" },
+        { title: "Next 30 days", content: weekSections[1]?.trim() || "" },
+        { title: "Final 30 days", content: weekSections[2]?.trim() || "" }
+      );
+    }
+  }
+  
+  // Try to split by month patterns
+  if (phases.length === 0 && text.includes('Month')) {
+    const monthSections = text.split(/Month \d+:?/i).filter(s => s.trim());
+    if (monthSections.length >= 3) {
+      phases.push(
+        { title: "First 30 days", content: monthSections[0]?.trim() || "" },
+        { title: "Next 30 days", content: monthSections[1]?.trim() || "" },
+        { title: "Final 30 days", content: monthSections[2]?.trim() || "" }
+      );
+    }
+  }
+  
+  // Try to split by phase names
+  if (phases.length === 0) {
+    const phaseSections = text.split(/Foundation Phase|Launch Phase|Scaling Phase|Optimisation Phase/i).filter(s => s.trim());
+    if (phaseSections.length >= 3) {
+      phases.push(
+        { title: "First 30 days", content: phaseSections[0]?.trim() || "" },
+        { title: "Next 30 days", content: phaseSections[1]?.trim() || "" },
+        { title: "Final 30 days", content: phaseSections[2]?.trim() || "" }
+      );
+    }
+  }
+  
+  // Fallback: split the text into three equal parts
+  if (phases.length === 0) {
+    const sentences = text.split(/[.!?]+/).filter(s => s.trim());
+    const third = Math.ceil(sentences.length / 3);
+    phases.push(
+      { title: "First 30 days", content: sentences.slice(0, third).join('. ') + '.' },
+      { title: "Next 30 days", content: sentences.slice(third, third * 2).join('. ') + '.' },
+      { title: "Final 30 days", content: sentences.slice(third * 2).join('. ') + '.' }
+    );
+  }
 
   return (
     <div className="space-y-6">
-      {phases.map((phase, index) => (
+      {phases.filter(p => p.content).map((phase, index) => (
         <div key={index}>
-          <h6
-            className="font-bold text-slate-900 text-base flex items-center"
-            style={{
-              marginTop: index > 0 ? "24px" : "0px",
-              marginBottom: "8px",
-              marginLeft: "0px",
-              marginRight: "0px",
-              paddingTop: "0px",
-              paddingBottom: "0px",
-            }}
-          >
+          <h6 className="font-bold text-slate-900 text-base flex items-center" style={{ marginTop: index > 0 ? "24px" : "0px", marginBottom: "8px" }}>
             <span className="text-blue-600 font-bold text-lg mr-3">•</span>
             <span>{phase.title}</span>
           </h6>
-          <p
-            className="text-slate-700"
-            style={{
-              marginTop: "0px",
-              marginBottom: "12px",
-              marginLeft: "20px",
-              paddingTop: "0px",
-              paddingBottom: "0px",
-              lineHeight: "1.6",
-            }}
-          >
-            {phase.content.trim()}
+          <p className="text-slate-700" style={{ marginLeft: "20px", lineHeight: "1.6" }}>
+            {phase.content}
           </p>
         </div>
       ))}
