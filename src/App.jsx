@@ -341,7 +341,9 @@ export default function App() {
       budget_band: budgetBand,
     };
 
-    console.log("Attempting to submit form with data:", body);
+    console.log("=== FORM SUBMISSION DEBUG ===");
+    console.log("Competitors being sent:", competitors);
+    console.log("Full form data:", body);
 
     // Create fetch with timeout helper
     const fetchWithTimeout = async (url, options, timeout = 90000) => {
@@ -389,6 +391,15 @@ export default function App() {
         const data = await response.json();
         if (data.error) {
           throw new Error(data.error);
+        }
+
+        console.log("=== API RESPONSE DEBUG ===");
+        console.log("Received data:", data);
+        if (data.market_foundation) {
+          console.log("Market foundation content:", data.market_foundation);
+        }
+        if (data.competitors_brief) {
+          console.log("Competitors brief content:", data.competitors_brief);
         }
 
         setResult(data);
