@@ -16,7 +16,7 @@ export default {
       'https://localhost:5000',
       'http://127.0.0.1:5000', 
       'https://127.0.0.1:5000',
-      'https://4ed238b6-44fe-47f0-8f40-754dbed6c70c-00-31bwxps5rwfru.worf.replit.dev'
+      'https://4ed238b6-44fe-47f0-8f40-754dbed6c70c-00-y3il5bpx45gx.sisko.replit.dev'
     ];
     
     if (origin && !allowedOrigins.includes(origin)) {
