@@ -554,248 +554,42 @@ function OptimizedContent({ data }) {
   );
 }
 
-/* COMPLETELY REWRITTEN: Smart text formatter for marketing strategy content */
+/* SIMPLE: Basic text formatter that handles bullets and subheadings properly */
 function FormattedText({ text }) {
   if (!text || typeof text !== 'string') return null;
   
-  // Clean the text first
   const cleanText = text.trim();
-  
-  // Handle 90-day action plan special case - MUCH more aggressive detection
-  if (cleanText.includes('Week') || cleanText.includes('day') || cleanText.includes('Foundation') || cleanText.includes('Launch') || cleanText.includes('Month')) {
-    return <ActionPlan90Days text={cleanText} />;
-  }
-  
-  // Handle personas - detect if this looks like persona content
-  if (cleanText.includes('Persona') || (cleanText.includes('Age:') && cleanText.includes('Income:')) || (cleanText.length > 500 && cleanText.includes('demographic'))) {
-    return <PersonasContent text={cleanText} />;
-  }
-  
-  // Handle marketing mix - detect 7 Ps content
-  if (cleanText.includes('Product:') || cleanText.includes('Price:') || cleanText.includes('Promotion:') || cleanText.includes('Place:')) {
-    return <MarketingMixContent text={cleanText} />;
-  }
-  
-  // Handle strategy pillars - detect pillar content  
-  if (cleanText.includes('Pillar') || (cleanText.includes('brand') && cleanText.includes('customer') && cleanText.length > 300)) {
-    return <StrategyPillarsContent text={cleanText} />;
-  }
-  
-  // Handle differentiation moves - detect competitive differentiation
-  if (cleanText.includes('differentiat') || cleanText.includes('competi') || (cleanText.includes('advantage') && cleanText.includes('market'))) {
-    return <DifferentiationContent text={cleanText} />;
-  }
+  const paragraphs = cleanText.split(/\n\n+/).filter(p => p.trim());
 
-  // For any other text, use enhanced paragraph processing
-  return <EnhancedTextContent text={cleanText} />;
-}
-
-/* SPECIALIZED CONTENT RENDERERS */
-
-/* Handler for personas content */
-function PersonasContent({ text }) {
-  // Use regex to capture actual subheadings from the content
-  const matches = Array.from(text.matchAll(/(?:^|\n)(?:Persona|Customer Persona|Target)\s*\d*\s*:?\s*([^\n:]{2,80})\s*[:\-–—]?\s*\n?([\s\S]*?)(?=(?:\n(?:Persona|Customer Persona|Target)\s*\d*\s*:)|$)/gi));
-  
-  if (matches.length > 0) {
-    return (
-      <div className="space-y-6">
-        {matches.map((match, index) => {
-          const title = match[1]?.trim() || `Persona ${index + 1}`;
-          const body = match[2]?.trim() || '';
-          
-          return (
-            <div key={index}>
-              <h6 className="font-bold text-slate-900 text-base flex items-center" style={{ marginTop: index > 0 ? "24px" : "0px", marginBottom: "8px" }}>
-                <span className="text-blue-600 font-bold text-lg mr-3">•</span>
-                <span>{title}</span>
-              </h6>
-              <div style={{ marginLeft: "20px" }}>
-                <EnhancedTextContent text={body} />
-              </div>
-            </div>
-          );
-        })}
-      </div>
-    );
-  }
-
-  // Fallback: split by paragraphs and use first line as heading
-  const paragraphs = text.split(/\n\n+/).filter(p => p.trim() && p.length > 50);
-  return (
-    <div className="space-y-6">
-      {paragraphs.slice(0, 3).map((para, index) => {
-        const lines = para.trim().split('\n');
-        const title = lines[0]?.split(':')[0]?.trim() || `Persona ${index + 1}`;
-        const body = lines.slice(0).join('\n').replace(/^[^:]*:?\s*/, '').trim();
-        
-        return (
-          <div key={index}>
-            <h6 className="font-bold text-slate-900 text-base flex items-center" style={{ marginTop: index > 0 ? "24px" : "0px", marginBottom: "8px" }}>
-              <span className="text-blue-600 font-bold text-lg mr-3">•</span>
-              <span>{title}</span>
-            </h6>
-            <div style={{ marginLeft: "20px" }}>
-              <EnhancedTextContent text={body} />
-            </div>
-          </div>
-        );
-      })}
-    </div>
-  );
-}
-
-/* Handler for marketing mix (7 Ps) content */
-function MarketingMixContent({ text }) {
-  const sevenPs = ['Product', 'Price', 'Place', 'Promotion', 'People', 'Process', 'Physical Evidence'];
-  
-  return (
-    <div className="space-y-6">
-      {sevenPs.map((p, index) => {
-        const regex = new RegExp(`${p}:(.*?)(?=${sevenPs[index + 1]}:|$)`, 'si');
-        const match = text.match(regex);
-        const content = match ? match[1].trim() : '';
-        
-        if (!content) return null;
-        
-        return (
-          <div key={index}>
-            <h6 className="font-bold text-slate-900 text-base flex items-center" style={{ marginTop: index > 0 ? "24px" : "0px", marginBottom: "8px" }}>
-              <span className="text-blue-600 font-bold text-lg mr-3">•</span>
-              <span>{p}</span>
-            </h6>
-            <p className="text-slate-700" style={{ marginLeft: "20px", lineHeight: "1.6" }}>{content}</p>
-          </div>
-        );
-      }).filter(Boolean)}
-    </div>
-  );
-}
-
-/* Handler for strategy pillars content */
-function StrategyPillarsContent({ text }) {
-  // Use regex to capture actual subheadings from the content
-  const matches = Array.from(text.matchAll(/(?:^|\n)(?:Strategic\s*)?Pillar\s*\d*\s*:?\s*([^\n:]{2,80})\s*[:\-–—]?\s*\n?([\s\S]*?)(?=(?:\n(?:Strategic\s*)?Pillar\s*\d*\s*:)|$)/gi));
-  
-  if (matches.length > 0) {
-    return (
-      <div className="space-y-6">
-        {matches.map((match, index) => {
-          const title = match[1]?.trim() || `Strategy Pillar ${index + 1}`;
-          const body = match[2]?.trim() || '';
-          
-          return (
-            <div key={index}>
-              <h6 className="font-bold text-slate-900 text-base flex items-center" style={{ marginTop: index > 0 ? "24px" : "0px", marginBottom: "8px" }}>
-                <span className="text-blue-600 font-bold text-lg mr-3">•</span>
-                <span>{title}</span>
-              </h6>
-              <div style={{ marginLeft: "20px" }}>
-                <EnhancedTextContent text={body} />
-              </div>
-            </div>
-          );
-        })}
-      </div>
-    );
-  }
-
-  // Fallback: split by paragraphs and use first line as heading
-  const paragraphs = text.split(/\n\n+/).filter(p => p.trim() && p.length > 50);
-  return (
-    <div className="space-y-6">
-      {paragraphs.map((para, index) => {
-        const lines = para.trim().split('\n');
-        const title = lines[0]?.split(':')[0]?.trim() || `Strategy Element ${index + 1}`;
-        const body = lines.slice(0).join('\n').replace(/^[^:]*:?\s*/, '').trim();
-        
-        return (
-          <div key={index}>
-            <h6 className="font-bold text-slate-900 text-base flex items-center" style={{ marginTop: index > 0 ? "24px" : "0px", marginBottom: "8px" }}>
-              <span className="text-blue-600 font-bold text-lg mr-3">•</span>
-              <span>{title}</span>
-            </h6>
-            <div style={{ marginLeft: "20px" }}>
-              <EnhancedTextContent text={body} />
-            </div>
-          </div>
-        );
-      })}
-    </div>
-  );
-}
-
-/* Handler for differentiation moves content */
-function DifferentiationContent({ text }) {
-  // Use regex to capture actual subheadings from the content
-  const matches = Array.from(text.matchAll(/(?:^|\n)(?:(?:Move|Differentiation)\s*\d*\s*:|\d+\.)\s*([^\n:–—-]{2,80})(?:[:–—-]\s*)?([\s\S]*?)(?=(?:\n(?:(?:Move|Differentiation)\s*\d*\s*:|\d+\.))|$)/gi));
-  
-  if (matches.length > 0) {
-    return (
-      <div className="space-y-6">
-        {matches.map((match, index) => {
-          const title = match[1]?.trim() || `Differentiation Move ${index + 1}`;
-          const body = match[2]?.trim() || '';
-          
-          return (
-            <div key={index}>
-              <h6 className="font-bold text-slate-900 text-base flex items-center" style={{ marginTop: index > 0 ? "24px" : "0px", marginBottom: "8px" }}>
-                <span className="text-blue-600 font-bold text-lg mr-3">•</span>
-                <span>{title}</span>
-              </h6>
-              <div style={{ marginLeft: "20px" }}>
-                <EnhancedTextContent text={body} />
-              </div>
-            </div>
-          );
-        })}
-      </div>
-    );
-  }
-
-  // Fallback: split by paragraphs and use first line as heading
-  const paragraphs = text.split(/\n\n+/).filter(p => p.trim() && p.length > 30);
-  return (
-    <div className="space-y-6">
-      {paragraphs.map((para, index) => {
-        const lines = para.trim().split('\n');
-        const title = lines[0]?.split(/[:–—-]/)[0]?.trim() || `Differentiation Move ${index + 1}`;
-        const body = lines.slice(0).join('\n').replace(/^[^:–—-]*[:–—-]?\s*/, '').trim();
-        
-        return (
-          <div key={index}>
-            <h6 className="font-bold text-slate-900 text-base flex items-center" style={{ marginTop: index > 0 ? "24px" : "0px", marginBottom: "8px" }}>
-              <span className="text-blue-600 font-bold text-lg mr-3">•</span>
-              <span>{title}</span>
-            </h6>
-            <div style={{ marginLeft: "20px" }}>
-              <EnhancedTextContent text={body} />
-            </div>
-          </div>
-        );
-      })}
-    </div>
-  );
-}
-
-/* Handler for enhanced general text content */
-function EnhancedTextContent({ text }) {
-  const paragraphs = text.split(/\n\n+/).filter(p => p.trim());
-  
   return (
     <div className="space-y-4">
       {paragraphs.map((para, index) => {
         const trimmed = para.trim();
         
-        // Check if paragraph contains multiple bullet points
-        if ((trimmed.match(/•/g) || []).length > 1) {
-          return <EmbeddedBulletList key={index} text={trimmed} />;
+        // Check if this paragraph contains multiple bullet points
+        const bulletCount = (trimmed.match(/[•\-\*]/g) || []).length;
+        const lines = trimmed.split('\n').filter(l => l.trim());
+        
+        // If most lines start with bullets, render as a list
+        const bulletLines = lines.filter(l => /^\s*[•\-\*]\s+/.test(l));
+        if (bulletLines.length >= 2 && bulletLines.length >= lines.length * 0.6) {
+          return (
+            <ul key={index} className="space-y-2 list-none">
+              {bulletLines.map((line, i) => (
+                <li key={i} className="flex items-start gap-3 text-slate-700 leading-relaxed">
+                  <span className="text-blue-600 font-bold">•</span>
+                  <span>{line.replace(/^\s*[•\-\*]\s+/, '').trim()}</span>
+                </li>
+              ))}
+            </ul>
+          );
         }
         
-        // Check if this looks like a subheading
-        if (trimmed.length < 80 && !trimmed.includes('.') && /^[A-Z]/.test(trimmed)) {
+        // Check if this looks like a subheading (short line without periods)
+        if (lines.length === 1 && trimmed.length < 80 && !trimmed.includes('.') && /^[A-Z]/.test(trimmed)) {
           return (
-            <h6 key={index} className="font-bold text-slate-900 text-base flex items-center" style={{ marginTop: index > 0 ? "24px" : "0px", marginBottom: "8px" }}>
+            <h6 key={index} className="font-bold text-slate-900 text-base flex items-center" 
+                style={{ marginTop: index > 0 ? "24px" : "0px", marginBottom: "8px" }}>
               <span className="text-blue-600 font-bold text-lg mr-3">•</span>
               <span>{trimmed}</span>
             </h6>
@@ -813,74 +607,6 @@ function EnhancedTextContent({ text }) {
   );
 }
 
-/* FIXED: Handler for 90-day action plans */
-function ActionPlan90Days({ text }) {
-  // Much more aggressive splitting for 90-day plans
-  const phases = [];
-  
-  // Try to split by week patterns first
-  if (text.includes('Week')) {
-    const weekSections = text.split(/Week \d+-?\d*:?/i).filter(s => s.trim());
-    if (weekSections.length >= 3) {
-      phases.push(
-        { title: "First 30 days", content: weekSections[0]?.trim() || "" },
-        { title: "Next 30 days", content: weekSections[1]?.trim() || "" },
-        { title: "Final 30 days", content: weekSections[2]?.trim() || "" }
-      );
-    }
-  }
-  
-  // Try to split by month patterns
-  if (phases.length === 0 && text.includes('Month')) {
-    const monthSections = text.split(/Month \d+:?/i).filter(s => s.trim());
-    if (monthSections.length >= 3) {
-      phases.push(
-        { title: "First 30 days", content: monthSections[0]?.trim() || "" },
-        { title: "Next 30 days", content: monthSections[1]?.trim() || "" },
-        { title: "Final 30 days", content: monthSections[2]?.trim() || "" }
-      );
-    }
-  }
-  
-  // Try to split by phase names
-  if (phases.length === 0) {
-    const phaseSections = text.split(/Foundation Phase|Launch Phase|Scaling Phase|Optimisation Phase/i).filter(s => s.trim());
-    if (phaseSections.length >= 3) {
-      phases.push(
-        { title: "First 30 days", content: phaseSections[0]?.trim() || "" },
-        { title: "Next 30 days", content: phaseSections[1]?.trim() || "" },
-        { title: "Final 30 days", content: phaseSections[2]?.trim() || "" }
-      );
-    }
-  }
-  
-  // Fallback: split the text into three equal parts
-  if (phases.length === 0) {
-    const sentences = text.split(/[.!?]+/).filter(s => s.trim());
-    const third = Math.ceil(sentences.length / 3);
-    phases.push(
-      { title: "First 30 days", content: sentences.slice(0, third).join('. ') + '.' },
-      { title: "Next 30 days", content: sentences.slice(third, third * 2).join('. ') + '.' },
-      { title: "Final 30 days", content: sentences.slice(third * 2).join('. ') + '.' }
-    );
-  }
-
-  return (
-    <div className="space-y-6">
-      {phases.filter(p => p.content).map((phase, index) => (
-        <div key={index}>
-          <h6 className="font-bold text-slate-900 text-base flex items-center" style={{ marginTop: index > 0 ? "24px" : "0px", marginBottom: "8px" }}>
-            <span className="text-blue-600 font-bold text-lg mr-3">•</span>
-            <span>{phase.title}</span>
-          </h6>
-          <p className="text-slate-700" style={{ marginLeft: "20px", lineHeight: "1.6" }}>
-            {phase.content}
-          </p>
-        </div>
-      ))}
-    </div>
-  );
-}
 
 /* FIXED: Check if text contains embedded bullet points */
 function containsEmbeddedBullets(text) {
