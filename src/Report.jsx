@@ -779,28 +779,103 @@ const SECTION_RENDERERS = {
 
 /* Enhanced specialized renderers */
 function renderPersonas(ast) {
+  // Check if we have structured personas with headings
+  const hasHeadings = ast.some(block => block.type === 'heading');
+  
+  if (hasHeadings) {
+    // Original structured approach
+    const personas = [];
+    let current = null;
+    
+    for (const block of ast) {
+      if (block.type === 'heading') {
+        if (current) personas.push(current);
+        current = { title: block.content, content: [] };
+      } else if (current) {
+        current.content.push(block);
+      }
+    }
+    if (current) personas.push(current);
+    
+    return (
+      <div className="space-y-8">
+        {personas.map((persona, index) => (
+          <div key={index} className="bg-gradient-to-br from-blue-50/30 to-indigo-50/20 p-6 rounded-2xl border-2 border-blue-200/40">
+            <h4 className="text-xl font-bold text-slate-900 mb-4 flex items-center gap-2">
+              <span className="w-3 h-3 rounded-full bg-blue-500"></span>
+              {persona.title}
+            </h4>
+            <div className="pl-4 border-l-2 border-blue-300/30">
+              <ContentRenderer ast={persona.content} />
+            </div>
+          </div>
+        ))}
+      </div>
+    );
+  }
+  
+  // Fallback: detect personas from content patterns
+  const personaKeywords = ['Primary', 'Secondary', 'Tertiary', 'Persona', 'Customer', 'Target', 'User'];
   const personas = [];
-  let current = null;
+  let currentPersona = null;
   
   for (const block of ast) {
-    if (block.type === 'heading') {
-      if (current) personas.push(current);
-      current = { title: block.content, content: [] };
-    } else if (current) {
-      current.content.push(block);
+    // Check if this block starts a new persona
+    const isPersonaStart = block.type === 'paragraph' && 
+      personaKeywords.some(keyword => 
+        block.content.toLowerCase().includes(keyword.toLowerCase()) &&
+        (block.content.includes(':') || block.content.length < 100)
+      );
+    
+    const isDefinitionPersona = block.type === 'definition' &&
+      personaKeywords.some(keyword => 
+        block.label.toLowerCase().includes(keyword.toLowerCase())
+      );
+    
+    if (isPersonaStart) {
+      if (currentPersona) personas.push(currentPersona);
+      // Extract persona name from the content
+      const colonIndex = block.content.indexOf(':');
+      const title = colonIndex > 0 ? block.content.substring(0, colonIndex).trim() : block.content;
+      const remaining = colonIndex > 0 ? block.content.substring(colonIndex + 1).trim() : '';
+      
+      currentPersona = { 
+        title, 
+        content: remaining ? [{ type: 'paragraph', content: remaining }] : [] 
+      };
+    } else if (isDefinitionPersona) {
+      if (currentPersona) personas.push(currentPersona);
+      currentPersona = { 
+        title: block.label, 
+        content: [{ type: 'paragraph', content: block.content }] 
+      };
+    } else if (currentPersona) {
+      currentPersona.content.push(block);
+    } else {
+      // If no persona detected yet, treat as general content
+      if (!currentPersona) {
+        currentPersona = { title: 'Customer Personas', content: [] };
+      }
+      currentPersona.content.push(block);
     }
   }
-  if (current) personas.push(current);
+  
+  if (currentPersona) personas.push(currentPersona);
+  
+  // If we still don't have structured personas, just render the content normally
+  if (personas.length === 0 || (personas.length === 1 && personas[0].title === 'Customer Personas')) {
+    return <ContentRenderer ast={ast} />;
+  }
   
   return (
-    <div className="space-y-8">
+    <div className="space-y-6">
       {personas.map((persona, index) => (
-        <div key={index} className="bg-gradient-to-br from-blue-50/30 to-indigo-50/20 p-6 rounded-2xl border-2 border-blue-200/40">
-          <h4 className="text-xl font-bold text-slate-900 mb-4 flex items-center gap-2">
-            <span className="w-3 h-3 rounded-full bg-blue-500"></span>
+        <div key={index} className="bg-white/60 p-6 rounded-xl border-2 border-slate-200/50">
+          <h4 className="text-lg font-bold text-slate-900 mb-4 flex items-center gap-2">
+            <span className="w-2 h-2 rounded-full bg-blue-500"></span>
             {persona.title}
           </h4>
-          <div className="pl-4 border-l-2 border-blue-300/30">
+          <div className="text-slate-700 pl-4 border-l-2 border-slate-200/50">
             <ContentRenderer ast={persona.content} />
           </div>
         </div>
