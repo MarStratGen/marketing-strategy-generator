@@ -736,7 +736,44 @@ const SECTION_RENDERERS = {
 
 /* SPECIALIZED SECTION RENDERERS */
 function renderPersonas(ast) {
-  // Group consecutive heading+paragraph pairs
+  // Handle bullet point format from API
+  const personaBullets = ast.filter(block => 
+    block.type === 'list_item' && 
+    (block.content.includes('Primary Persona') || 
+     block.content.includes('Secondary Persona') || 
+     block.content.includes('Tertiary Persona'))
+  );
+  
+  if (personaBullets.length > 0) {
+    return (
+      <div className="space-y-6">
+        {personaBullets.map((bullet, index) => {
+          // Extract title and content from bullet
+          const content = bullet.content;
+          const colonIndex = content.indexOf(':');
+          const title = colonIndex > 0 ? content.substring(0, colonIndex) : 'Persona';
+          const description = colonIndex > 0 ? content.substring(colonIndex + 1).trim() : content;
+          
+          return (
+            <div key={index}>
+              <h6 className="font-bold text-slate-900 text-base flex items-center" 
+                  style={{ marginTop: index > 0 ? "24px" : "0px", marginBottom: "8px" }}>
+                <span className="text-blue-600 font-bold text-lg mr-3">•</span>
+                <span>{title}</span>
+              </h6>
+              <div style={{ marginLeft: "20px" }}>
+                <p className="text-slate-700" style={{ lineHeight: "1.6", marginBottom: "12px" }}>
+                  {description}
+                </p>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    );
+  }
+  
+  // Fallback to original logic for heading+content format
   const personas = [];
   let current = null;
   

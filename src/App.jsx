@@ -395,12 +395,6 @@ export default function App() {
 
         console.log("✅ === API RESPONSE RECEIVED ===");
         console.log("📦 Full response data:", data);
-        console.log("👥 PERSONAS DEBUG:", {
-          hasPersonas: !!data.personas,
-          personasType: typeof data.personas,
-          personasLength: data.personas?.length,
-          personasContent: data.personas
-        });
         
         if (data.market_foundation) {
           console.log("🏢 Market foundation content:", data.market_foundation);
