@@ -796,20 +796,18 @@ export default function App() {
           
           {/* Coffee Support Section */}
           <div className="text-center mb-10">
-            <div className="inline-block bg-gray-800/50 backdrop-blur-sm rounded-2xl px-8 py-6 border border-gray-700/50 shadow-lg">
-              <p className="text-gray-300 text-base font-medium mb-4 leading-relaxed">
-                This generator is free. If it helped, you can shout me a coffee.
-              </p>
-              <div className="flex justify-center">
-                <a href="https://www.buymeacoffee.com/marstrat" target="_blank">
-                  <img 
-                    src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" 
-                    alt="Buy Me A Coffee" 
-                    className="transition-transform duration-200 hover:scale-105 shadow-lg rounded-lg"
-                    style={{height: '60px', width: '217px'}} 
-                  />
-                </a>
-              </div>
+            <p className="text-gray-300 text-base font-medium mb-4 leading-relaxed">
+              This generator is free. If it helped, you can shout me a coffee.
+            </p>
+            <div className="flex justify-center">
+              <a href="https://www.buymeacoffee.com/marstrat" target="_blank">
+                <img 
+                  src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" 
+                  alt="Buy Me A Coffee" 
+                  className="transition-transform duration-200 hover:scale-105"
+                  style={{height: '60px', width: '217px'}} 
+                />
+              </a>
             </div>
           </div>
 
