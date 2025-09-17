@@ -331,6 +331,17 @@ function OptimizedContent({ data }) {
                 <p className="text-slate-700 leading-relaxed" style={{marginTop: '0px', marginBottom: '12px'}}>{channel.why_it_works}</p>
               )}
 
+              {channel.key_actions && channel.key_actions.length > 0 && (
+                <div style={{marginTop: '12px', marginBottom: '12px'}}>
+                  <h6 className="font-semibold text-slate-900 text-sm" style={{marginBottom: '4px'}}>Key Actions</h6>
+                  <ul className="text-slate-700 text-sm space-y-1 ml-4">
+                    {channel.key_actions.map((action, actionIndex) => (
+                      <li key={actionIndex} className="list-disc">{action}</li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+
               <p className="text-slate-700" style={{marginTop: '0px', marginBottom: '4px'}}>Purchase intent level: {channel.intent}</p>
               <p className="text-slate-700" style={{marginTop: '0px', marginBottom: '4px'}}>Funnel job: {channel.role}</p>
               {channel.success_metric && (
@@ -397,6 +408,17 @@ function OptimizedContent({ data }) {
 
           {data.why_it_works && (
             <p className="text-slate-700 leading-relaxed" style={{marginTop: '0px', marginBottom: '12px'}}>{data.why_it_works}</p>
+          )}
+
+          {data.key_actions && data.key_actions.length > 0 && (
+            <div style={{marginTop: '12px', marginBottom: '12px'}}>
+              <h6 className="font-semibold text-slate-900 text-sm" style={{marginBottom: '4px'}}>Key Actions</h6>
+              <ul className="text-slate-700 text-sm space-y-1 ml-4">
+                {data.key_actions.map((action, actionIndex) => (
+                  <li key={actionIndex} className="list-disc">{action}</li>
+                ))}
+              </ul>
+            </div>
           )}
 
           <p className="text-slate-700" style={{marginTop: '0px', marginBottom: '4px'}}>Purchase intent level: {intent}</p>
