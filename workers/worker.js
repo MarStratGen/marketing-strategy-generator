@@ -1,7 +1,7 @@
 /*  ─────────────────────────────────────────────
     Marketing Strategy Generator Worker - Optimized
     ───────────────────────────────────────────── */
-const MODEL_FAST = "gpt-4o-mini";
+const MODEL = "gpt-4o";
 
 export default {
   async fetch(req, env) {
@@ -59,16 +59,17 @@ export default {
       );
     }
 
-    /* 7. Parallel generation for speed */
+    /* 7. ULTRA-FAST PARALLEL GENERATION */
     try {
-      const systemPrompt = "Marketing strategist. Write in British English (en-GB spelling). No markdown. Use headings as plain text. Include named competitors prominently.";
+      // Ultra-compressed system prompt
+      const systemPrompt = "Expert marketing strategist. British English only. No markdown. Include named competitors prominently.";
       
-      const competitorText = form.competitors?.length ? form.competitors.join(", ") : "general market";
-      const audienceText = form.audiences?.join(", ") || "general market";
+      const competitorText = form.competitors?.length ? form.competitors.join(", ") : "market competitors";
+      const audienceText = form.audiences?.join(", ") || "target customers";
       
-      // Create 4 parallel requests
+      // 2 parallel requests (instead of 3) for maximum speed
       const promises = [
-        // Request 1: Market + Competitors (18s timeout)
+        // Request 1: Core Strategy (market + strategy + personas)
         fetch("https://api.openai.com/v1/chat/completions", {
           method: "POST",
           headers: {
@@ -76,19 +77,19 @@ export default {
             Authorization: `Bearer ${env.OPENAI_API_KEY}`
           },
           body: JSON.stringify({
-            model: MODEL_FAST,
-            temperature: 0.4,
-            max_tokens: 800,
+            model: MODEL,
+            temperature: 0.3,
+            max_tokens: 2000,
             response_format: { type: "json_object" },
             messages: [
               { role: "system", content: systemPrompt },
-              { role: "user", content: `Generate market foundation and competitor analysis for: ${form.product_type} in ${form.country} ${form.sector} sector. Competitors: ${competitorText}. JSON format: {"market_foundation": "Market Overview\\n[analysis]\\n\\nCustomer Behaviour\\n[insights]\\n\\nCompetitor Analysis\\n[specific competitor analysis]\\n\\nMarket Opportunities\\n[opportunities]", "competitors_brief": "[competitor analysis with named competitors]"}` }
+              { role: "user", content: `Generate comprehensive marketing strategy for ${form.product_type} in ${form.country} ${form.sector} sector. Target: ${audienceText}. Competitors: ${competitorText}. JSON: {"market_foundation": "Market Overview\\n[200 words]\\n\\nCustomer Behaviour\\n[150 words]\\n\\nCompetitor Analysis\\n[200 words including ${competitorText}]\\n\\nMarket Opportunities\\n[150 words]", "strategy_pillars": "Pillar 1: [name]\\n[150 words]\\n\\nPillar 2: [name]\\n[150 words]\\n\\nPillar 3: [name]\\n[150 words]", "personas": "Primary: [name]\\n[150 words]\\n\\nSecondary: [name]\\n[120 words]\\n\\nTertiary: [name]\\n[100 words]", "competitors_brief": "[250 words competitor analysis featuring ${competitorText}]", "differentiators": "Core Differentiation\\n[150 words]\\n\\nValue Proposition\\n[120 words]\\n\\nPositioning Statement\\n[80 words]"}` }
             ]
           }),
-          signal: AbortSignal.timeout(18000)
+          signal: AbortSignal.timeout(15000)
         }),
         
-        // Request 2: Strategy + Differentiation (18s timeout)
+        // Request 2: Implementation (7Ps + Planning + KPIs + Risks)
         fetch("https://api.openai.com/v1/chat/completions", {
           method: "POST",
           headers: {
@@ -96,63 +97,23 @@ export default {
             Authorization: `Bearer ${env.OPENAI_API_KEY}`
           },
           body: JSON.stringify({
-            model: MODEL_FAST,
-            temperature: 0.4,
-            max_tokens: 700,
+            model: MODEL,
+            temperature: 0.3,
+            max_tokens: 2200,
             response_format: { type: "json_object" },
             messages: [
               { role: "system", content: systemPrompt },
-              { role: "user", content: `Generate strategy pillars and differentiation for: ${form.product_type} targeting ${audienceText}. JSON format: {"strategy_pillars": "Pillar 1: [name]\\n[strategy]\\n\\nPillar 2: [name]\\n[strategy]\\n\\nPillar 3: [name]\\n[strategy]", "differentiators": "Core Differentiation\\n[strategy]\\n\\nValue Proposition\\n[framework]\\n\\nPositioning Statement\\n[statement]"}` }
+              { role: "user", content: `Generate implementation plan for ${form.product_type} business in ${form.country} ${form.sector}. JSON: {"seven_ps": "Product\\n[120 words]\\n\\nPrice\\n[120 words]\\n\\nPlace\\n[120 words]\\n\\nPromotion\\n[120 words]\\n\\nPeople\\n[100 words]\\n\\nProcess\\n[100 words]\\n\\nPhysical Evidence\\n[100 words]", "calendar_next_90_days": "Week 1-2: Foundation Phase\\n[specific weekly activities]\\n\\nWeek 3-4: Launch Phase\\n[specific weekly activities]\\n\\nWeek 5-8: Scaling Phase\\n[specific weekly activities]\\n\\nWeek 9-12: Optimisation Phase\\n[specific weekly activities]", "kpis": "Channel KPIs\\n[150 words]\\n\\nBusiness KPIs\\n[150 words]\\n\\nMeasurement Framework\\n[120 words]", "risks_and_safety_nets": "Primary Risks\\n[150 words]\\n\\nMitigation Strategies\\n[150 words]\\n\\nContingency Plans\\n[120 words]"}` }
             ]
           }),
-          signal: AbortSignal.timeout(18000)
-        }),
-        
-        // Request 3: Personas + 7Ps (18s timeout)
-        fetch("https://api.openai.com/v1/chat/completions", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${env.OPENAI_API_KEY}`
-          },
-          body: JSON.stringify({
-            model: MODEL_FAST,
-            temperature: 0.4,
-            max_tokens: 900,
-            response_format: { type: "json_object" },
-            messages: [
-              { role: "system", content: systemPrompt },
-              { role: "user", content: `Generate personas and 7Ps for: ${form.product_type} in ${form.country}. Target: ${audienceText}. JSON format: {"personas": "Primary: [name]\\n[description]\\n\\nSecondary: [name]\\n[description]\\n\\nTertiary: [name]\\n[description]", "seven_ps": "Product\\n[strategy]\\n\\nPrice\\n[strategy]\\n\\nPlace\\n[strategy]\\n\\nPromotion\\n[strategy]\\n\\nPeople\\n[strategy]\\n\\nProcess\\n[strategy]\\n\\nPhysical Evidence\\n[strategy]"}` }
-            ]
-          }),
-          signal: AbortSignal.timeout(18000)
-        }),
-        
-        // Request 4: Planning sections (18s timeout)
-        fetch("https://api.openai.com/v1/chat/completions", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${env.OPENAI_API_KEY}`
-          },
-          body: JSON.stringify({
-            model: MODEL_FAST,
-            temperature: 0.4,
-            max_tokens: 800,
-            response_format: { type: "json_object" },
-            messages: [
-              { role: "system", content: systemPrompt },
-              { role: "user", content: `Generate planning sections for ${form.product_type} business in ${form.sector}. JSON format: {"calendar_next_90_days": "Month 1: Foundation\\n[activities]\\n\\nMonth 2: Scaling\\n[activities]\\n\\nMonth 3: Optimisation\\n[activities]", "kpis": "Channel KPIs\\n[metrics]\\n\\nBusiness KPIs\\n[outcomes]\\n\\nMeasurement Framework\\n[tools]", "risks_and_safety_nets": "Business Risks\\n[specific risks]\\n\\nMitigation Strategies\\n[solutions]", "experiments": "Priority Tests\\n[experiments]\\n\\nTesting Framework\\n[methodology]"}` }
-            ]
-          }),
-          signal: AbortSignal.timeout(18000)
+          signal: AbortSignal.timeout(15000)
         })
       ];
       
-      // Wait for all requests (max 18s wall time)
+      // Execute in parallel (max 15 seconds)
       const responses = await Promise.all(promises);
       
-      // Parse responses
+      // Parse responses with error handling
       const results = await Promise.all(
         responses.map(async (response, index) => {
           if (!response.ok) {
@@ -170,53 +131,120 @@ export default {
         })
       );
       
-      const [marketData, strategyData, personaData, planningData] = results;
+      const [strategyData, implementationData] = results;
       
-      // Generate channel playbook deterministically (instant)
+      // Generate channel playbook with QUALITY content (not templated)
       const channelByMotion = {
         ecom_checkout: [
-          { channel: "Search advertising", intent: "High", role: "Capture" },
-          { channel: "Paid social media", intent: "Mid", role: "Spark demand" },
-          { channel: "Email marketing", intent: "Mid", role: "Nurture" },
-          { channel: "Influencer partnerships", intent: "Mid", role: "Social proof" },
-          { channel: "Direct mail campaigns", intent: "Mid", role: "Target locals" }
+          { 
+            channel: "Search advertising", 
+            intent: "High", 
+            role: "Capture purchase-ready customers",
+            summary: "Target high-intent search queries to capture customers actively looking to purchase. Focus on product-specific keywords and commercial terms.",
+            key_actions: ["Launch Google Ads campaigns targeting purchase keywords", "Implement Shopping campaigns for product visibility", "Optimise landing pages for conversion"],
+            success_metric: "Cost per acquisition and conversion rate",
+            budget_percent: 35,
+            why_it_works: "Search advertising captures customers at the moment of purchase intent, delivering the highest conversion rates and ROI for ecommerce businesses."
+          },
+          { 
+            channel: "Paid social media", 
+            intent: "Mid", 
+            role: "Generate demand and social proof",
+            summary: "Use targeted social advertising to create awareness, showcase products, and drive traffic through engaging visual content and social proof.",
+            key_actions: ["Launch Facebook and Instagram campaigns", "Create engaging visual content showcasing products", "Implement retargeting campaigns for website visitors"],
+            success_metric: "Click-through rate and social engagement",
+            budget_percent: 25,
+            why_it_works: "Social media allows you to reach customers in discovery mode, build brand awareness, and create social proof through user-generated content."
+          },
+          { 
+            channel: "Email marketing", 
+            intent: "Mid", 
+            role: "Nurture leads and encourage repeat purchases",
+            summary: "Develop automated email sequences to nurture prospects, recover abandoned carts, and encourage repeat purchases from existing customers.",
+            key_actions: ["Set up abandoned cart recovery sequences", "Create welcome series for new subscribers", "Develop retention campaigns for existing customers"],
+            success_metric: "Email open rates and click-to-purchase conversion",
+            budget_percent: 20,
+            why_it_works: "Email marketing provides direct access to interested prospects and customers, offering excellent ROI through personalised messaging and automation."
+          },
+          { 
+            channel: "Influencer partnerships", 
+            intent: "Mid", 
+            role: "Build trust through authentic recommendations",
+            summary: "Partner with relevant influencers to showcase products authentically, reaching engaged audiences who trust their recommendations.",
+            key_actions: ["Identify micro-influencers in your niche", "Develop product collaboration programmes", "Track referral codes and affiliate links"],
+            success_metric: "Influencer referral conversions and brand mention engagement",
+            budget_percent: 15,
+            why_it_works: "Influencer partnerships leverage trusted voices to reach engaged audiences, providing social proof and authentic product recommendations."
+          },
+          { 
+            channel: "Direct mail campaigns", 
+            intent: "Mid", 
+            role: "Create tangible brand experiences",
+            summary: "Use targeted direct mail to create memorable brand touchpoints, especially effective for premium products and local markets.",
+            key_actions: ["Design premium catalogue mailings", "Target high-value postcode areas", "Include exclusive discount codes for tracking"],
+            success_metric: "Response rate and mail-to-purchase conversion",
+            budget_percent: 5,
+            why_it_works: "Direct mail cuts through digital noise, creating tangible brand experiences that drive consideration and purchase, especially for premium products."
+          }
         ],
         saas_checkout: [
-          { channel: "Search advertising", intent: "High", role: "Capture" },
-          { channel: "Content marketing", intent: "Mid", role: "Educate" },
-          { channel: "LinkedIn advertising", intent: "Mid", role: "Target professionals" },
-          { channel: "Webinars and demos", intent: "High", role: "Convert" },
-          { channel: "Trade publications", intent: "Mid", role: "Industry reach" }
-        ],
-        store_visit: [
-          { channel: "Local search advertising", intent: "High", role: "Drive visits" },
-          { channel: "Radio advertising", intent: "Mid", role: "Build awareness" },
-          { channel: "Local print advertising", intent: "Mid", role: "Community presence" },
-          { channel: "Outdoor advertising", intent: "Low", role: "Brand visibility" },
-          { channel: "Direct mail campaigns", intent: "Mid", role: "Target locals" }
-        ],
-        lead_capture: [
-          { channel: "Search advertising", intent: "High", role: "Capture" },
-          { channel: "LinkedIn advertising", intent: "Mid", role: "B2B targeting" },
-          { channel: "Trade publications", intent: "Mid", role: "Industry reach" },
-          { channel: "Trade shows and exhibitions", intent: "High", role: "Face-to-face" },
-          { channel: "Direct mail campaigns", intent: "Mid", role: "Targeted outreach" }
+          {
+            channel: "Search advertising",
+            intent: "High",
+            role: "Capture solution-seeking prospects",
+            summary: "Target problem-focused and solution keywords to capture prospects actively seeking software solutions like yours.",
+            key_actions: ["Launch campaigns targeting problem-solution keywords", "Create landing pages for specific use cases", "Implement free trial sign-up tracking"],
+            success_metric: "Cost per trial signup and trial-to-paid conversion",
+            budget_percent: 35,
+            why_it_works: "Search advertising captures prospects when they're actively seeking solutions, providing high-quality leads ready to evaluate your software."
+          },
+          {
+            channel: "Content marketing",
+            intent: "Mid",
+            role: "Educate prospects and build authority",
+            summary: "Create valuable content that educates prospects about their challenges whilst positioning your solution as the answer.",
+            key_actions: ["Develop comprehensive guides and case studies", "Create video tutorials and demos", "Optimise content for search engines"],
+            success_metric: "Content engagement and content-to-trial conversion",
+            budget_percent: 25,
+            why_it_works: "Content marketing builds trust and authority whilst educating prospects, creating a natural path from awareness to consideration."
+          },
+          {
+            channel: "LinkedIn advertising",
+            intent: "Mid",
+            role: "Target decision-makers professionally",
+            summary: "Use LinkedIn's professional targeting to reach decision-makers and influencers in companies that match your ideal customer profile.",
+            key_actions: ["Launch account-based marketing campaigns", "Target by job title and company size", "Create professional thought leadership content"],
+            success_metric: "LinkedIn lead quality and professional engagement",
+            budget_percent: 20,
+            why_it_works: "LinkedIn provides access to professional decision-makers in a business context, ideal for B2B software sales and lead generation."
+          },
+          {
+            channel: "Webinars and demos",
+            intent: "High",
+            role: "Demonstrate value and convert trials",
+            summary: "Host educational webinars and product demonstrations to showcase your software's capabilities and convert interested prospects.",
+            key_actions: ["Schedule regular product demonstration sessions", "Create educational webinar content", "Follow up with attendees personally"],
+            success_metric: "Webinar attendance and demo-to-signup conversion",
+            budget_percent: 15,
+            why_it_works: "Webinars and demos allow prospects to see your software in action, addressing objections and demonstrating clear value propositions."
+          },
+          {
+            channel: "Trade publications",
+            intent: "Mid",
+            role: "Build industry credibility",
+            summary: "Advertise in respected industry publications to build credibility and reach decision-makers who trust these authoritative sources.",
+            key_actions: ["Place adverts in relevant trade magazines", "Contribute thought leadership articles", "Sponsor industry newsletters"],
+            success_metric: "Publication response and industry recognition",
+            budget_percent: 5,
+            why_it_works: "Trade publications provide credibility and reach decision-makers who rely on industry sources for software recommendations."
+          }
         ]
       };
       
-      const channels = channelByMotion[form.motion] || channelByMotion.ecom_checkout;
-      const percentages = [35, 25, 20, 15, 5];
+      // Get channels for motion or default to ecom
+      const motionChannels = channelByMotion[form.motion] || channelByMotion.ecom_checkout;
       
-      const channelPlaybook = channels.slice(0, 5).map((channel, index) => ({
-        ...channel,
-        summary: `Deploy ${channel.channel.toLowerCase()} to ${channel.role.toLowerCase()}. Execute targeted campaigns through proven methods whilst tracking performance metrics. Launch initiatives to achieve strategic objectives.`,
-        key_actions: [`Launch ${channel.channel.toLowerCase()} campaign`, "Execute targeting strategy", "Implement measurement framework"],
-        success_metric: `Track ${channel.intent.toLowerCase()}-intent conversions`,
-        budget_percent: percentages[index] || 5,
-        why_it_works: `This channel works effectively for ${form.motion} because it captures ${channel.intent.toLowerCase()}-intent customers at the right moment.`
-      }));
-      
-      // Assemble final response
+      // Determine goal
       const derivedGoal = form.motion === "custom" && form.action_custom 
         ? `Goal aligned to: ${form.action_custom}`
         : {
@@ -226,6 +254,7 @@ export default {
             lead_capture: "Qualified leads"
           }[form.motion] || "Business growth";
       
+      // Assemble final response with quality fallbacks
       let json = {
         meta: {
           title: "Marketing Strategy Report",
@@ -233,21 +262,20 @@ export default {
           sector: form.sector || "General",
           goal: derivedGoal
         },
-        market_foundation: marketData?.market_foundation || "Market analysis shows strong growth potential in this sector with increasing customer demand.",
-        strategy_pillars: strategyData?.strategy_pillars || "Pillar 1: Customer Focus\nPrioritise customer satisfaction and retention through exceptional service delivery.\n\nPillar 2: Market Differentiation\nEstablish clear competitive advantages through unique value propositions.\n\nPillar 3: Operational Excellence\nOptimise processes and systems to deliver consistent, high-quality results.",
-        personas: personaData?.personas || "Primary: Target Customer\nPrimary segment demonstrates strong purchasing intent and values quality solutions.\n\nSecondary: Secondary Market\nThis segment shows growing interest and represents expansion opportunities.\n\nTertiary: Emerging Segment\nEmerging customer group with future growth potential.",
-        competitors_brief: marketData?.competitors_brief || `The competitive landscape includes ${competitorText} among other market players. Analysis shows opportunities for differentiation through superior customer experience and targeted positioning.`,
-        differentiators: strategyData?.differentiators || "Core Differentiation\nPosition the brand through superior quality and customer service excellence.\n\nValue Proposition\nDeliver exceptional value through innovative solutions and customer-centric approach.\n\nPositioning Statement\nFor customers who value quality, this brand delivers superior results through proven expertise.",
-        seven_ps: personaData?.seven_ps || "Product\nDevelop high-quality offerings that meet customer needs and exceed expectations.\n\nPrice\nImplement value-based pricing that reflects quality whilst remaining competitive.\n\nPlace\nEstablish distribution channels that maximise customer convenience and accessibility.\n\nPromotion\nExecute integrated marketing communications to build awareness and drive engagement.\n\nPeople\nDevelop team capabilities to deliver exceptional customer experiences.\n\nProcess\nOptimise operations to ensure consistent quality and efficient service delivery.\n\nPhysical Evidence\nCreate tangible elements that reinforce brand quality and professionalism.",
-        channel_playbook: channelPlaybook,
+        market_foundation: strategyData?.market_foundation || "Market analysis shows strong growth potential in this sector with increasing customer demand and clear opportunities for well-positioned businesses to capture market share through strategic positioning and targeted marketing approaches.",
+        strategy_pillars: strategyData?.strategy_pillars || "Pillar 1: Customer Excellence\nDevelop deep customer understanding and deliver exceptional experiences that exceed expectations whilst building long-term loyalty and advocacy.\n\nPillar 2: Market Leadership\nEstablish thought leadership and competitive advantage through innovation, quality excellence, and strategic positioning in key market segments.\n\nPillar 3: Operational Efficiency\nOptimise operational processes and systems to deliver consistent quality, reduce costs, and enable scalable growth whilst maintaining service excellence.",
+        personas: strategyData?.personas || "Primary Persona: Core Customer\nRepresents the primary target segment with strong purchasing power and clear need for your solution. These customers value quality and reliability above price.\n\nSecondary Persona: Growth Opportunity\nEmerging customer segment showing increasing interest and purchasing potential. Represents expansion opportunities with specific needs and preferences.\n\nTertiary Persona: Future Market\nForward-looking segment that may become important over time. Early adopters who influence broader market trends and adoption patterns.",
+        competitors_brief: strategyData?.competitors_brief || `The competitive landscape includes ${competitorText} as key market players alongside other established competitors. Analysis reveals opportunities for differentiation through superior customer experience, innovative solutions, and strategic market positioning that addresses unmet customer needs.`,
+        differentiators: strategyData?.differentiators || "Core Differentiation\nEstablish clear competitive advantages through superior quality, exceptional customer service, and innovative solutions that address specific market gaps competitors haven't adequately addressed.\n\nValue Proposition\nDeliver exceptional value through proven expertise, personalised service approaches, and results-driven solutions that consistently exceed customer expectations and industry standards.\n\nPositioning Statement\nFor customers who demand excellence and reliability, we deliver superior results through innovative solutions, proven expertise, and unwavering commitment to customer success.",
+        seven_ps: implementationData?.seven_ps || "Product\nDevelop high-quality offerings that precisely meet customer needs through continuous innovation, quality assurance, and customer feedback integration for market-leading solutions.\n\nPrice\nImplement value-based pricing that reflects quality and innovation whilst remaining competitive and accessible to target customer segments through strategic pricing architecture.\n\nPlace\nEstablish optimised distribution channels that maximise customer convenience, accessibility, and reach through strategic partnerships and multi-channel presence.\n\nPromotion\nExecute integrated marketing communications that build awareness, drive engagement, and establish thought leadership through consistent messaging across all touchpoints.\n\nPeople\nDevelop team capabilities and customer-focused culture that delivers exceptional experiences through continuous training, empowerment, and performance excellence.\n\nProcess\nOptimise operational processes to ensure consistent quality, efficient service delivery, and seamless customer journeys across all interactions and touchpoints.\n\nPhysical Evidence\nCreate tangible brand elements that reinforce quality, professionalism, and credibility through consistent visual identity, professional facilities, and service standards.",
+        channel_playbook: motionChannels,
         budget: {
           band: form.budget_band || "Low",
-          allocation: `Primary Allocation\n${channelPlaybook[0]?.channel}: ${channelPlaybook[0]?.budget_percent}% to ${channelPlaybook[0]?.role.toLowerCase()}.\n\nSecondary Allocation\n${channelPlaybook[1]?.channel}: ${channelPlaybook[1]?.budget_percent}% to ${channelPlaybook[1]?.role.toLowerCase()}.\n\nSupporting Channels\n${channelPlaybook[2]?.channel}: ${channelPlaybook[2]?.budget_percent}% to ${channelPlaybook[2]?.role.toLowerCase()}.\n\nAllocation Rationale\nPrioritise the primary channel to capture high-intent demand whilst supporting with secondary channels for comprehensive market coverage.`
+          allocation: `Primary Channel Investment\n${motionChannels[0]?.channel}: ${motionChannels[0]?.budget_percent}% allocated to ${motionChannels[0]?.role} with focus on high-conversion activities.\n\nSecondary Channel Support\n${motionChannels[1]?.channel}: ${motionChannels[1]?.budget_percent}% dedicated to ${motionChannels[1]?.role} for comprehensive market coverage.\n\nSupporting Channels\n${motionChannels[2]?.channel}: ${motionChannels[2]?.budget_percent}% investment in ${motionChannels[2]?.role} activities.\n${motionChannels[3]?.channel}: ${motionChannels[3]?.budget_percent}% allocation for ${motionChannels[3]?.role} initiatives.\n${motionChannels[4]?.channel}: ${motionChannels[4]?.budget_percent}% reserved for ${motionChannels[4]?.role} programmes.\n\nStrategic Rationale\nThis allocation prioritises high-impact channels that capture immediate demand whilst building broader market awareness and long-term brand equity through diversified channel investment.`
         },
-        calendar_next_90_days: planningData?.calendar_next_90_days || "Month 1: Foundation\nEstablish core marketing infrastructure and launch primary campaigns.\n\nMonth 2: Scaling\nExpand successful initiatives and optimise performance across channels.\n\nMonth 3: Optimisation\nRefine strategies based on performance data and prepare for next quarter.",
-        kpis: planningData?.kpis || "Channel KPIs\nTrack channel-specific metrics including conversion rates, cost per acquisition, and engagement levels.\n\nBusiness KPIs\nMonitor revenue growth, customer acquisition, and market share expansion.\n\nMeasurement Framework\nImplement analytics tools and regular reporting to track performance and inform decisions.",
-        risks_and_safety_nets: planningData?.risks_and_safety_nets || "Business Risks\nMarket competition, economic fluctuations, and changing customer preferences.\n\nMitigation Strategies\nDiversify marketing channels, maintain financial reserves, and implement agile response capabilities.",
-        experiments: planningData?.experiments || "Priority Tests\nExecute A/B tests on messaging, targeting, and channel performance.\n\nTesting Framework\nImplement systematic testing with statistical significance and clear success metrics."
+        calendar_next_90_days: implementationData?.calendar_next_90_days || "Week 1-2: Foundation Phase\nEstablish core marketing infrastructure, set up tracking systems, and launch primary campaign initiatives with baseline measurement frameworks.\n\nWeek 3-4: Launch Phase\nExecute main marketing campaigns across priority channels, implement customer acquisition activities, and begin performance monitoring and optimisation.\n\nWeek 5-8: Scaling Phase\nExpand successful initiatives, optimise underperforming channels, introduce secondary marketing tactics, and scale winning campaigns for broader reach.\n\nWeek 9-12: Optimisation Phase\nRefine strategies based on performance data, implement advanced tactics, prepare next quarter initiatives, and document learnings for future campaigns.",
+        kpis: implementationData?.kpis || "Channel KPIs\nTrack channel-specific performance metrics including conversion rates, cost per acquisition, customer lifetime value, and return on advertising spend for each marketing channel and campaign.\n\nBusiness KPIs\nMonitor overall business performance through revenue growth, customer acquisition costs, market share expansion, customer satisfaction scores, and competitive positioning metrics.\n\nMeasurement Framework\nImplement comprehensive analytics infrastructure with real-time dashboards, regular reporting cadence, and data-driven decision-making processes for continuous optimisation and strategic adjustment.",
+        risks_and_safety_nets: implementationData?.risks_and_safety_nets || "Primary Risks\nMarket competition intensification, economic fluctuations affecting customer spending, changing customer preferences, and potential supply chain or operational disruptions that could impact business performance.\n\nMitigation Strategies\nDiversify marketing channels to reduce dependency, maintain financial reserves for market volatility, implement agile response capabilities, and establish strong customer relationships for retention and loyalty.\n\nContingency Plans\nDevelop alternative channel strategies, establish emergency budget reallocation procedures, create crisis communication protocols, and maintain flexible operational capacity for rapid market response."
       };
       
       // Apply British English normalization
@@ -259,7 +287,7 @@ export default {
       console.error('Worker error:', e.message);
       if (e.name === 'TimeoutError' || e.message.includes('timeout') || e.message.includes('aborted')) {
         return new Response(
-          JSON.stringify({ error: "AI service is taking longer than expected. Please try again with a simpler request or check your connection." }),
+          JSON.stringify({ error: "AI service is taking longer than expected. Please try again." }),
           cors(408, origin)
         );
       }
