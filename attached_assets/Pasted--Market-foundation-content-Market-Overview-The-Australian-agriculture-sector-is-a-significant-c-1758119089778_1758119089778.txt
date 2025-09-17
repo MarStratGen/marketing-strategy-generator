@@ -1,0 +1,45 @@
+🏢 Market foundation content: • Market Overview
+The Australian agriculture sector is a significant contributor to the national economy, with tractors being a critical component in farm operations. The market is characterised by a mix of large-scale commercial farms and smaller family-owned operations. Demand for tractors is driven by the need for efficiency and productivity improvements, as well as the replacement of ageing machinery.
+
+• Customer Behaviour
+Farmers in Australia are increasingly tech-savvy, valuing tractors that offer advanced technology for precision farming. They are price-sensitive but willing to invest in quality equipment that promises long-term savings and efficiency. Brand loyalty is strong, but farmers are open to switching if a competitor offers superior technology or better service.
+
+• Market Opportunities
+• Growing interest in sustainable and precision agriculture creates demand for tractors with advanced technology. • Government incentives for modernising agricultural equipment can boost sales. • Increasing farm sizes and consolidation trends require more powerful and efficient tractors.
+
+• Competitor Analysis
+amazon: Amazon is primarily known for its e-commerce platform, offering a wide range of products including agricultural equipment. They position themselves as a convenient, one-stop shop for farmers looking for competitive pricing and fast delivery. Strengths include • Extensive distribution network and logistics capabilities. • Competitive pricing due to economies of scale. • Strong brand recognition and customer trust. However, • Limited specialised customer service for agricultural products. • Lack of physical presence for direct product demonstrations and support. • Perceived as a generalist rather than a specialist in agriculture. This creates opportunities to • Emphasise specialised customer service and support tailored to agricultural needs. • Highlight the benefits of in-person demonstrations and local expertise. • Develop a strong after-sales service network to build long-term relationships. Console.js:61:15
+🔍 Competitors found in market foundation: 
+Array [ "amazon" ]
+​
+0: "amazon"
+​
+length: 1
+​
+<prototype>: Array []
+Console.js:61:15
+❓ Missing competitors: 
+Array []
+​
+length: 0
+​
+<prototype>: Array []
+Console.js:61:15
+📊 Competitors brief content: • Competitor Analysis
+amazon: Amazon is primarily known for its e-commerce platform, offering a wide range of products including agricultural equipment. They position themselves as a convenient, one-stop shop for farmers looking for competitive pricing and fast delivery. Strengths include • Extensive distribution network and logistics capabilities. • Competitive pricing due to economies of scale. • Strong brand recognition and customer trust. However, • Limited specialised customer service for agricultural products. • Lack of physical presence for direct product demonstrations and support. • Perceived as a generalist rather than a specialist in agriculture. This creates opportunities to • Emphasise specialised customer service and support tailored to agricultural needs. • Highlight the benefits of in-person demonstrations and local expertise. • Develop a strong after-sales service network to build long-term relationships. Console.js:61:15
+🔍 Competitors found in brief: 
+Array [ "amazon" ]
+​
+0: "amazon"
+​
+length: 1
+​
+<prototype>: Array []
+Console.js:61:15
+❓ Missing from brief: 
+Array []
+​
+length: 0
+​
+<prototype>: Array []
+Console.js:61:15
