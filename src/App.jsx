@@ -152,8 +152,6 @@ export default function App() {
 
   const [result, setResult] = useState(null);
   const [loading, setLoading] = useState(false);
-  const [streaming, setStreaming] = useState(false);
-  const [streamingContent, setStreamingContent] = useState("");
   const [error, setErr] = useState("");
 
   /* ----- autofocus helpers for custom fields ----- */
@@ -298,9 +296,7 @@ export default function App() {
     flushSync(() => {
       setErr("");
       setResult(null);
-      setStreamingContent("");
       setLoading(true);
-      setStreaming(true);
     });
 
     // Flush any pending input to pills before validation
@@ -316,7 +312,6 @@ export default function App() {
       flushSync(() => {
         setErr("Please select a country.");
         setLoading(false);
-        setStreaming(false);
       });
       return;
     }
@@ -325,7 +320,6 @@ export default function App() {
       flushSync(() => {
         setErr("Please describe what you're selling.");
         setLoading(false);
-        setStreaming(false);
       });
       return;
     }
@@ -334,189 +328,74 @@ export default function App() {
       flushSync(() => {
         setErr("Please add at least one target segment.");
         setLoading(false);
-        setStreaming(false);
       });
       return;
     }
 
-    try {
-      const body = {
-        country: finalCountry,
-        sector: finalSector,
-        product_type: offering,
-        audiences: segments,
-        competitors,
+    const body = {
+      country: finalCountry,
+      sector: finalSector,
+      product_type: offering,
+      audiences: segments,
+      competitors,
 
-        motion: motion === "__custom_motion" ? "custom" : motion,
-        action_custom: motion === "__custom_motion" ? customMotion : undefined,
+      motion: motion === "__custom_motion" ? "custom" : motion,
+      action_custom: motion === "__custom_motion" ? customMotion : undefined,
 
-        budget_band: budgetBand,
-      };
+      budget_band: budgetBand,
+    };
 
-      console.log("Attempting to submit form with data:", body);
+    console.log("Attempting to submit form with data:", body);
 
-      // Create fetch with timeout helper
-      const fetchWithTimeout = async (url, options, timeout = 15000) => {
-        const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), timeout);
-        
-        try {
-          const response = await fetch(url, {
-            ...options,
-            signal: controller.signal,
-          });
-          clearTimeout(timeoutId);
-          return response;
-        } catch (error) {
-          clearTimeout(timeoutId);
-          if (error.name === 'AbortError') {
-            throw new Error('Request timed out after 15 seconds');
-          }
-          throw error;
-        }
-      };
-
-      // Try streaming first
+    // Create fetch with timeout helper
+    const fetchWithTimeout = async (url, options, timeout = 45000) => {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), timeout);
+      
       try {
-        console.log("Attempting streaming request to:", STREAM_URL);
+        const response = await fetch(url, {
+          ...options,
+          signal: controller.signal,
+        });
+        clearTimeout(timeoutId);
+        return response;
+      } catch (error) {
+        clearTimeout(timeoutId);
+        if (error.name === 'AbortError') {
+          throw new Error('Request timed out after 45 seconds');
+        }
+        throw error;
+      }
+    };
+
+    // Make direct API request (no streaming)
+    try {
+      console.log("Making request to:", WORKER_URL);
         
-        const response = await fetchWithTimeout(STREAM_URL, {
+        const response = await fetchWithTimeout(WORKER_URL, {
           method: "POST",
           headers: { 
-            "Content-Type": "application/json",
-            "Accept": "text/event-stream"
+            "Content-Type": "application/json"
           },
           body: JSON.stringify(body),
         });
 
-        console.log("Streaming response status:", response.status);
-        console.log("Streaming response headers:", Object.fromEntries(response.headers.entries()));
+        console.log("Response status:", response.status);
+        console.log("Response headers:", Object.fromEntries(response.headers.entries()));
 
         if (!response.ok) {
           const errorText = await response.text();
-          console.error("Streaming response error:", errorText);
-          throw new Error(`Streaming failed: ${response.status} - ${errorText || "No error details"}`);
+          console.error("API response error:", errorText);
+          throw new Error(`Request failed: ${response.status} - ${errorText || "No error details"}`);
         }
 
-        // Handle streaming response
-        const reader = response.body.getReader();
-        const textDecoder = new TextDecoder();
-        let buffer = "";
-        let completeJsonStr = "";
-        let finalPlanReceived = false;
-
-        setLoading(false); // Start showing streaming content
-
-        while (true) {
-          const { done, value } = await reader.read();
-          if (done) {
-            // Stream ended - check if we got final plan
-            if (!finalPlanReceived) {
-              throw new Error(
-                "Stream ended without final plan - falling back to regular request",
-              );
-            }
-            break;
-          }
-
-          // Decode chunk with streaming support
-          const chunk = textDecoder.decode(value, { stream: true });
-          buffer += chunk;
-
-          // Process complete lines from buffer (handle both \n and \r\n)
-          const lines = buffer.split(/\r?\n/);
-          buffer = lines.pop() || ""; // Keep incomplete line in buffer
-
-          for (const line of lines) {
-            if (line.trim() === "") continue;
-            if (line.startsWith("data: ")) {
-              const data = line.slice(6);
-              if (data === "[DONE]") {
-                // Don't hide streaming UI yet - wait for final event or fallback
-                continue;
-              }
-
-              try {
-                const parsed = JSON.parse(data);
-
-                // Handle final plan event
-                if (parsed.type === "final" && parsed.plan) {
-                  setResult(parsed.plan);
-                  setStreamingContent("");
-                  finalPlanReceived = true;
-                  setStreaming(false);
-                  return;
-                }
-
-                // Handle streaming content
-                if (parsed.content) {
-                  completeJsonStr += parsed.content;
-                  setStreamingContent(completeJsonStr);
-                }
-
-                if (parsed.error) {
-                  throw new Error(parsed.error);
-                }
-              } catch (e) {
-                // Skip invalid JSON chunks
-                console.log("Skipping invalid SSE chunk:", e);
-              }
-            }
-          }
-        }
-      } catch (streamError) {
-        console.log(
-          "Streaming failed, falling back to regular request:",
-          streamError,
-        );
-
-        // Fallback to non-streaming
-        console.log("Attempting fallback request to:", WORKER_URL);
-        
-        const r = await fetchWithTimeout(WORKER_URL, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(body),
-        });
-
-        console.log("Fallback response status:", r.status);
-
-        if (!r.ok) {
-          const errorText = await r.text();
-          console.error("Fallback API Error:", errorText);
-          throw new Error(`API returned ${r.status}: ${errorText || "No error details"}`);
-        }
-
-        const responseText = await r.text();
-        console.log("Fallback response text length:", responseText.length);
-
-        if (!responseText || responseText.trim() === "") {
-          throw new Error(
-            "Cloudflare Worker returned empty response. Please check the Worker configuration and ensure it has an OpenAI API key.",
-          );
-        }
-
-        let data;
-        try {
-          data = JSON.parse(responseText);
-        } catch (parseError) {
-          console.error("JSON Parse Error:", parseError);
-          console.error("Response text that failed to parse:", responseText);
-          throw new Error(
-            `Worker returned invalid JSON: ${responseText.substring(0, 100)}...`,
-          );
-        }
-
-        // Check for Worker-level errors
+        // Handle JSON response  
+        const data = await response.json();
         if (data.error) {
-          throw new Error(
-            `Worker error: ${data.error} - ${data.detail || "No details available"}`,
-          );
+          throw new Error(data.error);
         }
 
         setResult(data);
-        setStreamingContent("");
-      }
     } catch (err) {
       console.error("Form submission error:", err);
       const errorMessage = err.message || "Something went wrong.";
@@ -567,10 +446,8 @@ export default function App() {
       } else {
         setErr(`Error: ${errorMessage}`);
       }
-      setStreamingContent("");
     } finally {
       setLoading(false);
-      setStreaming(false);
     }
   }, [country, customCountry, sector, customSector, offering, segments, segInp, competitors, compInp, motion, customMotion, budgetBand]);
 
@@ -830,24 +707,17 @@ export default function App() {
 
               {/* submit */}
               <button
-                disabled={loading || streaming}
+                disabled={loading}
                 className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white text-lg font-semibold py-4 px-6 rounded-xl transition-all duration-200 disabled:opacity-60 shadow-lg hover:shadow-xl mt-8"
               >
                 {loading ? (
                   <LoadingSpinner />
-                ) : streaming ? (
-                  <div className="inline-flex items-center">
-                    <div className="animate-pulse rounded-full h-5 w-5 bg-white/30 mr-3"></div>
-                    <span>Streaming your strategy…</span>
-                  </div>
                 ) : (
                   "Generate Marketing Strategy"
                 )}
               </button>
               <p className="text-sm text-gray-500 text-center mt-2">
-                {streaming
-                  ? "Content appears in real-time"
-                  : "Usually takes 15-30 seconds"}
+                Usually takes 20-45 seconds
               </p>
             </form>
           </div>
@@ -856,8 +726,6 @@ export default function App() {
           <Report
             plan={result}
             loading={loading}
-            streaming={streaming}
-            streamingContent={streamingContent}
           />
         </div>
       </div>
