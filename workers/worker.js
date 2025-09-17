@@ -3,6 +3,29 @@
     ───────────────────────────────────────────── */
 const MODEL = "gpt-4o";
 
+// Sanitization function to remove markdown and normalize formatting
+function sanitizeContent(obj) {
+  if (typeof obj === 'string') {
+    return obj
+      .replace(/\*\*(.*?)\*\*/g, '$1')  // Remove **bold**
+      .replace(/\*(.*?)\*/g, '$1')      // Remove *italic*
+      .replace(/__(.*?)__/g, '$1')      // Remove __underline__
+      .replace(/#{1,6}\s/g, '')         // Remove # headings
+      .replace(/[-*]\s/g, '• ')         // Normalize bullets to •
+      .replace(/\n{3,}/g, '\n\n')       // Collapse multiple newlines
+      .trim();
+  } else if (Array.isArray(obj)) {
+    return obj.map(item => sanitizeContent(item));
+  } else if (obj && typeof obj === 'object') {
+    const sanitized = {};
+    for (const [key, value] of Object.entries(obj)) {
+      sanitized[key] = sanitizeContent(value);
+    }
+    return sanitized;
+  }
+  return obj;
+}
+
 export default {
   async fetch(req, env) {
     const origin = req.headers.get('Origin');
@@ -64,9 +87,9 @@ export default {
       const competitorText = form.competitors?.length ? form.competitors.join(", ") : "market competitors";
       const audienceText = form.audiences?.join(", ") || "target customers";
       
-      // Create abort controller for 22-second deadline
+      // Create abort controller for 28-second deadline
       const abortController = new AbortController();
-      const timeoutId = setTimeout(() => abortController.abort(), 22000);
+      const timeoutId = setTimeout(() => abortController.abort(), 28000);
       
       // Single optimized GPT-4o request with strict structured output
       const aiResponse = await fetch("https://api.openai.com/v1/chat/completions", {
@@ -78,7 +101,7 @@ export default {
         body: JSON.stringify({
           model: MODEL,
           temperature: 0.25,
-          max_tokens: 1500,
+          max_tokens: 2800,
           response_format: {
             type: "json_schema",
             json_schema: {
@@ -87,17 +110,58 @@ export default {
               schema: {
                 type: "object",
                 properties: {
-                  market_foundation: { type: "string" },
+                  market_foundation: {
+                    type: "object",
+                    properties: {
+                      market_overview: { type: "string" },
+                      customer_behaviour: { type: "string" },
+                      market_opportunities: { type: "string" },
+                      competitor_analyses: {
+                        type: "array",
+                        items: {
+                          type: "object",
+                          properties: {
+                            name: { type: "string" },
+                            positioning: { type: "string" },
+                            strengths: { type: "string" },
+                            weaknesses: { type: "string" },
+                            differentiation_opportunities: { type: "string" }
+                          },
+                          required: ["name", "positioning", "strengths", "weaknesses", "differentiation_opportunities"],
+                          additionalProperties: false
+                        }
+                      }
+                    },
+                    required: ["market_overview", "customer_behaviour", "market_opportunities", "competitor_analyses"],
+                    additionalProperties: false
+                  },
                   strategy_pillars: { type: "string" },
                   personas: { type: "string" },
-                  competitors_brief: { type: "string" },
                   differentiators: { type: "string" },
                   seven_ps: { type: "string" },
                   calendar_next_90_days: { type: "string" },
-                  kpis: { type: "string" },
-                  risks_and_safety_nets: { type: "string" }
+                  kpis: {
+                    type: "object",
+                    properties: {
+                      measurement_and_tracking: { type: "string" },
+                      performance_indicators: { type: "string" },
+                      analytics_framework: { type: "string" }
+                    },
+                    required: ["measurement_and_tracking", "performance_indicators", "analytics_framework"],
+                    additionalProperties: false
+                  },
+                  risks_and_safety_nets: {
+                    type: "object",
+                    properties: {
+                      primary_risks: { type: "string" },
+                      mitigation_strategies: { type: "string" },
+                      contingency_plans: { type: "string" }
+                    },
+                    required: ["primary_risks", "mitigation_strategies", "contingency_plans"],
+                    additionalProperties: false
+                  }
                 },
-                required: ["market_foundation", "strategy_pillars", "personas", "competitors_brief", "differentiators", "seven_ps", "calendar_next_90_days", "kpis", "risks_and_safety_nets"],
+                required: ["market_foundation", "strategy_pillars", "personas", "differentiators", "seven_ps", "calendar_next_90_days", "kpis", "risks_and_safety_nets"],
                 additionalProperties: false
               }
             }
@@ -105,11 +169,23 @@ export default {
           messages: [
             { 
               role: "system", 
-              content: "Expert marketing strategist. British English only. Write dense, specific content. Use bullet points (•) for subsections. Include named competitors prominently. Be realistic and specific to the business type." 
+              content: "Expert marketing strategist. British English only. PLAIN TEXT ONLY - no markdown, no bold, no asterisks, no headings. Use bullet character '• ' only at start of list items. Never include percentage targets or specific numbers unless provided in form data. Write dense, specific, form-relevant content. Each competitor from the form must be individually analyzed." 
             },
             { 
               role: "user", 
-              content: `Generate marketing strategy for ${form.product_type} in ${form.country} ${form.sector}. Target: ${audienceText}. Competitors: ${competitorText}. Write detailed, realistic content with proper formatting using bullet points for subsections. JSON with: market_foundation (Market Overview, Customer Behaviour, Competitor Analysis featuring ${competitorText}, Market Opportunities), strategy_pillars (• Pillar 1: [specific name] - detailed strategy focused on this business type, • Pillar 2: [specific name] - realistic strategy for market entry/growth, • Pillar 3: [specific name] - practical implementation strategy), personas (• Primary Persona: [realistic name] Age, income, behaviour patterns, specific shopping habits and motivations relevant to ${form.product_type}. • Secondary Persona: [realistic name] Demographics, behaviour, and purchasing patterns. • Tertiary Persona: [realistic name] Target characteristics and engagement preferences), competitors_brief (comprehensive analysis of ${competitorText} including market positioning, strengths, weaknesses, and differentiation opportunities), differentiators (• Core Differentiation: specific advantages over ${competitorText}, • Value Proposition: unique benefits for customers, • Positioning Statement: clear market position), seven_ps (• Product: specific improvements/features, • Price: realistic pricing strategy, • Place: distribution channels, • Promotion: marketing tactics, • People: team requirements, • Process: operational improvements, • Physical Evidence: brand touchpoints), calendar_next_90_days (• Week 1-2: Foundation Phase - realistic setup tasks like market research, brand assets, initial campaigns, • Week 3-4: Launch Phase - specific launch activities, content creation, campaign execution, • Week 5-8: Scaling Phase - expand successful tactics, A/B testing, optimization, • Week 9-12: Optimisation Phase - data analysis, strategy refinement, planning next quarter), kpis (• Measurement & Tracking: specific metrics based on chosen channels and strategies, tracking methods, reporting frequency, • Performance Indicators: realistic targets based on industry benchmarks, • Analytics Framework: tools and dashboards for monitoring progress), risks_and_safety_nets (• Primary Risks: realistic market/business risks for ${form.product_type} in ${form.country}, • Mitigation Strategies: specific actions to reduce identified risks, • Contingency Plans: backup strategies if primary approach fails).` 
+              content: `Generate marketing strategy for ${form.product_type} in ${form.country} ${form.sector}. Target: ${audienceText}. Competitors that MUST each be individually analyzed: ${form.competitors?.join(", ")}. 
+
+CRITICAL: market_foundation.competitor_analyses array must contain exactly one object for each competitor: ${form.competitors?.map(c => `"${c}"`).join(", ")}. 
+
+Generate detailed JSON with structured format:
+- market_foundation: object with market_overview, customer_behaviour, market_opportunities, and competitor_analyses array where each competitor gets individual analysis
+- strategy_pillars: dense content with bullet points for 3 specific strategic pillars
+- personas: detailed primary, secondary, tertiary personas with realistic names and specific behaviours for ${form.product_type} customers
+- differentiators: core differentiation, value proposition, positioning statement with bullet points
+- seven_ps: detailed analysis of Product, Price, Place, Promotion, People, Process, Physical Evidence
+- calendar_next_90_days: realistic 90-day implementation timeline with specific actionable tasks
+- kpis: structured object with measurement_and_tracking, performance_indicators (no percentage targets), analytics_framework
+- risks_and_safety_nets: structured object with primary_risks, mitigation_strategies, contingency_plans specific to ${form.product_type} business in ${form.country}` 
             }
           ]
         }),
@@ -133,6 +209,23 @@ export default {
         console.error('Failed to parse AI response:', content);
         throw new Error('Invalid AI response');
       }
+      
+      // Validate competitor coverage
+      if (form.competitors?.length && aiGenerated?.market_foundation?.competitor_analyses) {
+        const analyzedCompetitors = aiGenerated.market_foundation.competitor_analyses.map(c => c.name?.toLowerCase());
+        const requiredCompetitors = form.competitors.map(c => c.toLowerCase());
+        const missingCompetitors = requiredCompetitors.filter(req => 
+          !analyzedCompetitors.some(analyzed => analyzed.includes(req) || req.includes(analyzed))
+        );
+        
+        if (missingCompetitors.length > 0) {
+          console.error('Missing competitor analysis for:', missingCompetitors);
+          throw new Error('Incomplete competitor analysis');
+        }
+      }
+      
+      // Sanitize content to remove markdown and normalize formatting
+      aiGenerated = sanitizeContent(aiGenerated);
       
       // Generate channel playbook with QUALITY content (not templated)
       const channelByMotion = {
@@ -255,7 +348,22 @@ export default {
             lead_capture: "Qualified leads"
           }[form.motion] || "Business growth";
       
-      // Assemble final response with quality fallbacks
+      // Assemble final response using structured AI output (no fallbacks)
+      if (!aiGenerated || !aiGenerated.market_foundation || !aiGenerated.kpis || !aiGenerated.risks_and_safety_nets) {
+        throw new Error('AI response missing required structured sections');
+      }
+
+      // Convert structured market foundation to legacy format for frontend compatibility
+      const market_foundation_legacy = `• Market Overview\n${aiGenerated.market_foundation.market_overview}\n\n• Customer Behaviour\n${aiGenerated.market_foundation.customer_behaviour}\n\n• Market Opportunities\n${aiGenerated.market_foundation.market_opportunities}\n\n• Competitor Analysis\n${aiGenerated.market_foundation.competitor_analyses.map(comp => 
+        `${comp.name}: ${comp.positioning} Strengths include ${comp.strengths} However, ${comp.weaknesses} This creates opportunities to ${comp.differentiation_opportunities}`
+      ).join('\n\n')}`;
+
+      // Convert structured KPIs to legacy format
+      const kpis_legacy = `• Measurement & Tracking\n${aiGenerated.kpis.measurement_and_tracking}\n\n• Performance Indicators\n${aiGenerated.kpis.performance_indicators}\n\n• Analytics Framework\n${aiGenerated.kpis.analytics_framework}`;
+
+      // Convert structured risks to legacy format
+      const risks_legacy = `• Primary Risks\n${aiGenerated.risks_and_safety_nets.primary_risks}\n\n• Mitigation Strategies\n${aiGenerated.risks_and_safety_nets.mitigation_strategies}\n\n• Contingency Plans\n${aiGenerated.risks_and_safety_nets.contingency_plans}`;
+
       let json = {
         meta: {
           title: "Marketing Strategy Report",
@@ -263,20 +371,22 @@ export default {
           sector: form.sector || "General",
           goal: derivedGoal
         },
-        market_foundation: aiGenerated?.market_foundation || "• Market Overview\nThe sector demonstrates steady growth driven by evolving customer needs and digital transformation trends, creating opportunities for innovative businesses to establish strong market presence.\n\n• Customer Behaviour\nTarget customers are increasingly research-driven, comparing options online before purchasing, and value businesses that demonstrate expertise and transparency in their communications.\n\n• Market Opportunities\nGrowing demand for quality solutions, increased online purchasing behaviour, and gaps in customer service excellence create clear opportunities for well-positioned businesses to capture market share.",
-        strategy_pillars: aiGenerated?.strategy_pillars || "• Customer-Centric Growth\nBuild sustainable growth through deep customer understanding, exceptional service delivery, and data-driven decision making that creates lasting competitive advantages in the marketplace.\n\n• Market Differentiation\nEstablish clear competitive positioning through innovative solutions, superior quality, and unique value propositions that address specific customer pain points competitors haven't solved.\n\n• Operational Excellence\nDevelop efficient systems and processes that enable consistent service delivery, cost optimization, and scalable operations whilst maintaining high quality standards.",
-        personas: aiGenerated?.personas || "• Primary Persona: Sarah Mitchell\nAge 38, marketing manager, £45,000 salary, values quality and reliability. Researches thoroughly before purchasing, reads multiple reviews, and prioritises brands with strong reputation. Shops mainly online during evenings, influenced by expert recommendations and case studies.\n\n• Secondary Persona: James Thompson\nAge 32, small business owner, budget-conscious but growth-focused. Compares multiple options carefully, seeks value for money, and makes decisions based on ROI potential. Active in business communities and influenced by peer recommendations.\n\n• Tertiary Persona: Emma Rodriguez\nAge 29, busy professional, values convenience and time-saving solutions. Willing to pay premium for excellent service and fast results. Prefers mobile-first experiences and subscription-based services that simplify her workflow.",
-        competitors_brief: aiGenerated?.competitors_brief || `The competitive landscape includes ${competitorText} as key market players alongside other established competitors. Analysis reveals opportunities for differentiation through superior customer experience, innovative solutions, and strategic market positioning that addresses unmet customer needs.`,
-        differentiators: aiGenerated?.differentiators || "• Core Differentiation\nSpecialize in solving specific customer problems that competitors address only generally, offer superior customer support with faster response times and more personalized attention, and maintain higher quality standards through rigorous testing and continuous improvement processes.\n\n• Value Proposition\nDeliver measurable results that justify the investment, provide transparent communication throughout the customer journey, and offer flexible solutions that adapt to individual customer needs rather than one-size-fits-all approaches.\n\n• Positioning Statement\nFor customers who value reliability and results over lowest price, we provide the expertise, attention to detail, and commitment to success that ensures their investment delivers the outcomes they need to grow their business.",
-        seven_ps: aiGenerated?.seven_ps || "• Product\nFocus on core product features that solve specific customer problems, gather customer feedback for continuous improvement, ensure quality standards exceed customer expectations, and develop unique features that differentiate from competitors.\n\n• Price\nResearch competitor pricing and position strategically within market ranges, consider value-based pricing that reflects product benefits, offer flexible pricing options for different customer segments, and test pricing strategies with small customer groups.\n\n• Place\nOptimize online presence for easy customer access, consider distribution partnerships that expand market reach, ensure mobile-friendly purchasing experience, and evaluate additional sales channels based on customer preferences.\n\n• Promotion\nDevelop clear messaging that communicates unique value, use targeted advertising on platforms where customers spend time, create content that educates and engages prospects, and leverage customer testimonials and case studies.\n\n• People\nTrain team members on customer service excellence, ensure consistent brand representation across all customer interactions, develop expertise that customers can trust, and create processes for handling customer inquiries efficiently.\n\n• Process\nStreamline customer journey from awareness to purchase, eliminate friction points in buying process, establish clear communication protocols, and create systems for tracking and improving customer satisfaction.\n\n• Physical Evidence\nMaintain professional brand presentation across all materials, ensure website design reflects quality and trustworthiness, use consistent visual identity in all communications, and create tangible proof of quality through certifications or awards.",
+        market_foundation: market_foundation_legacy,
+        strategy_pillars: aiGenerated.strategy_pillars,
+        personas: aiGenerated.personas,
+        competitors_brief: `• Competitor Analysis\n${aiGenerated.market_foundation.competitor_analyses.map(comp => 
+          `${comp.name}: ${comp.positioning} Strengths include ${comp.strengths} However, ${comp.weaknesses} This creates opportunities to ${comp.differentiation_opportunities}`
+        ).join('\n\n')}`,
+        differentiators: aiGenerated.differentiators,
+        seven_ps: aiGenerated.seven_ps,
         channel_playbook: motionChannels,
         budget: {
           band: form.budget_band || "Low",
           allocation: `Primary Channel Investment\n${motionChannels[0]?.channel}: ${motionChannels[0]?.budget_percent}% allocated to ${motionChannels[0]?.role.toLowerCase()} with focus on high-conversion activities.\n\nSecondary Channel Support\n${motionChannels[1]?.channel}: ${motionChannels[1]?.budget_percent}% dedicated to ${motionChannels[1]?.role.toLowerCase()} for comprehensive market coverage.\n\nSupporting Channels\n${motionChannels[2]?.channel}: ${motionChannels[2]?.budget_percent}% investment in ${motionChannels[2]?.role.toLowerCase()} activities.\n${motionChannels[3]?.channel}: ${motionChannels[3]?.budget_percent}% allocation for ${motionChannels[3]?.role.toLowerCase()} initiatives.\n${motionChannels[4]?.channel}: ${motionChannels[4]?.budget_percent}% reserved for ${motionChannels[4]?.role.toLowerCase()} programmes.\n\nStrategic Rationale\nThis allocation prioritises high-impact channels that capture immediate demand whilst building broader market awareness and long-term brand equity through diversified channel investment.`
         },
-        calendar_next_90_days: aiGenerated?.calendar_next_90_days || "• Week 1-2: Foundation Phase\nSet up Google Analytics and Facebook Pixel tracking, create initial brand assets and messaging, research target keywords, establish social media presence, and launch basic website optimization with clear value propositions.\n\n• Week 3-4: Launch Phase\nLaunch targeted Google Ads campaigns, begin content marketing with blog posts and social content, start email list building, initiate customer feedback collection, and implement basic conversion tracking across all touchpoints.\n\n• Week 5-8: Scaling Phase\nAnalyse performance data and double down on successful channels, expand content creation based on engagement patterns, introduce referral programmes, optimize landing pages for better conversion, and begin customer retention initiatives.\n\n• Week 9-12: Optimisation Phase\nRefine targeting based on customer data, implement automation for lead nurturing, plan seasonal campaigns, establish partnerships or collaborations, and prepare comprehensive strategy review for next quarter based on actual performance metrics.",
-        kpis: aiGenerated?.kpis || "• Measurement & Tracking\nTrack website traffic sources and user behaviour patterns using Google Analytics, monitor conversion rates from each marketing channel, measure customer acquisition costs and lifetime value ratios, analyse content engagement and social media reach patterns.\n\n• Performance Indicators\nMonitor monthly website visitor growth and engagement duration, track email list growth and engagement rates, measure social media follower growth and content performance, analyse customer feedback scores and review ratings across platforms.\n\n• Analytics Framework\nUse Google Analytics for website performance tracking, implement Facebook Pixel for social media attribution, utilize email platform analytics for campaign monitoring, establish monthly reporting dashboard with key metrics, and conduct quarterly strategy reviews based on actual performance data.",
-        risks_and_safety_nets: aiGenerated?.risks_and_safety_nets || "• Primary Risks\nIncreased competition from established players or new market entrants, changes in customer behaviour or economic conditions affecting purchasing power, dependency on single marketing channels that could become less effective, potential negative reviews or reputation issues that impact trust.\n\n• Mitigation Strategies\nDiversify marketing channels to avoid over-reliance on any single source, build strong customer relationships through excellent service to encourage word-of-mouth referrals, maintain emergency budget reserves for market challenges, and establish monitoring systems for early warning of reputation issues.\n\n• Contingency Plans\nDevelop backup marketing channels ready for quick activation, create crisis communication templates for reputation management, establish relationships with alternative suppliers or partners, and maintain flexible budget allocation that can be shifted between channels based on performance."
+        calendar_next_90_days: aiGenerated.calendar_next_90_days,
+        kpis: kpis_legacy,
+        risks_and_safety_nets: risks_legacy
       };
       
       // Apply British English normalization

@@ -297,10 +297,6 @@ export default function App() {
       country === "__custom_country" ? customCountry : country;
     const finalSector = sector === "__custom_sector" ? customSector : sector;
 
-    // Debug logging
-    console.log("DEBUG: segments before validation:", segments);
-    console.log("DEBUG: segInp before validation:", segInp);
-
     if (!finalCountry.trim()) {
       flushSync(() => {
         setErr("Please select a country.");
@@ -323,8 +319,6 @@ export default function App() {
       const result = processTokenizedInput(segInp.trim(), segments, 3);
       currentSegments.push(...result.tokensAdded);
     }
-
-    console.log("DEBUG: currentSegments after manual flush check:", currentSegments);
 
     if (!currentSegments || currentSegments.length === 0) {
       flushSync(() => {
