@@ -341,9 +341,10 @@ export default function App() {
       budget_band: budgetBand,
     };
 
-    console.log("=== FORM SUBMISSION DEBUG ===");
-    console.log("Competitors being sent:", competitors);
-    console.log("Full form data:", body);
+    console.log("🚀 === FORM SUBMISSION STARTED ===");
+    console.log("🎯 Competitors being sent:", competitors);
+    console.log("📋 Full form data:", body);
+    console.log("🌐 Making request to URL:", WORKER_URL);
 
     // Create fetch with timeout helper
     const fetchWithTimeout = async (url, options, timeout = 90000) => {
@@ -393,23 +394,27 @@ export default function App() {
           throw new Error(data.error);
         }
 
-        console.log("=== API RESPONSE DEBUG ===");
-        console.log("Received data:", data);
+        console.log("✅ === API RESPONSE RECEIVED ===");
+        console.log("📦 Full response data:", data);
+        
         if (data.market_foundation) {
-          console.log("Market foundation content:", data.market_foundation);
+          console.log("🏢 Market foundation content:", data.market_foundation);
           // Check if competitors appear anywhere in market foundation
           const foundCompetitors = competitors.filter(comp => 
             data.market_foundation.toLowerCase().includes(comp.toLowerCase())
           );
-          console.log("Competitors found in market foundation:", foundCompetitors);
+          console.log("🔍 Competitors found in market foundation:", foundCompetitors);
+          console.log("❓ Missing competitors:", competitors.filter(comp => !foundCompetitors.includes(comp)));
         }
+        
         if (data.competitors_brief) {
-          console.log("Competitors brief content:", data.competitors_brief);
+          console.log("📊 Competitors brief content:", data.competitors_brief);
           // Check if competitors appear in competitors_brief
           const foundInBrief = competitors.filter(comp => 
             data.competitors_brief.toLowerCase().includes(comp.toLowerCase())
           );
-          console.log("Competitors found in brief:", foundInBrief);
+          console.log("🔍 Competitors found in brief:", foundInBrief);
+          console.log("❓ Missing from brief:", competitors.filter(comp => !foundInBrief.includes(comp)));
         }
 
         setResult(data);
