@@ -244,26 +244,10 @@ export default function App() {
     }
   };
   
-  // Handle blur - commit any remaining text as a pill
+  // Handle blur - keep text in input, don't auto-convert to pills
   const handlePillInputBlur = (e, setter, inpSetter, max = 99) => {
-    const value = e.target.value.trim();
-    if (value) {
-      setter((currentList) => {
-        const result = processTokenizedInput(value, currentList, max);
-        
-        // Only clear input if items were actually added
-        if (result.itemsWereAdded) {
-          inpSetter(result.remainingInput);
-        }
-        
-        // Add the tokens that fit
-        if (result.tokensAdded.length > 0) {
-          return [...currentList, ...result.tokensAdded];
-        }
-        
-        return currentList;
-      });
-    }
+    // Do nothing on blur - let users decide when to add pills
+    // Users can press Enter or comma to explicitly add pills
   };
   
   // Flush pending input to pills (used before form submission)
@@ -703,7 +687,7 @@ export default function App() {
                   onKeyDown={(e) => handlePillInputKeyDown(e, setComp, setCompInp, 3)}
                   onBlur={(e) => handlePillInputBlur(e, setComp, setCompInp, 3)}
                   aria-describedby="competitors-help"
-                  className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-white/80 focus:outline-none focus:ring-2 focus:ring-blue-400/50 focus:border-blue-300 focus:bg-white transition-all duration-200 text-gray-700 min-h-[44px]"
+                  className="w-full px-4 py-3 rounded-lg border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-200 text-gray-900 min-h-[44px]"
                   placeholder="e.g. Amazon, Local garden centre"
                 />
               </Field>
