@@ -12,6 +12,7 @@ const Pill = ({ text, onRemove }) => (
   <span className="inline-flex items-center bg-gray-100 text-gray-700 text-sm px-3 py-1.5 rounded-full mr-2 mb-2 border border-gray-200">
     {text}
     <button
+      type="button"
       onClick={onRemove}
       className="ml-2 w-4 h-4 flex items-center justify-center text-gray-400 hover:text-gray-600 hover:bg-gray-200 rounded-full text-xs transition-colors"
       title="Remove"
@@ -340,7 +341,7 @@ export default function App() {
     };
 
     console.log("🚀 === FORM SUBMISSION STARTED ===");
-    console.log("🎯 Competitors being sent:", competitors);
+    console.log("🎯 Competitor being sent:", competitor);
     console.log("📋 Full form data:", body);
     console.log("🌐 Making request to URL:", WORKER_URL);
 
@@ -397,22 +398,20 @@ export default function App() {
         
         if (data.market_foundation) {
           console.log("🏢 Market foundation content:", data.market_foundation);
-          // Check if competitors appear anywhere in market foundation
-          const foundCompetitors = competitors.filter(comp => 
-            data.market_foundation.toLowerCase().includes(comp.toLowerCase())
-          );
-          console.log("🔍 Competitors found in market foundation:", foundCompetitors);
-          console.log("❓ Missing competitors:", competitors.filter(comp => !foundCompetitors.includes(comp)));
+          // Check if competitor appears anywhere in market foundation
+          const foundCompetitor = competitor.trim() && 
+            data.market_foundation.toLowerCase().includes(competitor.toLowerCase().trim());
+          console.log("🔍 Competitor found in market foundation:", foundCompetitor ? [competitor] : []);
+          console.log("❓ Missing competitor:", foundCompetitor ? [] : [competitor]);
         }
         
         if (data.competitors_brief) {
           console.log("📊 Competitors brief content:", data.competitors_brief);
-          // Check if competitors appear in competitors_brief
-          const foundInBrief = competitors.filter(comp => 
-            data.competitors_brief.toLowerCase().includes(comp.toLowerCase())
-          );
-          console.log("🔍 Competitors found in brief:", foundInBrief);
-          console.log("❓ Missing from brief:", competitors.filter(comp => !foundInBrief.includes(comp)));
+          // Check if competitor appears in competitors_brief
+          const foundInBrief = competitor.trim() && 
+            data.competitors_brief.toLowerCase().includes(competitor.toLowerCase().trim());
+          console.log("🔍 Competitor found in brief:", foundInBrief ? [competitor] : []);
+          console.log("❓ Missing from brief:", foundInBrief ? [] : [competitor]);
         }
 
         setResult(data);
