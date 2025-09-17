@@ -594,7 +594,8 @@ Return valid JSON only with the exact field structure, clean formatting, and Bri
           "Content-Type": "application/json",
           Authorization: `Bearer ${env.OPENAI_API_KEY}`
         },
-        body: JSON.stringify(requestBody)
+        body: JSON.stringify(requestBody),
+        signal: AbortSignal.timeout(40000) // 40-second timeout for OpenAI API
       });
 
       if (!ai.ok) {
@@ -713,6 +714,13 @@ Return valid JSON only with the exact field structure, clean formatting, and Bri
       }
 
     } catch (e) {
+      console.error('Worker error:', e.message);
+      if (e.name === 'TimeoutError' || e.message.includes('timeout') || e.message.includes('aborted')) {
+        return new Response(
+          JSON.stringify({ error: "AI service is taking longer than expected. Please try again with a simpler request or check your connection." }),
+          cors(408, origin)
+        );
+      }
       return new Response(
         JSON.stringify({ error: "internal_server_error" }),
         cors(500, origin)
@@ -728,7 +736,7 @@ function cors(status = 200, origin = null) {
     'https://localhost:5000', 
     'http://127.0.0.1:5000',
     'https://127.0.0.1:5000',
-    'https://4ed238b6-44fe-47f0-8f40-754dbed6c70c-00-31bwxps5rwfru.worf.replit.dev'
+    'https://4ed238b6-44fe-47f0-8f40-754dbed6c70c-00-y3il5bpx45gx.sisko.replit.dev'
   ];
   
   // Only set CORS origin if the request origin is in allowlist
