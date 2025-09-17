@@ -736,20 +736,34 @@ const SECTION_RENDERERS = {
 
 /* SPECIALIZED SECTION RENDERERS */
 function renderPersonas(ast) {
-  // Handle bullet point format from API
-  const personaBullets = ast.filter(block => 
-    block.type === 'list_item' && 
-    (block.content.includes('Primary Persona') || 
-     block.content.includes('Secondary Persona') || 
-     block.content.includes('Tertiary Persona'))
-  );
+  // Look for unordered_list blocks and extract their items
+  const personaBullets = [];
+  
+  for (const block of ast) {
+    if (block.type === 'unordered_list' && block.items) {
+      for (const item of block.items) {
+        const itemText = typeof item === 'string' ? item : item.content || '';
+        if (itemText.includes('Primary Persona') || 
+            itemText.includes('Secondary Persona') || 
+            itemText.includes('Tertiary Persona')) {
+          personaBullets.push(itemText);
+        }
+      }
+    }
+    // Also check for direct list_item blocks
+    else if (block.type === 'list_item' && 
+             (block.content.includes('Primary Persona') || 
+              block.content.includes('Secondary Persona') || 
+              block.content.includes('Tertiary Persona'))) {
+      personaBullets.push(block.content);
+    }
+  }
   
   if (personaBullets.length > 0) {
     return (
       <div className="space-y-6">
-        {personaBullets.map((bullet, index) => {
+        {personaBullets.map((content, index) => {
           // Extract title and content from bullet
-          const content = bullet.content;
           const colonIndex = content.indexOf(':');
           const title = colonIndex > 0 ? content.substring(0, colonIndex) : 'Persona';
           const description = colonIndex > 0 ? content.substring(colonIndex + 1).trim() : content;
