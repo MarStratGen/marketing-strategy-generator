@@ -115,7 +115,7 @@ Respond with valid JSON only. Return EXACTLY these fields in this order with PLA
 
 {
   "market_foundation": "Comprehensive market analysis as flowing text with paragraph breaks. Cover market overview, customer behaviour patterns, key opportunities${competitorText ? ', and detailed analysis of ' + competitorText : ''}. Use natural paragraphs with occasional bullets for key insights.",
-  "personas": "Three detailed customer personas as flowing text with clear paragraph separation. Each persona should include name, age, demographics, background, pain points, motivations, and buying behaviour for ${form.product_type} customers in ${form.country}.",
+  "personas": "Three detailed customer personas as flowing text with clear paragraph separation. Each persona should include name, age range, background, lifestyle, pain points, motivations, and buying behaviour for ${form.product_type} customers.",
   "strategy_pillars": "Three core strategic pillars as flowing text with natural paragraph breaks. Focus on specific strategies for ${form.product_type} business without excessive bullet points.",
   "seven_ps": "Complete marketing mix analysis covering Product, Price, Place, Promotion, People, Process, Physical Evidence as flowing business text with paragraph structure.",
   "channel_playbook": "Detailed channel strategy and tactics as flowing text with natural paragraph breaks. Cover digital and traditional channels relevant to ${form.product_type} in ${form.country}.",
@@ -178,15 +178,15 @@ No markdown formatting.`
       }
 
       // Validate and repair personas if missing or too short
-      if (!aiGenerated?.personas || (typeof aiGenerated.personas === 'string' && aiGenerated.personas.length < 150)) {
+      if (!aiGenerated?.personas || (typeof aiGenerated.personas === 'string' && aiGenerated.personas.length < 100)) {
         console.log('🔧 PERSONAS REPAIR: Personas missing or too short, triggering fallback generation');
         
         try {
-          const personasPrompt = `Generate exactly 3 detailed customer personas for ${form.product_type} targeting ${audienceText} in ${form.country}. 
+          const personasPrompt = `Generate exactly 3 detailed customer personas for ${form.product_type} targeting ${audienceText}. 
 
 Format as bullet points with these details for each persona:
 • Name (realistic first name)
-• Age range and demographics  
+• Age range
 • Background and lifestyle
 • Pain points and challenges
 • Buying behaviour and motivations
