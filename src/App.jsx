@@ -714,7 +714,6 @@ export default function App() {
               <Field
                 label="Business stage"
                 required
-                tooltip="Shapes strategy focus"
                 id="business-stage"
               >
                 <div className="relative">
