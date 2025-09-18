@@ -1,50 +1,14 @@
-# Cloudflare Workers Configuration with Bot Protection
+# Cloudflare Workers Configuration 
 name = "marketing-strategy-api"
-main = "worker.js" 
+main = "workers/worker.js" 
 compatibility_date = "2025-01-01"
 
-# Rate limiting configuration for bot protection
-[[rate_limit]]
-namespace_id = 1
-# 10 requests per minute per IP
-limit = 10
-period = 60
-
-[[rate_limit]]
-namespace_id = 2  
-# 50 requests per day per IP (cost protection)
-limit = 50
-period = 86400
-
-[[rate_limit]]
-namespace_id = 3
-# 3 requests per minute for suspicious traffic
-limit = 3
-period = 60
-
-# Environment variables binding
-[vars]
-ENVIRONMENT = "production"
-
-# Rate limiter binding - Cloudflare will auto-inject this
+# KV namespace for rate limiting
 [[kv_namespaces]]
-binding = "RATE_LIMITER"
+binding = "RATE_LIMIT_KV"
 preview_id = "rate_limit_preview"
 id = "rate_limit_production"
 
-# Optional: Custom domain setup
-# [[routes]]
-# pattern = "api.marketingstratgenerator.com"
-# custom_domain = true
-
-# Security settings
-[build]
-command = ""
-
-[dev]
-local_protocol = "https"
-upstream_protocol = "https"
-
-# Worker limits
-[limits]
-cpu_ms = 30000  # 30 second timeout for AI processing
+# Environment variables
+[vars]
+ENVIRONMENT = "production"
