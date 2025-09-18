@@ -1,17 +1,43 @@
-## Running React on Replit
+# Marketing Strategy Generator
 
-[React](https://reactjs.org/) is a popular JavaScript library for building user interfaces.
+AI-powered marketing strategy generator that creates comprehensive marketing plans in 20 seconds using OpenAI's GPT-4o.
 
-[Vite](https://vitejs.dev/) is a blazing fast frontend build tool that includes features like Hot Module Reloading (HMR), optimized builds, and TypeScript support out of the box.
+## Features
 
-Using the two in conjunction is one of the fastest ways to build a web app.
+- **🎯 Comprehensive Strategies**: Complete marketing plans including STP analysis, 7 Ps, budgets, and KPIs
+- **⚡ Fast Generation**: Professional strategies in ~20 seconds
+- **🔒 Enterprise Security**: Bot protection, rate limiting, and input validation
+- **🇬🇧 British English**: All content optimized for UK markets
+- **📱 Responsive Design**: Works perfectly on all devices
+- **🎨 Professional UI**: Clean, modern interface with vintage office aesthetics
 
-### Getting Started
-- Hit run
-- Edit [App.jsx](#src/App.jsx) and watch it live update!
+## Tech Stack
 
-By default, Replit runs the `dev` script, but you can configure it by changing the `run` field in the [configuration file](#.replit). Here are the vite docs for [serving production websites](https://vitejs.dev/guide/build.html)
+- **Frontend**: React 18 + Vite + Tailwind CSS
+- **Backend**: Cloudflare Workers with OpenAI API
+- **Security**: Multi-tier rate limiting and bot protection
+- **Hosting**: Cloudflare Pages (frontend) + Cloudflare Workers (API)
 
-### Typescript
+## Deployment
 
-Just rename any file from `.jsx` to `.tsx`. You can also try our [TypeScript Template](https://replit.com/@replit/React-TypeScript)
+This app is deployed using GitHub + Cloudflare Pages for automatic deployments:
+
+1. **Frontend**: `marketingstratgenerator.com` (Cloudflare Pages)
+2. **API**: `api.marketingstratgenerator.com` (Cloudflare Workers)
+
+## Development
+
+```bash
+npm install
+npm run dev
+```
+
+Visit `http://localhost:5000` to see the app.
+
+## Build
+
+```bash
+npm run build
+```
+
+Builds the app for production to the `dist` folder.

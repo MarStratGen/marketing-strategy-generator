@@ -1,14 +1,15 @@
 {
-  "name": "react-javascript",
+  "name": "marketing-strategy-generator",
   "version": "1.0.0",
   "type": "module",
-  "description": "React TypeScript on Replit, using Vite bundler",
+  "description": "AI-powered Marketing Strategy Generator - Professional marketing plans in 20 seconds",
   "scripts": {
-    "dev": "vite",
+    "dev": "vite --host 0.0.0.0 --port 5000",
     "build": "vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "deploy": "npm run build"
   },
-  "keywords": [],
+  "keywords": ["marketing", "AI", "strategy", "business"],
   "author": "",
   "license": "ISC",
   "devDependencies": {

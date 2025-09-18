@@ -128,3 +128,25 @@ dist
 .yarn/build-state.yml
 .yarn/install-state.gz
 .pnp.*
+
+# Replit specific files
+.replit
+.config/
+.upm/
+replit.nix
+
+# Cloudflare Workers
+.wrangler/
+wrangler.toml
+
+# Build output for Cloudflare Pages
+dist/
+
+# Temporary test files
+test*.json
+*.tmp
+*.temp
+
+# IDE files
+.vscode/
+.idea/
