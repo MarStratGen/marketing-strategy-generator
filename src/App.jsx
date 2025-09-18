@@ -647,7 +647,7 @@ export default function App() {
 
               {/* sector */}
               <Field
-                label="Sector"
+                label="Your sector"
                 id="sector"
               >
                 <div className="relative">
