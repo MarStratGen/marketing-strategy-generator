@@ -606,7 +606,7 @@ export default function App() {
               <Field
                 label="Which country are you targeting?"
                 required
-                tooltip="This tailors regional insights and seasonality"
+                tooltip="Uses local insights and seasonality"
                 id="country"
               >
                 <div className="relative">
@@ -649,7 +649,7 @@ export default function App() {
               {/* sector */}
               <Field
                 label="Sector"
-                tooltip="If yours isn't listed, choose Other"
+                tooltip="Not listed? Choose Other"
                 id="sector"
               >
                 <div className="relative">
@@ -747,7 +747,7 @@ export default function App() {
               {/* segments */}
               <Field
                 label="Target segment(s)"
-                tooltip="Max 3 segments. Keep each under 10 words for speed."
+                tooltip="Max 3; under 10 words each"
                 required
                 id="segments"
               >
@@ -785,7 +785,7 @@ export default function App() {
               <Field
                 label="Primary action"
                 required
-                tooltip="Pick the main action you want customers to take"
+                tooltip="Choose the main customer action"
                 id="motion"
               >
                 <div className="relative">
@@ -828,7 +828,7 @@ export default function App() {
               <Field
                 label="Budget level"
                 required
-                tooltip="The plan uses percentages so you can scale up or down"
+                tooltip="Uses percentages; easy to scale"
                 id="budget"
               >
                 <div className="relative">
