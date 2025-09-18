@@ -1,47 +1,64 @@
-// Dead Simple Text Block Renderer - No Complex Parsing
+// Bulletproof Text Block Renderer - Displays ALL content reliably
 function SimpleTextBlock({ content }) {
-  // Handle non-string content
-  if (!content || typeof content !== 'string') {
+  // Handle completely empty content
+  if (!content) {
+    return <div className="text-gray-500 italic">No content available</div>;
+  }
+
+  // Handle non-string content - display as readable JSON
+  if (typeof content !== 'string') {
     return (
-      <pre className="bg-gray-50 p-4 rounded text-sm text-gray-600 whitespace-pre-wrap">
-        {JSON.stringify(content, null, 2)}
-      </pre>
+      <div className="bg-gray-50 p-4 rounded border">
+        <pre className="text-sm text-gray-700 whitespace-pre-wrap">
+          {JSON.stringify(content, null, 2)}
+        </pre>
+      </div>
     );
   }
 
-  // Split content into blocks separated by double newlines
-  const blocks = content.split(/\n\s*\n/).filter(block => block.trim());
+  // Clean up the content string
+  const cleanContent = content.trim();
+  if (!cleanContent) {
+    return <div className="text-gray-500 italic">No content available</div>;
+  }
+
+  // Split content into paragraphs and bullet blocks
+  const sections = cleanContent.split(/\n\s*\n+/);
   
   return (
     <div className="space-y-4">
-      {blocks.map((block, index) => {
-        const lines = block.trim().split('\n');
+      {sections.map((section, index) => {
+        const trimmedSection = section.trim();
+        if (!trimmedSection) return null;
         
-        // Check if all lines are bullets
-        const allBullets = lines.every(line => 
-          line.trim().match(/^(?:•|\-|\*)\s+/) || line.trim() === ''
+        const lines = trimmedSection.split('\n').map(line => line.trim()).filter(Boolean);
+        
+        // Check if this section is all bullets
+        const isBulletSection = lines.length > 0 && lines.every(line => 
+          line.match(/^(?:•|\-|\*|[\d]+\.)\s+/)
         );
         
-        if (allBullets && lines.some(line => line.trim())) {
+        if (isBulletSection) {
           // Render as bullet list
-          const bulletItems = lines
-            .filter(line => line.trim())
-            .map(line => line.replace(/^(?:•|\-|\*)\s+/, '').trim());
-            
           return (
-            <ul key={index} className="list-disc list-inside space-y-1 text-gray-700 ml-4">
-              {bulletItems.map((item, itemIndex) => (
-                <li key={itemIndex} className="leading-relaxed">{item}</li>
-              ))}
+            <ul key={index} className="list-disc list-inside space-y-1 text-gray-700">
+              {lines.map((line, lineIndex) => {
+                const bulletText = line.replace(/^(?:•|\-|\*|[\d]+\.)\s+/, '');
+                return (
+                  <li key={lineIndex} className="leading-relaxed ml-4">
+                    {bulletText}
+                  </li>
+                );
+              })}
             </ul>
           );
         } else {
-          // Render as paragraph
-          return (
-            <p key={index} className="text-gray-700 leading-relaxed">
-              {block.trim()}
+          // Render as paragraph(s)
+          return lines.map((line, lineIndex) => (
+            <p key={`${index}-${lineIndex}`} className="text-gray-700 leading-relaxed mb-2">
+              {line}
             </p>
-          );
+          ));
         }
       })}
     </div>
