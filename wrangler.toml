@@ -1,7 +1,25 @@
 # Cloudflare Workers Configuration for Marketing Strategy API
-name = "glow-api-lingering-queen-74b7"
+
+# Default configuration points to development worker (safe default)
+name = "glow-api-dev-lingering-queen-74b7"
 main = "workers/worker.js" 
 compatibility_date = "2025-01-01"
+
+# Default environment variables for development
+[vars]
+ENVIRONMENT = "development"
+
+# Development environment (default, safe)
+[env.dev]
+name = "glow-api-dev-lingering-queen-74b7"
+[env.dev.vars]
+ENVIRONMENT = "development"
+
+# Production environment (explicit flag required)
+[env.production] 
+name = "glow-api-lingering-queen-74b7"
+[env.production.vars]
+ENVIRONMENT = "production"
 
 # KV namespace for rate limiting (will be added later)
 # [[kv_namespaces]]
@@ -9,8 +27,4 @@ compatibility_date = "2025-01-01"
 # preview_id = "rate_limit_preview"
 # id = "rate_limit_production"
 
-# Environment variables
-[vars]
-ENVIRONMENT = "production"
-
-# Custom domain configured via Cloudflare Dashboard
+# Custom domain configured via Cloudflare Dashboard for production only

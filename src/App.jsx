@@ -59,8 +59,23 @@ const LoadingSpinner = () => (
 );
 
 /* ----- constants ----- */
-const WORKER_URL = "https://api.marketingstratgenerator.com/generate";
-const STREAM_URL = "https://api.marketingstratgenerator.com/stream";
+// Build-time environment configuration for reliable development workflow
+const API_BASE_URL = (() => {
+  const viteApiUrl = import.meta.env.VITE_API_BASE_URL;
+  
+  // Development guard: fail fast if in development mode without proper API URL
+  if (import.meta.env.DEV && !viteApiUrl) {
+    throw new Error(
+      "DEVELOPMENT ERROR: VITE_API_BASE_URL must be set in Replit Secrets for development testing. " +
+      "Add: VITE_API_BASE_URL=https://glow-api-dev-lingering-queen-74b7.cloudflare-4up2f.workers.dev"
+    );
+  }
+  
+  return viteApiUrl || "https://api.marketingstratgenerator.com";
+})();
+
+const WORKER_URL = `${API_BASE_URL}/generate`;
+const STREAM_URL = `${API_BASE_URL}/stream`;
 
 const COUNTRIES = [
   { label: "Australia", code: "Australia" },
