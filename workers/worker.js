@@ -245,9 +245,9 @@ export default {
       const audienceText = validAudiences.join(", ") || "target customers";
       const isLaunch = form.business_stage === "launch";
 
-      // Create abort controller for 25-second deadline
+      // Create abort controller for 40-second deadline
       const abortController = new AbortController();
-      const timeoutId = setTimeout(() => abortController.abort(), 25000);
+      const timeoutId = setTimeout(() => abortController.abort(), 40000);
 
       // Single optimized GPT-4o request - remove strict structured output for reliability
       const aiResponse = await fetch(
@@ -261,7 +261,7 @@ export default {
           body: JSON.stringify({
             model: MODEL,
             temperature: 0.25,
-            max_tokens: 1600,
+            max_tokens: 1450,
             response_format: { type: "json_object" },
             messages: [
               {
