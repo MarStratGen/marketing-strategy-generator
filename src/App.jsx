@@ -828,7 +828,6 @@ export default function App() {
               <Field
                 label="Budget level"
                 required
-                tooltip="The plan uses percentages so you can scale up or down"
                 id="budget"
               >
                 <div className="relative">
