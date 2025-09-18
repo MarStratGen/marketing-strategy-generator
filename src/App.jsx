@@ -38,15 +38,15 @@ const Field = ({ label, children, tooltip, required, id }) => (
       )}
     </label>
     <div className="space-y-2">
-      {children}
       {tooltip && (
         <p
           id={id ? `${id}-help` : undefined}
-          className="text-sm text-gray-600 leading-relaxed"
+          className="text-sm text-gray-600 leading-relaxed mb-2"
         >
           {tooltip}
         </p>
       )}
+      {children}
     </div>
   </div>
 );
