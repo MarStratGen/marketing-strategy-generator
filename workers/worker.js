@@ -111,36 +111,24 @@ export default {
               role: "user", 
               content: `Generate marketing strategy for ${form.product_type} in ${form.country} ${form.sector ? `(${form.sector} sector)` : ''}. Target: ${audienceText}.${competitorText ? ` Main competitor to analyze: ${competitorText}` : ' No specific competitor provided - focus on general market positioning.'}
 
-Respond with valid JSON only. Use this exact structure:
+Respond with valid JSON only. Use this exact structure with FLAT TEXT CONTENT for clean document display:
 
 {
-  "market_foundation": {
-    "market_overview": "text",
-    "customer_behaviour": "text", 
-    "market_opportunities": "text"${competitorText ? ',\n    "competitor_analysis": {\n      "name": "' + competitorText + '",\n      "positioning": "text",\n      "strengths": "text",\n      "weaknesses": "text",\n      "differentiation_opportunities": "text"\n    }' : ''}
-  },
-  "strategy_pillars": "dense content with bullet points for 3 specific strategic pillars",
-  "personas": "detailed primary, secondary, tertiary personas with realistic names, demographics, behaviours, pain points and motivations for ${form.product_type} customers",
-  "differentiators": "core differentiation, value proposition, positioning statement",
-  "seven_ps": "detailed analysis of Product, Price, Place, Promotion, People, Process, Physical Evidence",
-  "calendar_next_90_days": "realistic 90-day implementation timeline with specific tasks",
-  "kpis": {
-    "measurement_and_tracking": "specific tracking methods, tools, and measurement frequency for ${form.product_type} marketing in ${form.country}",
-    "performance_indicators": "concrete KPIs with realistic targets and benchmarks for ${form.motion} campaigns targeting ${audienceText}",
-    "analytics_framework": "detailed analytics setup including platforms, dashboards, and reporting cadence for ${form.product_type} business"
-  },
-  "risks_and_safety_nets": {
-    "primary_risks": "specific risks for ${form.product_type} business in ${form.country} market including competitive, operational, and financial risks",
-    "mitigation_strategies": "actionable strategies to prevent and reduce identified risks with specific steps and timelines",
-    "contingency_plans": "detailed backup plans and alternative approaches if primary strategies fail for ${form.product_type} business"
-  }
+  "market_foundation": "Write as flowing business document text covering market overview, customer behaviour patterns, and key opportunities. Include competitor analysis if provided. Use natural paragraphs with occasional bullet points for key insights only.",
+  "strategy_pillars": "Write as flowing text describing 3 core strategic pillars. Use natural paragraphs, not excessive bullet points.",
+  "personas": "Write detailed customer personas as flowing text with natural paragraph breaks. Include 3 distinct personas with names, demographics, behaviours, pain points and motivations.",
+  "differentiators": "Write as business document text covering core differentiation, value proposition, and positioning statement in natural paragraphs.",
+  "seven_ps": "Write comprehensive analysis as flowing business text covering Product, Price, Place, Promotion, People, Process, Physical Evidence. Use paragraph structure, not excessive subheadings.",
+  "calendar_next_90_days": "Write realistic 90-day timeline as flowing text with natural paragraph breaks and occasional bullet points for key milestones only.",
+  "kpis": "Write comprehensive KPI framework as flowing business text covering measurement methods, specific performance indicators with targets, and analytics setup. Use natural paragraphs with occasional bullet points for key metrics only.",
+  "risks_and_safety_nets": "Write risk analysis as flowing business document covering primary risks, mitigation strategies, and contingency plans in natural paragraph structure."
 }
 
 Generate comprehensive, business-specific content for ${form.product_type} in ${form.country}. 
 
 CRITICAL: Ensure the "personas" field contains detailed customer profiles with names, ages, backgrounds, and specific behaviours. Do not leave personas empty. Create 3 distinct personas for ${audienceText} customers in the ${form.country} market.
 
-CRITICAL: Ensure the "kpis" section contains specific, measurable KPIs with realistic targets and clear tracking methods. Include actual metric names (like conversion rate, CAC, LTV, CTR, ROAS) with specific measurement tools and reporting frequencies. Do not use generic phrases.
+CRITICAL: Write comprehensive content in flowing paragraph format. Avoid excessive bullet points and subheadings. Focus on readable business document style.
 
 No markdown formatting.` 
             }
@@ -175,7 +163,7 @@ No markdown formatting.`
       }
       
       // Validate required structure
-      if (!aiGenerated?.market_foundation || !aiGenerated?.kpis || !aiGenerated?.risks_and_safety_nets) {
+      if (!aiGenerated?.market_foundation || !aiGenerated?.personas || !aiGenerated?.kpis) {
         console.error('AI response missing required sections:', Object.keys(aiGenerated || {}));
         throw new Error('Incomplete AI response structure');
       }
