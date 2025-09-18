@@ -74,8 +74,10 @@ const API_BASE_URL = (() => {
   return viteApiUrl || "https://api.marketingstratgenerator.com";
 })();
 
-const WORKER_URL = `${API_BASE_URL}/generate`;
-const STREAM_URL = `${API_BASE_URL}/stream`;
+// Ensure no double slashes in URL construction
+const cleanApiUrl = API_BASE_URL.endsWith('/') ? API_BASE_URL.slice(0, -1) : API_BASE_URL;
+const WORKER_URL = `${cleanApiUrl}/generate`;
+const STREAM_URL = `${cleanApiUrl}/stream`;
 
 const COUNTRIES = [
   { label: "Australia", code: "Australia" },
