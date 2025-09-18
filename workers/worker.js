@@ -1,7 +1,7 @@
 /*  ─────────────────────────────────────────────
     Marketing Strategy Generator Worker - Optimized
     ───────────────────────────────────────────── */
-const MODEL = "gpt-4o";
+const MODEL = "gpt-4o-mini";
 
 // Sanitization function to remove markdown and normalize formatting
 function sanitizeContent(obj) {
