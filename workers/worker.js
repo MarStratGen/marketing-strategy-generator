@@ -245,9 +245,9 @@ export default {
       const audienceText = validAudiences.join(", ") || "target customers";
       const isLaunch = form.business_stage === "launch";
 
-      // Create abort controller for 45-second deadline
+      // Create abort controller for 30-second deadline
       const abortController = new AbortController();
-      const timeoutId = setTimeout(() => abortController.abort(), 45000);
+      const timeoutId = setTimeout(() => abortController.abort(), 30000);
 
       // Single optimized GPT-4o request - remove strict structured output for reliability
       const aiResponse = await fetch(
@@ -261,13 +261,13 @@ export default {
           body: JSON.stringify({
             model: MODEL,
             temperature: 0.25,
-            max_tokens: 2800,
+            max_tokens: 2200,
             response_format: { type: "json_object" },
             messages: [
               {
                 role: "system",
                 content:
-                  "Expert marketing strategist. MANDATORY: British English only (use 'colour', 'favour', 'centre', 'analyse', 'realise', 'organise', 'recognised', 'specialised', 'optimised', 'utilise', 'behaviour', 'neighbouring', 'practise' as verb). PLAIN TEXT ONLY - no markdown, no bold, no asterisks, no headings. Use bullet character '• ' only at start of list items. CRITICAL: Insert double line breaks (\\n\\n) between every 2-3 sentences to create clear paragraph separation. Write dense, specific, form-relevant content with proper paragraph structure.",
+                  "Marketing strategist. British English only (colour, favour, centre, analyse, realise, organise, utilise, behaviour). Plain text only, no markdown. Use \\n\\n between paragraphs for readability. Write concise, specific, relevant content.",
               },
               {
                 role: "user",
@@ -276,7 +276,7 @@ export default {
 Respond with valid JSON only. Return EXACTLY these fields in this order with PLAIN TEXT STRINGS only (no objects, no arrays):
 
 {
-  "market_foundation": "Comprehensive market analysis with MANDATORY paragraph breaks every 2-3 sentences using \\n\\n. Cover market overview, customer behaviour patterns, key opportunities${competitorText ? ", and detailed analysis of " + competitorText : ""}. Each major point gets its own paragraph.",
+  "market_foundation": "Market overview, customer behaviour, opportunities${competitorText ? ", analysis of " + competitorText : ""}. Use \\n\\n for paragraphs.",
   "personas": "Three detailed customer personas with MANDATORY \\n\\n separation between each persona AND between major points within each persona. Each persona: name, age range, background, lifestyle, pain points, motivations, buying behaviour for ${form.product_type} customers.",
   "strategy_pillars": "Three core strategic pillars with MANDATORY \\n\\n breaks between each pillar and within each pillar explanation. ${isLaunch ? "Focus on launch strategies including market entry, awareness building, and initial customer acquisition" : "Focus on growth strategies including market expansion, customer retention, and competitive positioning"} for ${form.product_type} business.",
   "seven_ps": "Complete marketing mix analysis with MANDATORY \\n\\n breaks between each P (Product, Price, Place, Promotion, People, Process, Physical Evidence) and within longer explanations. Each P gets its own paragraph section.",
