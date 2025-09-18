@@ -175,7 +175,7 @@ No markdown formatting.`
       }
       
       // Validate required structure
-      if (!aiGenerated?.market_foundation || !aiGenerated?.kpis || !aiGenerated?.risks_and_safety_nets) {
+      if (!aiGenerated?.market_foundation || !aiGenerated?.kpis || !aiGenerated?.risks_and_safety_nets || !aiGenerated?.personas) {
         console.error('AI response missing required sections:', Object.keys(aiGenerated || {}));
         throw new Error('Incomplete AI response structure');
       }
