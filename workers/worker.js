@@ -29,6 +29,9 @@ function sanitizeContent(obj) {
 export default {
   async fetch(req, env) {
     const origin = req.headers.get('Origin');
+    const clientIP = req.headers.get('CF-Connecting-IP') || req.headers.get('X-Forwarded-For') || 'unknown';
+    const userAgent = req.headers.get('User-Agent') || '';
+    const timestamp = Date.now();
     
     /* 1. CORS pre-flight */
     if (req.method === "OPTIONS") return new Response(null, cors(200, origin));
@@ -60,7 +63,84 @@ export default {
       );
     }
 
-    /* 4. Input validation */
+    /* 4. Bot protection and rate limiting */
+    try {
+      // Rate limiting - 10 requests per minute per IP
+      const rateLimitKey = `rate_limit:${clientIP}`;
+      const dailyLimitKey = `daily_limit:${clientIP}`;
+      const patternKey = `pattern:${clientIP}`;
+      
+      // Check daily limit (cost protection) - 50 requests per day per IP
+      if (env.RATE_LIMITER) {
+        const dailyResult = await env.RATE_LIMITER.limit({
+          key: dailyLimitKey,
+          limit: 50,
+          period: 86400 // 24 hours
+        });
+        
+        if (!dailyResult.success) {
+          return new Response(JSON.stringify({ 
+            error: "daily_limit_exceeded", 
+            message: "Daily request limit exceeded. Please try again tomorrow.",
+            retry_after: dailyResult.reset
+          }), cors(429, origin));
+        }
+        
+        // Rate limiting - 10 requests per minute per IP  
+        const minuteResult = await env.RATE_LIMITER.limit({
+          key: rateLimitKey,
+          limit: 10,
+          period: 60 // 1 minute
+        });
+        
+        if (!minuteResult.success) {
+          return new Response(JSON.stringify({ 
+            error: "rate_limit_exceeded", 
+            message: "Too many requests. Please wait a moment before trying again.",
+            retry_after: minuteResult.reset
+          }), cors(429, origin));
+        }
+      }
+      
+      // Bot detection heuristics
+      const suspiciousPatterns = [
+        !userAgent, // No user agent
+        userAgent.length < 10, // Very short user agent
+        /bot|crawl|spider|scrape/i.test(userAgent), // Known bot keywords
+        !/mozilla|chrome|safari|firefox|edge/i.test(userAgent), // Not a browser
+        req.headers.get('Accept') === '*/*', // Generic accept header
+        !req.headers.get('Accept-Language'), // Missing language header
+      ];
+      
+      const suspiciousScore = suspiciousPatterns.filter(Boolean).length;
+      
+      // If too suspicious, require higher scrutiny
+      if (suspiciousScore >= 3) {
+        // Additional rate limiting for suspicious requests - 3 per minute
+        if (env.RATE_LIMITER) {
+          const suspiciousResult = await env.RATE_LIMITER.limit({
+            key: `suspicious:${clientIP}`,
+            limit: 3,
+            period: 60
+          });
+          
+          if (!suspiciousResult.success) {
+            return new Response(JSON.stringify({ 
+              error: "suspicious_activity_detected", 
+              message: "Suspicious activity detected. Please try again later."
+            }), cors(429, origin));
+          }
+        }
+        
+        console.log(`Suspicious request from ${clientIP}: score ${suspiciousScore}, UA: ${userAgent}`);
+      }
+      
+    } catch (rateLimitError) {
+      console.error('Rate limiting error:', rateLimitError);
+      // Continue processing if rate limiting fails (fail open for availability)
+    }
+    
+    /* 5. Input validation */
     let form;
     try { 
       const text = await req.text();
@@ -71,7 +151,7 @@ export default {
     }
     catch { return new Response(JSON.stringify({ error: "invalid_request" }), cors(400, origin)); }
 
-    /* 5. Enhanced input validation and security */
+    /* 6. Enhanced input validation and security */
     // Validate required fields
     if (!form.country || !form.product_type || !form.audiences) {
       return new Response(JSON.stringify({ error: "missing_required_fields" }), cors(400, origin));
@@ -579,7 +659,9 @@ function cors(status = 200, origin = null) {
     'https://localhost:5000', 
     'http://127.0.0.1:5000',
     'https://127.0.0.1:5000',
-    'https://4ed238b6-44fe-47f0-8f40-754dbed6c70c-00-y3il5bpx45gx.sisko.replit.dev'
+    'https://4ed238b6-44fe-47f0-8f40-754dbed6c70c-00-y3il5bpx45gx.sisko.replit.dev',
+    'https://marketingstratgenerator.com',
+    'https://www.marketingstratgenerator.com'
   ];
   
   const corsOrigin = origin && allowedOrigins.includes(origin) ? origin : null;
@@ -589,7 +671,10 @@ function cors(status = 200, origin = null) {
     "X-Content-Type-Options": "nosniff",
     "X-Frame-Options": "DENY", 
     "X-XSS-Protection": "1; mode=block",
-    "Referrer-Policy": "strict-origin-when-cross-origin"
+    "Referrer-Policy": "strict-origin-when-cross-origin",
+    "Content-Security-Policy": "default-src 'none'; script-src 'none';",
+    "X-Robots-Tag": "noindex, nofollow",
+    "Cache-Control": "no-store, no-cache, must-revalidate"
   };
 
   if (corsOrigin) {
