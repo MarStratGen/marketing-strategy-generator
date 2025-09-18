@@ -876,11 +876,11 @@ export default function App() {
                 Is my business information kept private?
               </h3>
               <p className="text-gray-700 leading-relaxed">
-                This page keeps data use minimal. Plan inputs are processed in
-                memory to generate your draft and are not stored by this page
-                after the response is returned. Inputs are sent to the OpenAI
+                Your form inputs are processed to generate your strategy and are not 
+                stored by this page after the response is returned. Inputs are sent to the OpenAI
                 API solely to create the draft and may be briefly retained by
-                that provider for security or operations. Please do not submit
+                that provider for security or operations. This site uses Google Analytics
+                to track usage patterns and improve the service. Please do not submit
                 sensitive or personal information.
               </p>
             </div>
