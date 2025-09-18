@@ -261,7 +261,7 @@ export default {
           body: JSON.stringify({
             model: MODEL,
             temperature: 0.25,
-            max_tokens: 2800,
+            max_tokens: 1500,
             messages: [
               {
                 role: "system",
@@ -270,30 +270,24 @@ export default {
               },
               {
                 role: "user",
-                content: `Generate marketing strategy for ${isLaunch ? "launching" : "growing an established"} ${form.product_type} business in ${form.country} ${form.sector ? `(${form.sector} sector)` : ""}. Target: ${audienceText}.${competitorText ? ` Main competitor to analyze: ${competitorText}` : " No specific competitor provided - focus on general market positioning."}
+                content: `Create a concise marketing strategy for ${form.product_type} business in ${form.country}. Target: ${audienceText}.${competitorText ? ` Competitor: ${competitorText}` : ""}
 
-Respond with valid JSON only. Return EXACTLY these fields in this order with PLAIN TEXT STRINGS only (no objects, no arrays):
+Return valid JSON with these fields as SHORT TEXT STRINGS:
 
 {
-  "market_foundation": "Comprehensive market analysis as flowing text with paragraph breaks. Cover market overview, customer behaviour patterns, key opportunities${competitorText ? ", and detailed analysis of " + competitorText : ""}. Use natural paragraphs with occasional bullets for key insights.",
-  "personas": "Three detailed customer personas as flowing text with clear paragraph separation. Each persona should include name, age range, background, lifestyle, pain points, motivations, and buying behaviour for ${form.product_type} customers.",
-  "strategy_pillars": "Three core strategic pillars as flowing text with natural paragraph breaks. ${isLaunch ? "Focus on launch strategies including market entry, awareness building, and initial customer acquisition" : "Focus on growth strategies including market expansion, customer retention, and competitive positioning"} for ${form.product_type} business without excessive bullet points.",
-  "seven_ps": "Complete marketing mix analysis covering Product, Price, Place, Promotion, People, Process, Physical Evidence as flowing business text with paragraph structure.",
-  "channel_playbook": "Detailed channel strategy and tactics as flowing text with natural paragraph breaks. Cover digital and traditional channels relevant to ${form.product_type} in ${form.country}.",
-  "budget": "Budget allocation and financial planning as flowing text with paragraph structure. Include investment priorities and cost considerations for ${form.product_type} marketing.",
-  "calendar_next_90_days": "${isLaunch ? "Launch-focused 90-day timeline covering pre-launch, launch week, and post-launch optimization phases" : "Growth-focused 90-day plan with optimization, scaling, and expansion initiatives"} as flowing text with clear paragraph breaks and occasional bullets for key milestones only.",
-  "kpis": "Comprehensive KPI framework as flowing business text covering measurement methods, specific performance indicators with realistic targets, and analytics setup. Use natural paragraphs.",
-  "differentiators": "Core differentiation strategy, value proposition, and positioning statement as flowing business text with natural paragraph structure.",
-  "risks_and_safety_nets": "Risk analysis covering primary risks, mitigation strategies, and contingency plans as flowing business document with natural paragraph structure."
+  "market_foundation": "Brief market overview for ${form.product_type} in ${form.country}. 2-3 sentences about market size, trends, and opportunities.",
+  "personas": "Three customer personas: Name, age, job, main need for ${form.product_type}. Keep each persona to 1-2 sentences.",
+  "strategy_pillars": "Three key strategies for ${form.product_type}: 1) Strategy name and brief description 2) Strategy name and brief description 3) Strategy name and brief description",
+  "seven_ps": "Quick marketing mix: Product (main features), Price (pricing approach), Place (where to sell), Promotion (how to advertise).",
+  "channel_playbook": "Top 3 marketing channels for ${form.product_type}: 1) Channel name - why it works 2) Channel name - why it works 3) Channel name - why it works",
+  "budget": "Simple budget breakdown: X% for advertising, Y% for marketing tools, Z% for content creation.",
+  "calendar_next_90_days": "90-day plan: Month 1 (setup), Month 2 (launch/promote), Month 3 (optimize and scale).",
+  "kpis": "Key metrics to track: Lead generation, customer acquisition cost, conversion rate, customer lifetime value.",
+  "differentiators": "What makes ${form.product_type} different from competitors and why customers should choose it.",
+  "risks_and_safety_nets": "Main business risks and how to mitigate them."
 }
 
-Generate comprehensive, business-specific content for ${form.product_type} in ${form.country}. 
-
-CRITICAL: Ensure the "personas" field contains detailed customer profiles with names, ages, backgrounds, and specific behaviours. Do not leave personas empty. Create 3 distinct personas for ${audienceText} customers in the ${form.country} market.
-
-CRITICAL: Each field must be a PLAIN TEXT STRING with natural paragraph breaks (use \\n\\n between paragraphs). Never return objects, arrays, or undefined values. Write comprehensive flowing content without excessive bullet points or subheadings.
-
-No markdown formatting.`,
+Keep all responses SHORT and practical. No fluff.`,
               },
             ],
           }),
