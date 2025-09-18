@@ -154,6 +154,13 @@ export default function App() {
   const [budgetBand, setBudgetBand] = useState("low");
   const [businessStage, setBusinessStage] = useState("growth");
 
+  // Dropdown open states for caret rotation
+  const [countryOpen, setCountryOpen] = useState(false);
+  const [sectorOpen, setSectorOpen] = useState(false);
+  const [businessStageOpen, setBusinessStageOpen] = useState(false);
+  const [motionOpen, setMotionOpen] = useState(false);
+  const [budgetOpen, setBudgetOpen] = useState(false);
+
   const [result, setResult] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setErr] = useState("");
@@ -592,6 +599,8 @@ export default function App() {
                     id="country"
                     value={country}
                     onChange={(e) => setCountry(e.target.value)}
+                    onFocus={() => setCountryOpen(true)}
+                    onBlur={() => setCountryOpen(false)}
                     aria-describedby="country-help"
                     required
                     className="w-full px-4 py-3 pr-12 rounded-xl border border-gray-200 bg-white/80 focus:outline-none focus:ring-2 focus:ring-blue-400/50 focus:border-blue-300 focus:bg-white transition-all duration-200 text-gray-700 min-h-[44px] appearance-none cursor-pointer"
@@ -603,7 +612,7 @@ export default function App() {
                     ))}
                   </select>
                   <div className="absolute inset-y-0 right-0 flex items-center pr-4 pointer-events-none">
-                    <svg className="w-4 h-4 text-gray-400 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className={`w-4 h-4 text-gray-400 transition-transform duration-200 ${countryOpen ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
                     </svg>
                   </div>
@@ -633,6 +642,8 @@ export default function App() {
                     id="sector"
                     value={sector}
                     onChange={(e) => setSector(e.target.value)}
+                    onFocus={() => setSectorOpen(true)}
+                    onBlur={() => setSectorOpen(false)}
                     aria-describedby="sector-help"
                     className="w-full px-4 py-3 pr-12 rounded-xl border border-gray-200 bg-white/80 focus:outline-none focus:ring-2 focus:ring-blue-400/50 focus:border-blue-300 focus:bg-white transition-all duration-200 text-gray-700 min-h-[44px] appearance-none cursor-pointer"
                   >
@@ -649,7 +660,7 @@ export default function App() {
                     ))}
                   </select>
                   <div className="absolute inset-y-0 right-0 flex items-center pr-4 pointer-events-none">
-                    <svg className="w-4 h-4 text-gray-400 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className={`w-4 h-4 text-gray-400 transition-transform duration-200 ${sectorOpen ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
                     </svg>
                   </div>
@@ -671,7 +682,7 @@ export default function App() {
               <Field
                 label="Offering (product or service)"
                 required
-                tooltip="Keep it short for faster results"
+                tooltip="Keep it short for faster results."
                 id="offering"
               >
                 <input
@@ -690,7 +701,7 @@ export default function App() {
               <Field
                 label="Business stage"
                 required
-                tooltip="Shapes strategy focus"
+                tooltip="Shapes strategy focus."
                 id="business-stage"
               >
                 <div className="relative">
@@ -698,6 +709,8 @@ export default function App() {
                     id="business-stage"
                     value={businessStage}
                     onChange={(e) => setBusinessStage(e.target.value)}
+                    onFocus={() => setBusinessStageOpen(true)}
+                    onBlur={() => setBusinessStageOpen(false)}
                     aria-describedby="business-stage-help"
                     required
                     className="w-full px-4 py-3 pr-12 rounded-xl border border-gray-200 bg-white/80 focus:outline-none focus:ring-2 focus:ring-blue-400/50 focus:border-blue-300 focus:bg-white transition-all duration-200 text-gray-700 min-h-[44px] appearance-none cursor-pointer"
@@ -709,7 +722,7 @@ export default function App() {
                     ))}
                   </select>
                   <div className="absolute inset-y-0 right-0 flex items-center pr-4 pointer-events-none">
-                    <svg className="w-4 h-4 text-gray-400 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className={`w-4 h-4 text-gray-400 transition-transform duration-200 ${businessStageOpen ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
                     </svg>
                   </div>
@@ -765,6 +778,8 @@ export default function App() {
                     id="motion"
                     value={motion}
                     onChange={(e) => setMotion(e.target.value)}
+                    onFocus={() => setMotionOpen(true)}
+                    onBlur={() => setMotionOpen(false)}
                     aria-describedby="motion-help"
                     required
                     className="w-full px-4 py-3 pr-12 rounded-xl border border-gray-200 bg-white/80 focus:outline-none focus:ring-2 focus:ring-blue-400/50 focus:border-blue-300 focus:bg-white transition-all duration-200 text-gray-700 min-h-[44px] appearance-none cursor-pointer"
@@ -776,7 +791,7 @@ export default function App() {
                     ))}
                   </select>
                   <div className="absolute inset-y-0 right-0 flex items-center pr-4 pointer-events-none">
-                    <svg className="w-4 h-4 text-gray-400 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className={`w-4 h-4 text-gray-400 transition-transform duration-200 ${motionOpen ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
                     </svg>
                   </div>
@@ -806,6 +821,8 @@ export default function App() {
                     id="budget"
                     value={budgetBand}
                     onChange={(e) => setBudgetBand(e.target.value)}
+                    onFocus={() => setBudgetOpen(true)}
+                    onBlur={() => setBudgetOpen(false)}
                     aria-describedby="budget-help"
                     required
                     className="w-full px-4 py-3 pr-12 rounded-xl border border-gray-200 bg-white/80 focus:outline-none focus:ring-2 focus:ring-blue-400/50 focus:border-blue-300 focus:bg-white transition-all duration-200 text-gray-700 min-h-[44px] appearance-none cursor-pointer"
@@ -817,7 +834,7 @@ export default function App() {
                     ))}
                   </select>
                   <div className="absolute inset-y-0 right-0 flex items-center pr-4 pointer-events-none">
-                    <svg className="w-4 h-4 text-gray-400 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className={`w-4 h-4 text-gray-400 transition-transform duration-200 ${budgetOpen ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
                     </svg>
                   </div>
@@ -827,7 +844,7 @@ export default function App() {
               {/* competitors */}
               <Field
                 label="Top competitor"
-                tooltip="Short name for faster analysis"
+                tooltip="Short name for faster analysis."
                 id="competitor"
               >
                 <input
