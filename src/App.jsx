@@ -41,7 +41,7 @@ const Field = ({ label, children, tooltip, required, id }) => (
       {tooltip && (
         <p
           id={id ? `${id}-help` : undefined}
-          className="text-sm text-gray-600 leading-relaxed mb-2"
+          className="text-sm text-gray-600 leading-relaxed"
         >
           {tooltip}
         </p>
