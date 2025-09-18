@@ -1,0 +1,205 @@
+<!doctype html>
+<!--
+ __    __     ______     ______     __  __     ______     ______   __     __   __     ______      
+/\ "-./  \   /\  __ \   /\  == \   /\ \/ /    /\  ___\   /\__  _\ /\ \   /\ "-.\ \   /\  ___\     
+\ \ \-./\ \  \ \  __ \  \ \  __<   \ \  _"-.  \ \  __\   \/_/\ \/ \ \ \  \ \ \-.  \  \ \ \__ \    
+ \ \_\ \ \_\  \ \_\ \_\  \ \_\ \_\  \ \_\ \_\  \ \_____\    \ \_\  \ \_\  \ \_\\"\_\  \ \_____\   
+  \/_/  \/_/   \/_/\/_/   \/_/ /_/   \/_/\/_/   \/_____/     \/_/   \/_/   \/_/ \/_/   \/_____/   
+                                                                                                  
+ ______     ______   ______     ______     ______   ______     ______     __  __                  
+/\  ___\   /\__  _\ /\  == \   /\  __ \   /\__  _\ /\  ___\   /\  ___\   /\ \_\ \                 
+\ \___  \  \/_/\ \/ \ \  __<   \ \  __ \  \/_/\ \/ \ \  __\   \ \ \__ \  \ \____ \                
+ \/\_____\    \ \_\  \ \_\ \_\  \ \_\ \_\    \ \_\  \ \_____\  \ \_____\  \/\_____\               
+  \/_____/     \/_/   \/_/ /_/   \/_/\/_/     \/_/   \/_____/   \/_____/   \/_____/               
+                                                                                                  
+ ______     ______     __   __     ______     ______     ______     ______   ______     ______    
+/\  ___\   /\  ___\   /\ "-.\ \   /\  ___\   /\  == \   /\  __ \   /\__  _\ /\  __ \   /\  == \   
+\ \ \__ \  \ \  __\   \ \ \-.  \  \ \  __\   \ \  __<   \ \  __ \  \/_/\ \/ \ \ \/\ \  \ \  __<   
+ \ \_____\  \ \_____\  \ \_\\"\_\  \ \_____\  \ \_\ \_\  \ \_\ \_\    \ \_\  \ \_____\  \ \_\ \_\ 
+  \/_____/   \/_____/   \/_/ \/_/   \/_____/   \/_/ /_/   \/_/\/_/     \/_/   \/_____/   \/_/ /_/ 
+                                                                                                  
+
+-->
+<html lang="en">
+  <head>
+    <script type="module">
+import RefreshRuntime from "/@react-refresh"
+RefreshRuntime.injectIntoGlobalHook(window)
+window.$RefreshReg$ = () => {}
+window.$RefreshSig$ = () => (type) => type
+window.__vite_plugin_react_preamble_installed__ = true
+</script>
+
+    <script type="module" src="/@vite/client"></script>
+
+    <meta charset="UTF-8" />
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="192x192"
+      href="/android-chrome-192x192.png"
+    />
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="512x512"
+      href="/android-chrome-512x512.png"
+    />
+    <link rel="manifest" href="/site.webmanifest" />
+    <meta name="theme-color" content="#8b5cf6" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'self'; font-src 'self' https://fonts.googleapis.com https://fonts.gstatic.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.tailwindcss.com; script-src 'self' 'unsafe-eval' https://cdn.tailwindcss.com; img-src 'self' data: https:; connect-src 'self' https://api.openai.com https://glow-api-lingering-queen-74b7.cloudflare-4up2f.workers.dev;"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap"
+      rel="stylesheet"
+    />
+    <meta
+      name="description"
+      content="Create a free marketing strategy for your business. No sign-up needed. No strings attached."
+    />
+    <title>Free Marketing Strategy Generator | No Sign-Up Needed</title>
+    
+    <!-- Print CSS for text-only printing -->
+    <style>
+      @media print {
+        /* Hide background images and graphics */
+        body::before, 
+        div[style*="background"], 
+        .bg-gradient-to-br,
+        .bg-gradient-to-r,
+        .bg-gradient-to-b,
+        [style*="background-image"] {
+          background-image: none !important;
+          background: white !important;
+        }
+        
+        /* Ensure text is black on white */
+        * {
+          color: black !important;
+          background: white !important;
+        }
+        
+        /* Hide gradients and decorative elements */
+        .bg-blue-50, .bg-purple-50, .bg-green-50, .bg-indigo-50 {
+          background: white !important;
+        }
+        
+        /* Make sure text is readable */
+        h1, h2, h3, h4, h5, h6 {
+          color: black !important;
+          font-weight: bold !important;
+        }
+        
+        /* Hide interactive elements in print */
+        button {
+          display: none !important;
+        }
+      }
+    </style>
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website" />
+    <meta
+      property="og:url"
+      content="https://4ed238b6-44fe-47f0-8f40-754dbed6c70c-00-31bwxps5rwfru.worf.replit.dev"
+    />
+    <meta
+      property="og:title"
+      content="Free Marketing Strategy Generator | No Sign-Up Needed"
+    />
+    <meta
+      property="og:description"
+      content="Create a free marketing strategy for your business. No sign-up needed. No strings attached."
+    />
+    <meta
+      property="og:image"
+      content="https://4ed238b6-44fe-47f0-8f40-754dbed6c70c-00-31bwxps5rwfru.worf.replit.dev/og-image.png"
+    />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image" />
+    <meta
+      property="twitter:url"
+      content="https://4ed238b6-44fe-47f0-8f40-754dbed6c70c-00-31bwxps5rwfru.worf.replit.dev"
+    />
+    <meta
+      property="twitter:title"
+      content="Free Marketing Strategy Generator | No Sign-Up Needed"
+    />
+    <meta
+      property="twitter:description"
+      content="Create a free marketing strategy for your business. No sign-up needed. No strings attached."
+    />
+    <meta
+      property="twitter:image"
+      content="https://4ed238b6-44fe-47f0-8f40-754dbed6c70c-00-31bwxps5rwfru.worf.replit.dev/og-image.png"
+    />
+
+    <!-- JSON-LD Schema Markup -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "WebApplication",
+        "name": "Free Marketing Strategy Generator",
+        "description": "Create a marketing strategy for your business instantly. No sign-up needed. Generate detailed go-to-market plans with channel recommendations, budget allocation, and KPIs.",
+        "url": "https://4ed238b6-44fe-47f0-8f40-754dbed6c70c-00-31bwxps5rwfru.worf.replit.dev",
+        "applicationCategory": "BusinessApplication",
+        "operatingSystem": "Web Browser",
+        "permissions": "No registration required",
+        "isAccessibleForFree": true,
+        "offers": {
+          "@type": "Offer",
+          "price": "0",
+          "priceCurrency": "USD"
+        },
+        "featureList": [
+          "Marketing channel recommendations",
+          "Budget allocation planning",
+          "90-day action calendar",
+          "KPI framework",
+          "Competitor analysis",
+          "Print-friendly format"
+        ]
+      }
+    </script>
+
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "Service",
+        "name": "Marketing Strategy Generation",
+        "description": "Professional marketing strategy creation service powered by AI",
+        "provider": {
+          "@type": "Organization",
+          "name": "Marketing Strategy Generator"
+        },
+        "areaServed": "Worldwide",
+        "availableChannel": {
+          "@type": "ServiceChannel",
+          "serviceUrl": "https://4ed238b6-44fe-47f0-8f40-754dbed6c70c-00-31bwxps5rwfru.worf.replit.dev",
+          "serviceName": "Web Application"
+        },
+        "category": "Marketing Consulting",
+        "audience": {
+          "@type": "BusinessAudience",
+          "audienceType": "Small and Medium Businesses"
+        }
+      }
+    </script>
+  </head>
+  <body class="font-[Poppins,sans-serif]" style="margin: 0; padding: 0">
+    <div id="root"></div>
+    <script type="module" src="/src/main.jsx?t=1758164389987"></script>
+  </body>
+</html>
