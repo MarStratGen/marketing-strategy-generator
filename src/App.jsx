@@ -810,8 +810,7 @@ export default function App() {
                 the OpenAI API to draft a comprehensive marketing strategy. The strategy
                 includes classic frameworks like the 7 Ps of marketing, detailed customer
                 personas, channel recommendations, budget allocation guidance, a 90-day
-                action plan, and KPI frameworks. You get the complete strategy on screen
-                with options to download or print.
+                action plan, and KPI frameworks. You get the complete strategy on screen.
               </p>
             </div>
 
