@@ -197,11 +197,6 @@ function ContentSection({ section, isFirst }) {
             </div>
           </div>
           <div className="flex items-center gap-3">
-            {isFirst && (
-              <span className="px-3 py-1 bg-blue-100 text-blue-700 text-xs font-bold rounded-full">
-                START HERE
-              </span>
-            )}
             {isOpen ? (
               <ChevronDownIcon className="w-6 h-6 text-slate-400" />
             ) : (
