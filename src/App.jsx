@@ -176,40 +176,44 @@ export default function App() {
     // Split on commas and clean up tokens
     const allTokens = inputValue
       .split(",")
-      .map(token => token.trim())
-      .filter(token => token.length > 0);
+      .map((token) => token.trim())
+      .filter((token) => token.length > 0);
 
     const availableSlots = Math.max(0, max - currentList.length);
     const tokensToAdd = allTokens.slice(0, availableSlots);
     const overflowTokens = allTokens.slice(availableSlots);
-    
-    const remainingInput = overflowTokens.length > 0 ? overflowTokens.join(", ") : "";
-    
+
+    const remainingInput =
+      overflowTokens.length > 0 ? overflowTokens.join(", ") : "";
+
     return {
       tokensAdded: tokensToAdd,
       remainingInput,
-      itemsWereAdded: tokensToAdd.length > 0
+      itemsWereAdded: tokensToAdd.length > 0,
     };
   };
 
   // Handle comma detection in input - works on all keyboards
   const handlePillInputChange = (e, setter, inpSetter, max = 99) => {
     const value = e.target.value;
-    
+
     if (value.includes(",")) {
       setter((currentList) => {
         const result = processTokenizedInput(value, currentList, max);
-        
+
         // Only update input if tokens were processed
-        if (result.tokensAdded.length > 0 || result.remainingInput !== value.trim()) {
+        if (
+          result.tokensAdded.length > 0 ||
+          result.remainingInput !== value.trim()
+        ) {
           inpSetter(result.remainingInput);
         }
-        
+
         // Add the tokens that fit
         if (result.tokensAdded.length > 0) {
           return [...currentList, ...result.tokensAdded];
         }
-        
+
         return currentList;
       });
     } else {
@@ -217,177 +221,183 @@ export default function App() {
       inpSetter(value);
     }
   };
-  
+
   // Handle Enter key
   const handlePillInputKeyDown = (e, setter, inpSetter, max = 99) => {
     if (e.key === "Enter") {
       e.preventDefault();
       const value = e.target.value.trim();
-      
+
       if (value) {
         setter((currentList) => {
           const result = processTokenizedInput(value, currentList, max);
-          
+
           // Only clear input if items were actually added
           if (result.itemsWereAdded) {
             inpSetter(result.remainingInput);
           }
-          
+
           // Add the tokens that fit
           if (result.tokensAdded.length > 0) {
             return [...currentList, ...result.tokensAdded];
           }
-          
+
           return currentList;
         });
       }
     }
   };
-  
+
   // Handle blur - keep text in input, don't auto-convert to pills
   const handlePillInputBlur = (e, setter, inpSetter, max = 99) => {
     // Do nothing on blur - let users decide when to add pills
     // Users can press Enter or comma to explicitly add pills
   };
-  
+
   // Flush pending input to pills (used before form submission)
   const flushPendingInput = (inputValue, setter, inpSetter, max = 99) => {
     const value = inputValue.trim();
     if (value) {
       setter((currentList) => {
         const result = processTokenizedInput(value, currentList, max);
-        
+
         // Only clear input if items were actually added
         if (result.itemsWereAdded) {
           inpSetter(result.remainingInput);
         }
-        
+
         // Add the tokens that fit
         if (result.tokensAdded.length > 0) {
           return [...currentList, ...result.tokensAdded];
         }
-        
+
         return currentList;
       });
     }
   };
 
   /* ----- submit ----- */
-  const handleSubmit = useCallback(async (e) => {
-    e.preventDefault();
+  const handleSubmit = useCallback(
+    async (e) => {
+      e.preventDefault();
 
-    // Immediately set loading state to prevent double-clicks
-    flushSync(() => {
-      setErr("");
-      setResult(null);
-      setLoading(true);
-    });
-
-    // Small delay to ensure any pending blur events complete first
-    await new Promise(resolve => setTimeout(resolve, 10));
-
-    // Flush any pending input to pills before validation (synchronously)
-    flushSync(() => {
-      flushPendingInput(segInp, setSeg, setSegInp, 3);
-    });
-
-    // Basic validation
-    const finalCountry =
-      country === "__custom_country" ? customCountry : country;
-    const finalSector = sector === "__custom_sector" ? customSector : sector;
-
-    if (!finalCountry.trim()) {
+      // Immediately set loading state to prevent double-clicks
       flushSync(() => {
-        setErr("Please select a country.");
-        setLoading(false);
+        setErr("");
+        setResult(null);
+        setLoading(true);
       });
-      return;
-    }
 
-    if (!offering.trim()) {
+      // Small delay to ensure any pending blur events complete first
+      await new Promise((resolve) => setTimeout(resolve, 10));
+
+      // Flush any pending input to pills before validation (synchronously)
       flushSync(() => {
-        setErr("Please describe what you're selling.");
-        setLoading(false);
+        flushPendingInput(segInp, setSeg, setSegInp, 3);
       });
-      return;
-    }
 
-    // Get the most current segments, including any flushed input
-    const currentSegments = [...segments];
-    if (segInp.trim()) {
-      const result = processTokenizedInput(segInp.trim(), segments, 3);
-      currentSegments.push(...result.tokensAdded);
-    }
+      // Basic validation
+      const finalCountry =
+        country === "__custom_country" ? customCountry : country;
+      const finalSector = sector === "__custom_sector" ? customSector : sector;
 
-    if (!currentSegments || currentSegments.length === 0) {
-      flushSync(() => {
-        setErr("Please add at least one target segment.");
-        setLoading(false);
-      });
-      return;
-    }
-
-    const body = {
-      country: finalCountry,
-      sector: finalSector,
-      product_type: offering,
-      audiences: currentSegments,
-      competitor: competitor.trim(),
-
-      motion: motion === "__custom_motion" ? "custom" : motion,
-      action_custom: motion === "__custom_motion" ? customMotion : undefined,
-
-      budget_band: budgetBand,
-    };
-
-    console.log("🚀 === FORM SUBMISSION STARTED ===");
-    console.log("🎯 Competitor being sent:", competitor);
-    console.log("📋 Full form data:", body);
-    console.log("🌐 Making request to URL:", WORKER_URL);
-
-    // Create fetch with timeout helper
-    const fetchWithTimeout = async (url, options, timeout = 90000) => {
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), timeout);
-      
-      try {
-        const response = await fetch(url, {
-          ...options,
-          signal: controller.signal,
+      if (!finalCountry.trim()) {
+        flushSync(() => {
+          setErr("Please select a country.");
+          setLoading(false);
         });
-        clearTimeout(timeoutId);
-        return response;
-      } catch (error) {
-        clearTimeout(timeoutId);
-        if (error.name === 'AbortError') {
-          throw new Error('Request timed out after 90 seconds');
-        }
-        throw error;
+        return;
       }
-    };
 
-    // Make direct API request (no streaming)
-    try {
-      console.log("Making request to:", WORKER_URL);
-        
+      if (!offering.trim()) {
+        flushSync(() => {
+          setErr("Please describe what you're selling.");
+          setLoading(false);
+        });
+        return;
+      }
+
+      // Get the most current segments, including any flushed input
+      const currentSegments = [...segments];
+      if (segInp.trim()) {
+        const result = processTokenizedInput(segInp.trim(), segments, 3);
+        currentSegments.push(...result.tokensAdded);
+      }
+
+      if (!currentSegments || currentSegments.length === 0) {
+        flushSync(() => {
+          setErr("Please add at least one target segment.");
+          setLoading(false);
+        });
+        return;
+      }
+
+      const body = {
+        country: finalCountry,
+        sector: finalSector,
+        product_type: offering,
+        audiences: currentSegments,
+        competitor: competitor.trim(),
+
+        motion: motion === "__custom_motion" ? "custom" : motion,
+        action_custom: motion === "__custom_motion" ? customMotion : undefined,
+
+        budget_band: budgetBand,
+      };
+
+      console.log("🚀 === FORM SUBMISSION STARTED ===");
+      console.log("🎯 Competitor being sent:", competitor);
+      console.log("📋 Full form data:", body);
+      console.log("🌐 Making request to URL:", WORKER_URL);
+
+      // Create fetch with timeout helper
+      const fetchWithTimeout = async (url, options, timeout = 90000) => {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), timeout);
+
+        try {
+          const response = await fetch(url, {
+            ...options,
+            signal: controller.signal,
+          });
+          clearTimeout(timeoutId);
+          return response;
+        } catch (error) {
+          clearTimeout(timeoutId);
+          if (error.name === "AbortError") {
+            throw new Error("Request timed out after 90 seconds");
+          }
+          throw error;
+        }
+      };
+
+      // Make direct API request (no streaming)
+      try {
+        console.log("Making request to:", WORKER_URL);
+
         const response = await fetchWithTimeout(WORKER_URL, {
           method: "POST",
-          headers: { 
-            "Content-Type": "application/json"
+          headers: {
+            "Content-Type": "application/json",
           },
           body: JSON.stringify(body),
         });
 
         console.log("Response status:", response.status);
-        console.log("Response headers:", Object.fromEntries(response.headers.entries()));
+        console.log(
+          "Response headers:",
+          Object.fromEntries(response.headers.entries()),
+        );
 
         if (!response.ok) {
           const errorText = await response.text();
           console.error("API response error:", errorText);
-          throw new Error(`Request failed: ${response.status} - ${errorText || "No error details"}`);
+          throw new Error(
+            `Request failed: ${response.status} - ${errorText || "No error details"}`,
+          );
         }
 
-        // Handle JSON response  
+        // Handle JSON response
         const data = await response.json();
         if (data.error) {
           throw new Error(data.error);
@@ -395,80 +405,129 @@ export default function App() {
 
         console.log("✅ === API RESPONSE RECEIVED ===");
         console.log("📦 Full response data:", data);
-        
+
         if (data.market_foundation) {
           console.log("🏢 Market foundation content:", data.market_foundation);
           // Check if competitor appears anywhere in market foundation
-          const foundCompetitor = competitor.trim() && 
-            data.market_foundation.toLowerCase().includes(competitor.toLowerCase().trim());
-          console.log("🔍 Competitor found in market foundation:", foundCompetitor ? [competitor] : []);
-          console.log("❓ Missing competitor:", foundCompetitor ? [] : [competitor]);
+          const foundCompetitor =
+            competitor.trim() &&
+            data.market_foundation
+              .toLowerCase()
+              .includes(competitor.toLowerCase().trim());
+          console.log(
+            "🔍 Competitor found in market foundation:",
+            foundCompetitor ? [competitor] : [],
+          );
+          console.log(
+            "❓ Missing competitor:",
+            foundCompetitor ? [] : [competitor],
+          );
         }
-        
+
         if (data.competitors_brief) {
           console.log("📊 Competitors brief content:", data.competitors_brief);
           // Check if competitor appears in competitors_brief
-          const foundInBrief = competitor.trim() && 
-            data.competitors_brief.toLowerCase().includes(competitor.toLowerCase().trim());
-          console.log("🔍 Competitor found in brief:", foundInBrief ? [competitor] : []);
-          console.log("❓ Missing from brief:", foundInBrief ? [] : [competitor]);
+          const foundInBrief =
+            competitor.trim() &&
+            data.competitors_brief
+              .toLowerCase()
+              .includes(competitor.toLowerCase().trim());
+          console.log(
+            "🔍 Competitor found in brief:",
+            foundInBrief ? [competitor] : [],
+          );
+          console.log(
+            "❓ Missing from brief:",
+            foundInBrief ? [] : [competitor],
+          );
         }
 
         setResult(data);
-    } catch (err) {
-      console.error("Form submission error:", err);
-      const errorMessage = err.message || "Something went wrong.";
+      } catch (err) {
+        console.error("Form submission error:", err);
+        const errorMessage = err.message || "Something went wrong.";
 
-      // Handle specific error types with better user messages
-      if (errorMessage.includes("Failed to fetch") || errorMessage.includes("fetch")) {
-        setErr(
-          "Unable to connect to our servers. Please check your internet connection and try again. If the problem persists, our service may be temporarily unavailable."
-        );
-      } else if (errorMessage.includes("timed out") || errorMessage.includes("timeout")) {
-        setErr(
-          "The request is taking longer than expected. Please try again with a simpler description or check your internet connection."
-        );
-      } else if (errorMessage.includes("CORS") || errorMessage.includes("cors")) {
-        setErr(
-          "Connection blocked by browser security. Please try refreshing the page and submitting again."
-        );
-      } else if (
-        errorMessage.includes("meaningful description") ||
-        errorMessage.includes("detailed description")
-      ) {
-        setErr(
-          "Please provide a clear, meaningful description of your business offering.",
-        );
-      } else if (
-        errorMessage.includes("guidelines") ||
-        errorMessage.includes("appropriate business information")
-      ) {
-        setErr(
-          "Please ensure your business information follows our content guidelines.",
-        );
-      } else if (errorMessage.includes("valid business sector")) {
-        setErr("Please select or enter a valid business sector.");
-      } else if (
-        errorMessage.includes("api_key") ||
-        errorMessage.includes("OPENAI_API_KEY")
-      ) {
-        setErr(
-          "API configuration issue. Please contact support if this persists.",
-        );
-      } else if (
-        errorMessage.includes("rate_limit") ||
-        errorMessage.includes("quota")
-      ) {
-        setErr("Service temporarily busy. Please wait a moment and try again.");
-      } else if (errorMessage.includes("500") || errorMessage.includes("502") || errorMessage.includes("503")) {
-        setErr("Our servers are experiencing issues. Please try again in a few moments.");
-      } else {
-        setErr(`Error: ${errorMessage}`);
+        // Handle specific error types with better user messages
+        if (
+          errorMessage.includes("Failed to fetch") ||
+          errorMessage.includes("fetch")
+        ) {
+          setErr(
+            "Unable to connect to our servers. Please check your internet connection and try again. If the problem persists, our service may be temporarily unavailable.",
+          );
+        } else if (
+          errorMessage.includes("timed out") ||
+          errorMessage.includes("timeout")
+        ) {
+          setErr(
+            "The request is taking longer than expected. Please try again with a simpler description or check your internet connection.",
+          );
+        } else if (
+          errorMessage.includes("CORS") ||
+          errorMessage.includes("cors")
+        ) {
+          setErr(
+            "Connection blocked by browser security. Please try refreshing the page and submitting again.",
+          );
+        } else if (
+          errorMessage.includes("meaningful description") ||
+          errorMessage.includes("detailed description")
+        ) {
+          setErr(
+            "Please provide a clear, meaningful description of your business offering.",
+          );
+        } else if (
+          errorMessage.includes("guidelines") ||
+          errorMessage.includes("appropriate business information")
+        ) {
+          setErr(
+            "Please ensure your business information follows our content guidelines.",
+          );
+        } else if (errorMessage.includes("valid business sector")) {
+          setErr("Please select or enter a valid business sector.");
+        } else if (
+          errorMessage.includes("api_key") ||
+          errorMessage.includes("OPENAI_API_KEY")
+        ) {
+          setErr(
+            "API configuration issue. Please contact support if this persists.",
+          );
+        } else if (
+          errorMessage.includes("rate_limit") ||
+          errorMessage.includes("quota")
+        ) {
+          setErr(
+            "Service temporarily busy. Please wait a moment and try again.",
+          );
+        } else if (
+          errorMessage.includes("500") ||
+          errorMessage.includes("502") ||
+          errorMessage.includes("503")
+        ) {
+          setErr(
+            "Our servers are experiencing issues. Please try again in a few moments.",
+          );
+        } else {
+          setErr(`Error: ${errorMessage}`);
+        }
+      } finally {
+        setLoading(false);
       }
-    } finally {
-      setLoading(false);
-    }
-  }, [country, customCountry, sector, customSector, offering, segments, segInp, competitor, motion, customMotion, budgetBand]);
+    },
+    [
+      country,
+      customCountry,
+      sector,
+      customSector,
+      offering,
+      segments,
+      segInp,
+      competitor,
+      motion,
+      customMotion,
+      budgetBand,
+    ],
+  );
 
   /* ─────────────────────────────────────────── render ─── */
   return (
@@ -503,7 +562,7 @@ export default function App() {
           </div>
 
           {/* ---------- form card ---------- */}
-          <div className="bg-white rounded-3xl shadow-xl p-10 max-w-xl mx-auto border border-gray-100 mb-20">
+          <div className="bg-white rounded-3xl shadow-xl p-10 max-w-lg mx-auto border border-gray-100 mb-20">
             {error && (
               <div
                 role="alert"
@@ -630,8 +689,12 @@ export default function App() {
                 <input
                   id="segments"
                   value={segInp}
-                  onChange={(e) => handlePillInputChange(e, setSeg, setSegInp, 3)}
-                  onKeyDown={(e) => handlePillInputKeyDown(e, setSeg, setSegInp, 3)}
+                  onChange={(e) =>
+                    handlePillInputChange(e, setSeg, setSegInp, 3)
+                  }
+                  onKeyDown={(e) =>
+                    handlePillInputKeyDown(e, setSeg, setSegInp, 3)
+                  }
                   onBlur={(e) => handlePillInputBlur(e, setSeg, setSegInp, 3)}
                   aria-describedby="segments-help"
                   aria-required="true"
@@ -718,11 +781,7 @@ export default function App() {
                 disabled={loading}
                 className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white text-lg font-semibold py-4 px-6 rounded-xl transition-all duration-200 disabled:opacity-60 shadow-lg hover:shadow-xl mt-8"
               >
-                {loading ? (
-                  <LoadingSpinner />
-                ) : (
-                  "Generate Marketing Strategy"
-                )}
+                {loading ? <LoadingSpinner /> : "Generate Marketing Strategy"}
               </button>
               <p className="text-sm text-gray-500 text-center mt-2">
                 Usually takes 20-90 seconds
@@ -731,10 +790,7 @@ export default function App() {
           </div>
 
           {/* report */}
-          <Report
-            plan={result}
-            loading={loading}
-          />
+          <Report plan={result} loading={loading} />
         </div>
       </div>
 
@@ -754,8 +810,8 @@ export default function App() {
                 the OpenAI API to draft a marketing strategy and plan. The draft
                 is mapped to classic frameworks like STP and the 7 Ps, with
                 budgets shown as percentages and a 90-day calendar, KPIs, and
-                experiments. You get the result on screen and can print using
-                your browser.
+                experiments. You get the result on screen with options to
+                download or print.
               </p>
             </div>
 
@@ -805,7 +861,6 @@ export default function App() {
       {/* Footer */}
       <footer className="bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 py-12 border-t border-gray-700">
         <div className="max-w-4xl mx-auto px-6">
-          
           {/* Coffee Support Section */}
           <div className="text-center mb-10">
             <p className="text-gray-300 text-base font-medium mb-4 leading-relaxed">
@@ -813,11 +868,11 @@ export default function App() {
             </p>
             <div className="flex justify-center">
               <a href="https://www.buymeacoffee.com/marstrat" target="_blank">
-                <img 
-                  src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" 
-                  alt="Buy Me A Coffee" 
+                <img
+                  src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png"
+                  alt="Buy Me A Coffee"
                   className="transition-transform duration-200 hover:scale-105"
-                  style={{height: '48px', width: '174px'}} 
+                  style={{ height: "48px", width: "174px" }}
                 />
               </a>
             </div>
@@ -828,13 +883,14 @@ export default function App() {
             <p className="text-xs text-gray-500 leading-relaxed max-w-3xl mx-auto">
               *The marketing strategies generated by this tool are for guidance
               and educational purposes only. They are based on general marketing
-              principles and frameworks, not specific market research or real-time
-              data analysis. While the strategies follow proven methodologies, we
-              recommend conducting your own market research, testing assumptions,
-              and adapting recommendations to your specific circumstances before
-              implementation. Always verify claims, validate assumptions, and
-              consider seeking professional marketing consultation for significant
-              business decisions or large budget allocations.
+              principles and frameworks, not specific market research or
+              real-time data analysis. While the strategies follow proven
+              methodologies, we recommend conducting your own market research,
+              testing assumptions, and adapting recommendations to your specific
+              circumstances before implementation. Always verify claims,
+              validate assumptions, and consider seeking professional marketing
+              consultation for significant business decisions or large budget
+              allocations.
             </p>
           </div>
         </div>
