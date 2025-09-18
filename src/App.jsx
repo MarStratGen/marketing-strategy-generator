@@ -587,20 +587,27 @@ export default function App() {
                 tooltip="This tailors regional insights and seasonality."
                 id="country"
               >
-                <select
-                  id="country"
-                  value={country}
-                  onChange={(e) => setCountry(e.target.value)}
-                  aria-describedby="country-help"
-                  required
-                  className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-white/80 focus:outline-none focus:ring-2 focus:ring-blue-400/50 focus:border-blue-300 focus:bg-white transition-all duration-200 text-gray-700 min-h-[44px]"
-                >
-                  {COUNTRIES.map((c) => (
-                    <option key={c.code} value={c.code}>
-                      {c.label}
-                    </option>
-                  ))}
-                </select>
+                <div className="relative">
+                  <select
+                    id="country"
+                    value={country}
+                    onChange={(e) => setCountry(e.target.value)}
+                    aria-describedby="country-help"
+                    required
+                    className="w-full px-4 py-3 pr-12 rounded-xl border border-gray-200 bg-white/80 focus:outline-none focus:ring-2 focus:ring-blue-400/50 focus:border-blue-300 focus:bg-white transition-all duration-200 text-gray-700 min-h-[44px] appearance-none cursor-pointer"
+                  >
+                    {COUNTRIES.map((c) => (
+                      <option key={c.code} value={c.code}>
+                        {c.label}
+                      </option>
+                    ))}
+                  </select>
+                  <div className="absolute inset-y-0 right-0 flex items-center pr-4 pointer-events-none">
+                    <svg className="w-4 h-4 text-gray-400 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+                    </svg>
+                  </div>
+                </div>
                 {country === "__custom_country" && (
                   <input
                     ref={ccRef}
@@ -621,25 +628,32 @@ export default function App() {
                 tooltip="If yours isn't listed, choose Other."
                 id="sector"
               >
-                <select
-                  id="sector"
-                  value={sector}
-                  onChange={(e) => setSector(e.target.value)}
-                  aria-describedby="sector-help"
-                  className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-white/80 focus:outline-none focus:ring-2 focus:ring-blue-400/50 focus:border-blue-300 focus:bg-white transition-all duration-200 text-gray-700 min-h-[44px]"
-                >
-                  <option value="" disabled>
-                    Choose your sector (optional)
-                  </option>
-                  {[
-                    ...SECTORS.map((s) => ({ code: s, label: s })),
-                    { code: "__custom_sector", label: "Other (custom)" },
-                  ].map((s) => (
-                    <option key={s.code} value={s.code}>
-                      {s.label}
+                <div className="relative">
+                  <select
+                    id="sector"
+                    value={sector}
+                    onChange={(e) => setSector(e.target.value)}
+                    aria-describedby="sector-help"
+                    className="w-full px-4 py-3 pr-12 rounded-xl border border-gray-200 bg-white/80 focus:outline-none focus:ring-2 focus:ring-blue-400/50 focus:border-blue-300 focus:bg-white transition-all duration-200 text-gray-700 min-h-[44px] appearance-none cursor-pointer"
+                  >
+                    <option value="" disabled>
+                      Choose your sector (optional)
                     </option>
-                  ))}
-                </select>
+                    {[
+                      ...SECTORS.map((s) => ({ code: s, label: s })),
+                      { code: "__custom_sector", label: "Other (custom)" },
+                    ].map((s) => (
+                      <option key={s.code} value={s.code}>
+                        {s.label}
+                      </option>
+                    ))}
+                  </select>
+                  <div className="absolute inset-y-0 right-0 flex items-center pr-4 pointer-events-none">
+                    <svg className="w-4 h-4 text-gray-400 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+                    </svg>
+                  </div>
+                </div>
                 {sector === "__custom_sector" && (
                   <input
                     ref={csRef}
@@ -676,23 +690,30 @@ export default function App() {
               <Field
                 label="Business stage"
                 required
-                tooltip="This affects whether the strategy focuses on launch tactics or growth optimization."
+                tooltip="Shapes strategy focus"
                 id="business-stage"
               >
-                <select
-                  id="business-stage"
-                  value={businessStage}
-                  onChange={(e) => setBusinessStage(e.target.value)}
-                  aria-describedby="business-stage-help"
-                  required
-                  className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-white/80 focus:outline-none focus:ring-2 focus:ring-blue-400/50 focus:border-blue-300 focus:bg-white transition-all duration-200 text-gray-700 min-h-[44px]"
-                >
-                  {BUSINESS_STAGES.map((stage) => (
-                    <option key={stage.value} value={stage.value}>
-                      {stage.label}
-                    </option>
-                  ))}
-                </select>
+                <div className="relative">
+                  <select
+                    id="business-stage"
+                    value={businessStage}
+                    onChange={(e) => setBusinessStage(e.target.value)}
+                    aria-describedby="business-stage-help"
+                    required
+                    className="w-full px-4 py-3 pr-12 rounded-xl border border-gray-200 bg-white/80 focus:outline-none focus:ring-2 focus:ring-blue-400/50 focus:border-blue-300 focus:bg-white transition-all duration-200 text-gray-700 min-h-[44px] appearance-none cursor-pointer"
+                  >
+                    {BUSINESS_STAGES.map((stage) => (
+                      <option key={stage.value} value={stage.value}>
+                        {stage.label}
+                      </option>
+                    ))}
+                  </select>
+                  <div className="absolute inset-y-0 right-0 flex items-center pr-4 pointer-events-none">
+                    <svg className="w-4 h-4 text-gray-400 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+                    </svg>
+                  </div>
+                </div>
               </Field>
 
               {/* segments */}
@@ -739,20 +760,27 @@ export default function App() {
                 tooltip="Pick the main action you want customers to take."
                 id="motion"
               >
-                <select
-                  id="motion"
-                  value={motion}
-                  onChange={(e) => setMotion(e.target.value)}
-                  aria-describedby="motion-help"
-                  required
-                  className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-white/80 focus:outline-none focus:ring-2 focus:ring-blue-400/50 focus:border-blue-300 focus:bg-white transition-all duration-200 text-gray-700 min-h-[44px]"
-                >
-                  {MOTIONS.map((m) => (
-                    <option key={m.value} value={m.value}>
-                      {m.label}
-                    </option>
-                  ))}
-                </select>
+                <div className="relative">
+                  <select
+                    id="motion"
+                    value={motion}
+                    onChange={(e) => setMotion(e.target.value)}
+                    aria-describedby="motion-help"
+                    required
+                    className="w-full px-4 py-3 pr-12 rounded-xl border border-gray-200 bg-white/80 focus:outline-none focus:ring-2 focus:ring-blue-400/50 focus:border-blue-300 focus:bg-white transition-all duration-200 text-gray-700 min-h-[44px] appearance-none cursor-pointer"
+                  >
+                    {MOTIONS.map((m) => (
+                      <option key={m.value} value={m.value}>
+                        {m.label}
+                      </option>
+                    ))}
+                  </select>
+                  <div className="absolute inset-y-0 right-0 flex items-center pr-4 pointer-events-none">
+                    <svg className="w-4 h-4 text-gray-400 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+                    </svg>
+                  </div>
+                </div>
                 {motion === "__custom_motion" && (
                   <input
                     value={customMotion}
@@ -773,20 +801,27 @@ export default function App() {
                 tooltip="The plan uses percentages so you can scale up or down."
                 id="budget"
               >
-                <select
-                  id="budget"
-                  value={budgetBand}
-                  onChange={(e) => setBudgetBand(e.target.value)}
-                  aria-describedby="budget-help"
-                  required
-                  className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 min-h-[44px]"
-                >
-                  {BUDGET_BANDS.map((b) => (
-                    <option key={b.value} value={b.value}>
-                      {b.label}
-                    </option>
-                  ))}
-                </select>
+                <div className="relative">
+                  <select
+                    id="budget"
+                    value={budgetBand}
+                    onChange={(e) => setBudgetBand(e.target.value)}
+                    aria-describedby="budget-help"
+                    required
+                    className="w-full px-4 py-3 pr-12 rounded-xl border border-gray-200 bg-white/80 focus:outline-none focus:ring-2 focus:ring-blue-400/50 focus:border-blue-300 focus:bg-white transition-all duration-200 text-gray-700 min-h-[44px] appearance-none cursor-pointer"
+                  >
+                    {BUDGET_BANDS.map((b) => (
+                      <option key={b.value} value={b.value}>
+                        {b.label}
+                      </option>
+                    ))}
+                  </select>
+                  <div className="absolute inset-y-0 right-0 flex items-center pr-4 pointer-events-none">
+                    <svg className="w-4 h-4 text-gray-400 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+                    </svg>
+                  </div>
+                </div>
               </Field>
 
               {/* competitors */}
