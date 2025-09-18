@@ -606,7 +606,6 @@ export default function App() {
               <Field
                 label="Which country are you targeting?"
                 required
-                tooltip="Uses local insights and seasonality"
                 id="country"
               >
                 <div className="relative">
@@ -649,7 +648,6 @@ export default function App() {
               {/* sector */}
               <Field
                 label="Sector"
-                tooltip="Not listed? Choose Other"
                 id="sector"
               >
                 <div className="relative">
