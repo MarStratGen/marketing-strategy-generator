@@ -112,10 +112,10 @@ export default {
     // Validate field lengths to prevent extremely long inputs
     const maxLengths = {
       country: 100,
-      product_type: 1000,
+      product_type: 200,
       sector: 100,
-      competitor: 500,
-      action_custom: 500,
+      competitor: 100,
+      action_custom: 300,
     };
 
     for (const [field, maxLength] of Object.entries(maxLengths)) {
@@ -173,13 +173,13 @@ export default {
     for (let i = 0; i < form.audiences.length; i++) {
       if (
         typeof form.audiences[i] !== "string" ||
-        form.audiences[i].length > 200
+        form.audiences[i].length > 100
       ) {
         return new Response(
           JSON.stringify({
             error: "audience_invalid",
             index: i,
-            max_length: 200,
+            max_length: 100,
           }),
           cors(400, origin),
         );

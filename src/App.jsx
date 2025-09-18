@@ -657,7 +657,7 @@ export default function App() {
               <Field
                 label="Offering (product or service)"
                 required
-                tooltip="The more specific, the better the recommendations."
+                tooltip="Keep it short for faster results"
                 id="offering"
               >
                 <input
@@ -667,7 +667,7 @@ export default function App() {
                   aria-describedby="offering-help"
                   aria-required="true"
                   className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-white/80 focus:outline-none focus:ring-2 focus:ring-blue-400/50 focus:border-blue-300 focus:bg-white transition-all duration-200 text-gray-700 min-h-[44px]"
-                  placeholder="e.g. Organic seed kits"
+                  placeholder="e.g. Organic seed kits (be concise)"
                   required
                 />
               </Field>
@@ -698,7 +698,7 @@ export default function App() {
               {/* segments */}
               <Field
                 label="Target segment(s)"
-                tooltip="Add segments by typing and pressing comma or Enter (max 3)."
+                tooltip="Max 3 segments. Keep each under 10 words for speed."
                 required
                 id="segments"
               >
@@ -728,7 +728,7 @@ export default function App() {
                   aria-describedby="segments-help"
                   aria-required="true"
                   className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-white/80 focus:outline-none focus:ring-2 focus:ring-blue-400/50 focus:border-blue-300 focus:bg-white transition-all duration-200 text-gray-700 min-h-[44px]"
-                  placeholder="e.g. Home gardeners aged 35-55"
+                  placeholder="e.g. Home gardeners aged 35-55 (keep short)"
                 />
               </Field>
 
@@ -792,7 +792,7 @@ export default function App() {
               {/* competitors */}
               <Field
                 label="Top competitor"
-                tooltip="Your main competitor in this market."
+                tooltip="Short name for faster analysis"
                 id="competitor"
               >
                 <input
@@ -801,7 +801,7 @@ export default function App() {
                   onChange={(e) => setComp(e.target.value)}
                   aria-describedby="competitor-help"
                   className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-white/80 focus:outline-none focus:ring-2 focus:ring-blue-400/50 focus:border-blue-300 focus:bg-white transition-all duration-200 text-gray-700 min-h-[44px]"
-                  placeholder="e.g. Amazon, Local garden centre"
+                  placeholder="e.g. Amazon (just the name)"
                 />
               </Field>
 
@@ -813,7 +813,7 @@ export default function App() {
                 {loading ? <LoadingSpinner /> : "Generate Marketing Strategy"}
               </button>
               <p className="text-sm text-gray-500 text-center mt-2">
-                Usually takes 20-90 seconds
+                Usually takes 20-90 seconds • Shorter inputs = faster results
               </p>
             </form>
           </div>
