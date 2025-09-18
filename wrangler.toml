@@ -3,17 +3,14 @@ name = "marketing-strategy-api"
 main = "workers/worker.js" 
 compatibility_date = "2025-01-01"
 
-# KV namespace for rate limiting
-[[kv_namespaces]]
-binding = "RATE_LIMIT_KV"
-preview_id = "rate_limit_preview"
-id = "rate_limit_production"
+# KV namespace for rate limiting (will be added later)
+# [[kv_namespaces]]
+# binding = "RATE_LIMIT_KV"
+# preview_id = "rate_limit_preview"
+# id = "rate_limit_production"
 
 # Environment variables
 [vars]
 ENVIRONMENT = "production"
 
-# Custom domain routes
-[[routes]]
-pattern = "api.marketingstratgenerator.com/*"
-custom_domain = true
+# Custom domain configured via Cloudflare Dashboard
