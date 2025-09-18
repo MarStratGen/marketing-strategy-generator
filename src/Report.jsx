@@ -26,7 +26,7 @@ function SimpleTextBlock({ content }) {
   const sections = cleanContent.split(/\n\s*\n+/);
   
   return (
-    <div className="space-y-4">
+    <div className="space-y-6 sm:space-y-4">
       {sections.map((section, index) => {
         const trimmedSection = section.trim();
         if (!trimmedSection) return null;
@@ -55,7 +55,7 @@ function SimpleTextBlock({ content }) {
         } else {
           // Render as paragraph(s)
           return lines.map((line, lineIndex) => (
-            <p key={`${index}-${lineIndex}`} className="text-gray-700 leading-relaxed mb-2">
+            <p key={`${index}-${lineIndex}`} className="text-gray-700 leading-relaxed mb-3 sm:mb-2">
               {line}
             </p>
           ));
@@ -103,7 +103,7 @@ export default function Report({ plan, loading }) {
       </header>
 
       {/* Main Report Document */}
-      <div className="bg-white rounded-2xl shadow-xl p-12 space-y-8">
+      <div className="bg-white rounded-2xl shadow-xl p-6 sm:p-8 lg:p-12 space-y-10 sm:space-y-8">
         
         {/* Market Foundation */}
         {plan.market_foundation && (
