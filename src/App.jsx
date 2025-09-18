@@ -807,11 +807,11 @@ export default function App() {
               </h3>
               <p className="text-gray-700 leading-relaxed">
                 This page turns your inputs into a clear brief and sends it to
-                the OpenAI API to draft a comprehensive marketing strategy. The strategy
-                includes classic frameworks like the 7 Ps of marketing, detailed customer
-                personas, channel recommendations, budget allocation guidance, a 90-day
-                action plan, and KPI frameworks. You get the complete strategy on screen
-                with options to download or print.
+                the OpenAI API to draft a marketing strategy and plan. The draft
+                is mapped to classic frameworks like STP and the 7 Ps, with
+                budgets shown as percentages and a 90-day calendar, KPIs, and
+                experiments. You get the result on screen with options to
+                download or print.
               </p>
             </div>
 
@@ -834,7 +834,7 @@ export default function App() {
                 Is this enough on its own?
               </h3>
               <p className="text-gray-700 leading-relaxed">
-                Use it as version one. Validate the ideas with customers, run
+                No. Use it as version one. Validate the ideas with customers, run
                 small tests, measure results, and iterate. When stakes are high,
                 ask a real marketer to sanity check the plan and tailor it to
                 your budget, brand, and operations.
