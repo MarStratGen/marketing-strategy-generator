@@ -267,7 +267,7 @@ export default {
               {
                 role: "system",
                 content:
-                  "Expert marketing strategist. British English only. PLAIN TEXT ONLY - no markdown, no bold, no asterisks, no headings. Use bullet character '• ' only at start of list items. Never include percentage targets or specific numbers unless provided in form data. Write dense, specific, form-relevant content.",
+                  "Expert marketing strategist. MANDATORY: British English only (use 'colour', 'favour', 'centre', 'analyse', 'realise', 'organise', 'recognised', 'specialised', 'optimised', 'utilise', 'behaviour', 'neighbouring', 'practise' as verb). PLAIN TEXT ONLY - no markdown, no bold, no asterisks, no headings. Use bullet character '• ' only at start of list items. CRITICAL: Insert double line breaks (\\n\\n) between every 2-3 sentences to create clear paragraph separation. Write dense, specific, form-relevant content with proper paragraph structure.",
               },
               {
                 role: "user",
@@ -276,23 +276,23 @@ export default {
 Respond with valid JSON only. Return EXACTLY these fields in this order with PLAIN TEXT STRINGS only (no objects, no arrays):
 
 {
-  "market_foundation": "Comprehensive market analysis as flowing text with paragraph breaks. Cover market overview, customer behaviour patterns, key opportunities${competitorText ? ", and detailed analysis of " + competitorText : ""}. Use natural paragraphs with occasional bullets for key insights.",
-  "personas": "Three detailed customer personas as flowing text with clear paragraph separation. Each persona should include name, age range, background, lifestyle, pain points, motivations, and buying behaviour for ${form.product_type} customers.",
-  "strategy_pillars": "Three core strategic pillars as flowing text with natural paragraph breaks. ${isLaunch ? "Focus on launch strategies including market entry, awareness building, and initial customer acquisition" : "Focus on growth strategies including market expansion, customer retention, and competitive positioning"} for ${form.product_type} business without excessive bullet points.",
-  "seven_ps": "Complete marketing mix analysis covering Product, Price, Place, Promotion, People, Process, Physical Evidence as flowing business text with paragraph structure.",
-  "channel_playbook": "Detailed channel strategy and tactics as flowing text with natural paragraph breaks. Cover digital and traditional channels relevant to ${form.product_type} in ${form.country}.",
-  "budget": "Budget allocation and financial planning as flowing text with paragraph structure. Include investment priorities and cost considerations for ${form.product_type} marketing.",
-  "calendar_next_90_days": "${isLaunch ? "Launch-focused 90-day timeline covering pre-launch, launch week, and post-launch optimization phases" : "Growth-focused 90-day plan with optimization, scaling, and expansion initiatives"} as flowing text with clear paragraph breaks and occasional bullets for key milestones only.",
-  "kpis": "Comprehensive KPI framework as flowing business text covering measurement methods, specific performance indicators with realistic targets, and analytics setup. Use natural paragraphs.",
-  "differentiators": "Core differentiation strategy, value proposition, and positioning statement as flowing business text with natural paragraph structure.",
-  "risks_and_safety_nets": "Risk analysis covering primary risks, mitigation strategies, and contingency plans as flowing business document with natural paragraph structure."
+  "market_foundation": "Comprehensive market analysis with MANDATORY paragraph breaks every 2-3 sentences using \\n\\n. Cover market overview, customer behaviour patterns, key opportunities${competitorText ? ", and detailed analysis of " + competitorText : ""}. Each major point gets its own paragraph.",
+  "personas": "Three detailed customer personas with MANDATORY \\n\\n separation between each persona AND between major points within each persona. Each persona: name, age range, background, lifestyle, pain points, motivations, buying behaviour for ${form.product_type} customers.",
+  "strategy_pillars": "Three core strategic pillars with MANDATORY \\n\\n breaks between each pillar and within each pillar explanation. ${isLaunch ? "Focus on launch strategies including market entry, awareness building, and initial customer acquisition" : "Focus on growth strategies including market expansion, customer retention, and competitive positioning"} for ${form.product_type} business.",
+  "seven_ps": "Complete marketing mix analysis with MANDATORY \\n\\n breaks between each P (Product, Price, Place, Promotion, People, Process, Physical Evidence) and within longer explanations. Each P gets its own paragraph section.",
+  "channel_playbook": "Detailed channel strategy with MANDATORY \\n\\n breaks between digital and traditional channels, and between major platform/tactic discussions. Cover channels relevant to ${form.product_type} in ${form.country}.",
+  "budget": "Budget allocation with MANDATORY \\n\\n breaks between investment categories and financial sections. Include investment priorities and cost considerations for ${form.product_type} marketing.",
+  "calendar_next_90_days": "${isLaunch ? "Launch-focused 90-day timeline with MANDATORY \\n\\n breaks between phases (pre-launch, launch week, post-launch optimisation)" : "Growth-focused 90-day plan with MANDATORY \\n\\n breaks between months and major initiative sections"} with clear paragraph separation and occasional bullets for key milestones only.",
+  "kpis": "Comprehensive KPI framework with MANDATORY \\n\\n breaks between measurement categories, between indicator types, and between analytics sections. Cover measurement methods, specific performance indicators with realistic targets, and analytics setup.",
+  "differentiators": "Core differentiation strategy with MANDATORY \\n\\n breaks between value proposition elements, positioning points, and competitive advantages. Include differentiation strategy, value proposition, and positioning statement.",
+  "risks_and_safety_nets": "Risk analysis with MANDATORY \\n\\n breaks between primary risks, between mitigation strategies, and between contingency plan sections. Cover risks, mitigation strategies, and contingency plans."
 }
 
 Generate comprehensive, business-specific content for ${form.product_type} in ${form.country}. 
 
 CRITICAL: Ensure the "personas" field contains detailed customer profiles with names, ages, backgrounds, and specific behaviours. Do not leave personas empty. Create 3 distinct personas for ${audienceText} customers in the ${form.country} market.
 
-CRITICAL: Each field must be a PLAIN TEXT STRING with natural paragraph breaks (use \\n\\n between paragraphs). Never return objects, arrays, or undefined values. Write comprehensive flowing content without excessive bullet points or subheadings.
+CRITICAL: Each field must be a PLAIN TEXT STRING with MANDATORY \\n\\n paragraph breaks every 2-3 sentences. Never return objects, arrays, or undefined values. Write comprehensive flowing content with proper paragraph structure - no long text blocks without breaks. MANDATORY: Use British English exclusively (colour, analyse, realise, centre, behaviour, neighbouring, practise, recognised, specialised, optimised, utilise, programme, whilst, amongst).
 
 No markdown formatting.`,
               },
