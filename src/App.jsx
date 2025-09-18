@@ -864,7 +864,7 @@ export default function App() {
                   onChange={(e) => setComp(e.target.value)}
                   aria-describedby="competitor-help"
                   className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-white/80 focus:outline-none focus:ring-2 focus:ring-blue-400/50 focus:border-blue-300 focus:bg-white transition-all duration-200 text-gray-700 min-h-[44px]"
-                  placeholder="e.g. Amazon (just the name)"
+                  placeholder="e.g. Amazon"
                 />
               </Field>
 
