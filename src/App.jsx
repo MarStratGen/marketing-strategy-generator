@@ -807,11 +807,11 @@ export default function App() {
               </h3>
               <p className="text-gray-700 leading-relaxed">
                 This page turns your inputs into a clear brief and sends it to
-                the OpenAI API to draft a marketing strategy and plan. The draft
-                is mapped to classic frameworks like STP and the 7 Ps, with
-                budgets shown as percentages and a 90-day calendar, KPIs, and
-                experiments. You get the result on screen with options to
-                download or print.
+                the OpenAI API to draft a comprehensive marketing strategy. The strategy
+                includes classic frameworks like the 7 Ps of marketing, detailed customer
+                personas, channel recommendations, budget allocation guidance, a 90-day
+                action plan, and KPI frameworks. You get the complete strategy on screen
+                with options to download or print.
               </p>
             </div>
 
@@ -820,7 +820,7 @@ export default function App() {
                 Who is the Marketing Strategy Generator for?
               </h3>
               <p className="text-gray-700 leading-relaxed">
-                Founders, small teams, and marketers who want a structured plan
+                Founders and small teams, who want a structured plan
                 they can act on. It works for product and service businesses,
                 online and offline, B2C and B2B. Treat it as guidance, not
                 professional advice. AI can draft quickly, but a real marketer
