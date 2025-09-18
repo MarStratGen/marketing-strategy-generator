@@ -59,8 +59,8 @@ const LoadingSpinner = () => (
 );
 
 /* ----- constants ----- */
-const WORKER_URL = "https://api.marketingstratgenerator.com/generate";
-const STREAM_URL = "https://api.marketingstratgenerator.com/stream";
+const WORKER_URL = "https://glow-api-lingering-queen-74b7.cloudflare-4up2f.workers.dev/generate";
+const STREAM_URL = "https://glow-api-lingering-queen-74b7.cloudflare-4up2f.workers.dev/stream";
 
 const COUNTRIES = [
   { label: "Australia", code: "Australia" },

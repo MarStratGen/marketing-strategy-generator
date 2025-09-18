@@ -1,5 +1,5 @@
 # Cloudflare Workers Configuration for Marketing Strategy API
-name = "marketing-strategy-api"
+name = "glow-api-lingering-queen-74b7"
 main = "workers/worker.js" 
 compatibility_date = "2025-01-01"
 
