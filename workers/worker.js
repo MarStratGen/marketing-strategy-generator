@@ -125,20 +125,22 @@ Respond with valid JSON only. Use this exact structure:
   "seven_ps": "detailed analysis of Product, Price, Place, Promotion, People, Process, Physical Evidence",
   "calendar_next_90_days": "realistic 90-day implementation timeline with specific tasks",
   "kpis": {
-    "measurement_and_tracking": "text",
-    "performance_indicators": "text", 
-    "analytics_framework": "text"
+    "measurement_and_tracking": "specific tracking methods, tools, and measurement frequency for ${form.product_type} marketing in ${form.country}",
+    "performance_indicators": "concrete KPIs with realistic targets and benchmarks for ${form.motion} campaigns targeting ${audienceText}",
+    "analytics_framework": "detailed analytics setup including platforms, dashboards, and reporting cadence for ${form.product_type} business"
   },
   "risks_and_safety_nets": {
-    "primary_risks": "text",
-    "mitigation_strategies": "text",
-    "contingency_plans": "text"
+    "primary_risks": "specific risks for ${form.product_type} business in ${form.country} market including competitive, operational, and financial risks",
+    "mitigation_strategies": "actionable strategies to prevent and reduce identified risks with specific steps and timelines",
+    "contingency_plans": "detailed backup plans and alternative approaches if primary strategies fail for ${form.product_type} business"
   }
 }
 
 Generate comprehensive, business-specific content for ${form.product_type} in ${form.country}. 
 
 CRITICAL: Ensure the "personas" field contains detailed customer profiles with names, ages, backgrounds, and specific behaviours. Do not leave personas empty. Create 3 distinct personas for ${audienceText} customers in the ${form.country} market.
+
+CRITICAL: Ensure the "kpis" section contains specific, measurable KPIs with realistic targets and clear tracking methods. Include actual metric names (like conversion rate, CAC, LTV, CTR, ROAS) with specific measurement tools and reporting frequencies. Do not use generic phrases.
 
 No markdown formatting.` 
             }
