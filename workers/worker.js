@@ -245,9 +245,9 @@ export default {
       const audienceText = validAudiences.join(", ") || "target customers";
       const isLaunch = form.business_stage === "launch";
 
-      // Create abort controller for 20-second deadline
+      // Create abort controller for 25-second deadline
       const abortController = new AbortController();
-      const timeoutId = setTimeout(() => abortController.abort(), 20000);
+      const timeoutId = setTimeout(() => abortController.abort(), 25000);
 
       // Single optimized GPT-4o request - remove strict structured output for reliability
       const aiResponse = await fetch(
@@ -261,7 +261,8 @@ export default {
           body: JSON.stringify({
             model: MODEL,
             temperature: 0.25,
-            max_tokens: 1500,
+            max_tokens: 2800,
+            response_format: { type: "json_object" },
             messages: [
               {
                 role: "system",
@@ -270,24 +271,30 @@ export default {
               },
               {
                 role: "user",
-                content: `Create a concise marketing strategy for ${form.product_type} business in ${form.country}. Target: ${audienceText}.${competitorText ? ` Competitor: ${competitorText}` : ""}
+                content: `Generate marketing strategy for ${isLaunch ? "launching" : "growing an established"} ${form.product_type} business in ${form.country} ${form.sector ? `(${form.sector} sector)` : ""}. Target: ${audienceText}.${competitorText ? ` Main competitor to analyze: ${competitorText}` : " No specific competitor provided - focus on general market positioning."}
 
-Return valid JSON with these fields as SHORT TEXT STRINGS:
+Respond with valid JSON only. Return EXACTLY these fields in this order with PLAIN TEXT STRINGS only (no objects, no arrays):
 
 {
-  "market_foundation": "Brief market overview for ${form.product_type} in ${form.country}. 2-3 sentences about market size, trends, and opportunities.",
-  "personas": "Three customer personas: Name, age, job, main need for ${form.product_type}. Keep each persona to 1-2 sentences.",
-  "strategy_pillars": "Three key strategies for ${form.product_type}: 1) Strategy name and brief description 2) Strategy name and brief description 3) Strategy name and brief description",
-  "seven_ps": "Quick marketing mix: Product (main features), Price (pricing approach), Place (where to sell), Promotion (how to advertise).",
-  "channel_playbook": "Top 3 marketing channels for ${form.product_type}: 1) Channel name - why it works 2) Channel name - why it works 3) Channel name - why it works",
-  "budget": "Simple budget breakdown: X% for advertising, Y% for marketing tools, Z% for content creation.",
-  "calendar_next_90_days": "90-day plan: Month 1 (setup), Month 2 (launch/promote), Month 3 (optimize and scale).",
-  "kpis": "Key metrics to track: Lead generation, customer acquisition cost, conversion rate, customer lifetime value.",
-  "differentiators": "What makes ${form.product_type} different from competitors and why customers should choose it.",
-  "risks_and_safety_nets": "Main business risks and how to mitigate them."
+  "market_foundation": "Comprehensive market analysis as flowing text with paragraph breaks. Cover market overview, customer behaviour patterns, key opportunities${competitorText ? ", and detailed analysis of " + competitorText : ""}. Use natural paragraphs with occasional bullets for key insights.",
+  "personas": "Three detailed customer personas as flowing text with clear paragraph separation. Each persona should include name, age range, background, lifestyle, pain points, motivations, and buying behaviour for ${form.product_type} customers.",
+  "strategy_pillars": "Three core strategic pillars as flowing text with natural paragraph breaks. ${isLaunch ? "Focus on launch strategies including market entry, awareness building, and initial customer acquisition" : "Focus on growth strategies including market expansion, customer retention, and competitive positioning"} for ${form.product_type} business without excessive bullet points.",
+  "seven_ps": "Complete marketing mix analysis covering Product, Price, Place, Promotion, People, Process, Physical Evidence as flowing business text with paragraph structure.",
+  "channel_playbook": "Detailed channel strategy and tactics as flowing text with natural paragraph breaks. Cover digital and traditional channels relevant to ${form.product_type} in ${form.country}.",
+  "budget": "Budget allocation and financial planning as flowing text with paragraph structure. Include investment priorities and cost considerations for ${form.product_type} marketing.",
+  "calendar_next_90_days": "${isLaunch ? "Launch-focused 90-day timeline covering pre-launch, launch week, and post-launch optimization phases" : "Growth-focused 90-day plan with optimization, scaling, and expansion initiatives"} as flowing text with clear paragraph breaks and occasional bullets for key milestones only.",
+  "kpis": "Comprehensive KPI framework as flowing business text covering measurement methods, specific performance indicators with realistic targets, and analytics setup. Use natural paragraphs.",
+  "differentiators": "Core differentiation strategy, value proposition, and positioning statement as flowing business text with natural paragraph structure.",
+  "risks_and_safety_nets": "Risk analysis covering primary risks, mitigation strategies, and contingency plans as flowing business document with natural paragraph structure."
 }
 
-Keep all responses SHORT and practical. No fluff.`,
+Generate comprehensive, business-specific content for ${form.product_type} in ${form.country}. 
+
+CRITICAL: Ensure the "personas" field contains detailed customer profiles with names, ages, backgrounds, and specific behaviours. Do not leave personas empty. Create 3 distinct personas for ${audienceText} customers in the ${form.country} market.
+
+CRITICAL: Each field must be a PLAIN TEXT STRING with natural paragraph breaks (use \\n\\n between paragraphs). Never return objects, arrays, or undefined values. Write comprehensive flowing content without excessive bullet points or subheadings.
+
+No markdown formatting.`,
               },
             ],
           }),
@@ -350,78 +357,7 @@ Keep all responses SHORT and practical. No fluff.`,
         );
       }
 
-      // Validate and repair personas if missing or too short
-      if (
-        !aiGenerated?.personas ||
-        (typeof aiGenerated.personas === "string" &&
-          aiGenerated.personas.length < 100)
-      ) {
-        console.log(
-          "🔧 PERSONAS REPAIR: Personas missing or too short, triggering fallback generation",
-        );
-
-        try {
-          const personasPrompt = `Generate exactly 3 detailed customer personas for ${isLaunch ? "a new" : "an established"} ${form.product_type} business targeting ${audienceText}. 
-
-Format as bullet points with these details for each persona:
-• Name (realistic first name)
-• Age range
-• Background and lifestyle
-• Pain points and challenges
-• Buying behaviour and motivations
-• How they would discover ${form.product_type}
-
-Be specific and realistic. No generic descriptions.`;
-
-          const personasResponse = await fetch(
-            "https://api.openai.com/v1/chat/completions",
-            {
-              method: "POST",
-              headers: {
-                Authorization: `Bearer ${env.OPENAI_API_KEY}`,
-                "Content-Type": "application/json",
-              },
-              body: JSON.stringify({
-                model: "gpt-4o",
-                messages: [
-                  {
-                    role: "user",
-                    content: personasPrompt,
-                  },
-                ],
-                temperature: 0.7,
-                max_tokens: 800,
-              }),
-            },
-          );
-
-          if (personasResponse.ok) {
-            const personasData = await personasResponse.json();
-            const generatedPersonas =
-              personasData.choices[0]?.message?.content?.trim();
-            if (generatedPersonas && generatedPersonas.length > 100) {
-              aiGenerated.personas = generatedPersonas;
-              console.log(
-                "✅ PERSONAS REPAIR: Successfully generated fallback personas",
-              );
-            } else {
-              console.error(
-                "❌ PERSONAS REPAIR: Fallback generation returned insufficient content",
-              );
-              throw new Error("Failed to generate adequate personas content");
-            }
-          } else {
-            console.error("❌ PERSONAS REPAIR: Fallback API call failed");
-            throw new Error("Personas generation fallback failed");
-          }
-        } catch (error) {
-          console.error(
-            "❌ PERSONAS REPAIR: Exception during fallback:",
-            error.message,
-          );
-          throw new Error("Critical personas generation failure");
-        }
-      }
+      // Removed personas fallback - JSON response format ensures proper structure
 
       // Validate competitor coverage for single competitor
       if (
