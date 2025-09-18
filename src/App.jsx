@@ -503,7 +503,7 @@ export default function App() {
           </div>
 
           {/* ---------- form card ---------- */}
-          <div className="bg-white rounded-3xl shadow-xl p-10 max-w-lg mx-auto border border-gray-100 mb-20">
+          <div className="bg-white rounded-3xl shadow-xl p-10 max-w-xl mx-auto border border-gray-100 mb-20">
             {error && (
               <div
                 role="alert"
