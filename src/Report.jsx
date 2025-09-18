@@ -115,7 +115,7 @@ export default function Report({ plan, loading }) {
           </section>
         )}
 
-        {/* Personas */}
+        {/* Customer Personas */}
         {plan.personas && (
           <section>
             <h2 className="text-2xl font-bold text-gray-900 mb-6 border-b border-gray-200 pb-3">
@@ -175,7 +175,7 @@ export default function Report({ plan, loading }) {
           </section>
         )}
 
-        {/* KPIs */}
+        {/* Key Performance Indicators */}
         {plan.kpis && (
           <section>
             <h2 className="text-2xl font-bold text-gray-900 mb-6 border-b border-gray-200 pb-3">
@@ -185,7 +185,7 @@ export default function Report({ plan, loading }) {
           </section>
         )}
 
-        {/* Differentiation */}
+        {/* Differentiation Strategy */}
         {plan.differentiators && (
           <section>
             <h2 className="text-2xl font-bold text-gray-900 mb-6 border-b border-gray-200 pb-3">

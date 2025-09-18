@@ -111,24 +111,26 @@ export default {
               role: "user", 
               content: `Generate marketing strategy for ${form.product_type} in ${form.country} ${form.sector ? `(${form.sector} sector)` : ''}. Target: ${audienceText}.${competitorText ? ` Main competitor to analyze: ${competitorText}` : ' No specific competitor provided - focus on general market positioning.'}
 
-Respond with valid JSON only. Use this exact structure with FLAT TEXT CONTENT for clean document display:
+Respond with valid JSON only. Return EXACTLY these fields in this order with PLAIN TEXT STRINGS only (no objects, no arrays):
 
 {
-  "market_foundation": "Write as flowing business document text covering market overview, customer behaviour patterns, and key opportunities. Include competitor analysis if provided. Use natural paragraphs with occasional bullet points for key insights only.",
-  "strategy_pillars": "Write as flowing text describing 3 core strategic pillars. Use natural paragraphs, not excessive bullet points.",
-  "personas": "Write detailed customer personas as flowing text with natural paragraph breaks. Include 3 distinct personas with names, demographics, behaviours, pain points and motivations.",
-  "differentiators": "Write as business document text covering core differentiation, value proposition, and positioning statement in natural paragraphs.",
-  "seven_ps": "Write comprehensive analysis as flowing business text covering Product, Price, Place, Promotion, People, Process, Physical Evidence. Use paragraph structure, not excessive subheadings.",
-  "calendar_next_90_days": "Write realistic 90-day timeline as flowing text with natural paragraph breaks and occasional bullet points for key milestones only.",
-  "kpis": "Write comprehensive KPI framework as flowing business text covering measurement methods, specific performance indicators with targets, and analytics setup. Use natural paragraphs with occasional bullet points for key metrics only.",
-  "risks_and_safety_nets": "Write risk analysis as flowing business document covering primary risks, mitigation strategies, and contingency plans in natural paragraph structure."
+  "market_foundation": "Comprehensive market analysis as flowing text with paragraph breaks. Cover market overview, customer behaviour patterns, key opportunities${competitorText ? ', and detailed analysis of ' + competitorText : ''}. Use natural paragraphs with occasional bullets for key insights.",
+  "personas": "Three detailed customer personas as flowing text with clear paragraph separation. Each persona should include name, age, demographics, background, pain points, motivations, and buying behaviour for ${form.product_type} customers in ${form.country}.",
+  "strategy_pillars": "Three core strategic pillars as flowing text with natural paragraph breaks. Focus on specific strategies for ${form.product_type} business without excessive bullet points.",
+  "seven_ps": "Complete marketing mix analysis covering Product, Price, Place, Promotion, People, Process, Physical Evidence as flowing business text with paragraph structure.",
+  "channel_playbook": "Detailed channel strategy and tactics as flowing text with natural paragraph breaks. Cover digital and traditional channels relevant to ${form.product_type} in ${form.country}.",
+  "budget": "Budget allocation and financial planning as flowing text with paragraph structure. Include investment priorities and cost considerations for ${form.product_type} marketing.",
+  "calendar_next_90_days": "Realistic 90-day implementation timeline as flowing text with clear paragraph breaks and occasional bullets for key milestones only.",
+  "kpis": "Comprehensive KPI framework as flowing business text covering measurement methods, specific performance indicators with realistic targets, and analytics setup. Use natural paragraphs.",
+  "differentiators": "Core differentiation strategy, value proposition, and positioning statement as flowing business text with natural paragraph structure.",
+  "risks_and_safety_nets": "Risk analysis covering primary risks, mitigation strategies, and contingency plans as flowing business document with natural paragraph structure."
 }
 
 Generate comprehensive, business-specific content for ${form.product_type} in ${form.country}. 
 
 CRITICAL: Ensure the "personas" field contains detailed customer profiles with names, ages, backgrounds, and specific behaviours. Do not leave personas empty. Create 3 distinct personas for ${audienceText} customers in the ${form.country} market.
 
-CRITICAL: Write comprehensive content in flowing paragraph format. Avoid excessive bullet points and subheadings. Focus on readable business document style.
+CRITICAL: Each field must be a PLAIN TEXT STRING with natural paragraph breaks (use \\n\\n between paragraphs). Never return objects, arrays, or undefined values. Write comprehensive flowing content without excessive bullet points or subheadings.
 
 No markdown formatting.` 
             }
@@ -162,10 +164,17 @@ No markdown formatting.`
         throw new Error('Invalid JSON response from AI');
       }
       
-      // Validate required structure
-      if (!aiGenerated?.market_foundation || !aiGenerated?.personas || !aiGenerated?.kpis) {
-        console.error('AI response missing required sections:', Object.keys(aiGenerated || {}));
-        throw new Error('Incomplete AI response structure');
+      // Validate all required fields are present and are strings
+      const requiredFields = [
+        'market_foundation', 'personas', 'strategy_pillars', 'seven_ps', 
+        'channel_playbook', 'budget', 'calendar_next_90_days', 'kpis', 
+        'differentiators', 'risks_and_safety_nets'
+      ];
+      const missingFields = requiredFields.filter(field => !aiGenerated?.[field] || typeof aiGenerated[field] !== 'string');
+      
+      if (missingFields.length > 0) {
+        console.error('AI response missing or invalid fields:', missingFields, 'Available keys:', Object.keys(aiGenerated || {}));
+        throw new Error(`Invalid AI response structure. Missing/invalid: ${missingFields.join(', ')}`);
       }
 
       // Validate and repair personas if missing or too short
@@ -369,20 +378,7 @@ Be specific and realistic. No generic descriptions.`;
             lead_capture: "Qualified leads"
           }[form.motion] || "Business growth";
       
-      // Process the validated AI response
-
-      // Convert structured market foundation to legacy format for frontend compatibility
-      const competitorSection = aiGenerated.market_foundation.competitor_analysis ? 
-        `\n\n• Competitor Analysis\n${aiGenerated.market_foundation.competitor_analysis.name}: ${aiGenerated.market_foundation.competitor_analysis.positioning} Strengths include ${aiGenerated.market_foundation.competitor_analysis.strengths} However, ${aiGenerated.market_foundation.competitor_analysis.weaknesses} This creates opportunities to ${aiGenerated.market_foundation.competitor_analysis.differentiation_opportunities}` : '';
-        
-      const market_foundation_legacy = `• Market Overview\n${aiGenerated.market_foundation.market_overview}\n\n• Customer Behaviour\n${aiGenerated.market_foundation.customer_behaviour}\n\n• Market Opportunities\n${aiGenerated.market_foundation.market_opportunities}${competitorSection}`;
-
-      // Convert structured KPIs to legacy format
-      const kpis_legacy = `• Measurement & Tracking\n${aiGenerated.kpis.measurement_and_tracking}\n\n• Performance Indicators\n${aiGenerated.kpis.performance_indicators}\n\n• Analytics Framework\n${aiGenerated.kpis.analytics_framework}`;
-
-      // Convert structured risks to legacy format
-      const risks_legacy = `• Primary Risks\n${aiGenerated.risks_and_safety_nets.primary_risks}\n\n• Mitigation Strategies\n${aiGenerated.risks_and_safety_nets.mitigation_strategies}\n\n• Contingency Plans\n${aiGenerated.risks_and_safety_nets.contingency_plans}`;
-
+      // Use AI response directly - all fields are now plain text strings
       let json = {
         meta: {
           title: "Marketing Strategy Report",
@@ -390,22 +386,16 @@ Be specific and realistic. No generic descriptions.`;
           sector: form.sector || "General",
           goal: derivedGoal
         },
-        market_foundation: market_foundation_legacy,
-        strategy_pillars: aiGenerated.strategy_pillars,
+        market_foundation: aiGenerated.market_foundation,
         personas: aiGenerated.personas,
-        competitors_brief: aiGenerated.market_foundation.competitor_analysis ? 
-          `• Competitor Analysis\n${aiGenerated.market_foundation.competitor_analysis.name}: ${aiGenerated.market_foundation.competitor_analysis.positioning} Strengths include ${aiGenerated.market_foundation.competitor_analysis.strengths} However, ${aiGenerated.market_foundation.competitor_analysis.weaknesses} This creates opportunities to ${aiGenerated.market_foundation.competitor_analysis.differentiation_opportunities}` : 
-          null,
-        differentiators: aiGenerated.differentiators,
+        strategy_pillars: aiGenerated.strategy_pillars,
         seven_ps: aiGenerated.seven_ps,
-        channel_playbook: motionChannels,
-        budget: {
-          band: form.budget_band || "Low",
-          allocation: `Primary Channel Investment\n${motionChannels[0]?.channel}: ${motionChannels[0]?.budget_percent}% allocated to ${motionChannels[0]?.role.toLowerCase()} with focus on high-conversion activities.\n\nSecondary Channel Support\n${motionChannels[1]?.channel}: ${motionChannels[1]?.budget_percent}% dedicated to ${motionChannels[1]?.role.toLowerCase()} for comprehensive market coverage.\n\nSupporting Channels\n${motionChannels[2]?.channel}: ${motionChannels[2]?.budget_percent}% investment in ${motionChannels[2]?.role.toLowerCase()} activities.\n${motionChannels[3]?.channel}: ${motionChannels[3]?.budget_percent}% allocation for ${motionChannels[3]?.role.toLowerCase()} initiatives.\n${motionChannels[4]?.channel}: ${motionChannels[4]?.budget_percent}% reserved for ${motionChannels[4]?.role.toLowerCase()} programmes.\n\nStrategic Rationale\nThis allocation prioritises high-impact channels that capture immediate demand whilst building broader market awareness and long-term brand equity through diversified channel investment.`
-        },
+        channel_playbook: aiGenerated.channel_playbook,
+        budget: aiGenerated.budget,
         calendar_next_90_days: aiGenerated.calendar_next_90_days,
-        kpis: kpis_legacy,
-        risks_and_safety_nets: risks_legacy
+        kpis: aiGenerated.kpis,
+        differentiators: aiGenerated.differentiators,
+        risks_and_safety_nets: aiGenerated.risks_and_safety_nets
       };
       
       // Apply British English normalization
