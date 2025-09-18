@@ -26,6 +26,7 @@
     "docx": "^9.5.1",
     "file-saver": "^2.0.5",
     "tailwindcss": "^4.1.13",
+    "wrangler": "^4.37.1",
     "xlsx": "^0.18.5"
   }
 }
