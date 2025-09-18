@@ -599,7 +599,7 @@ export default function App() {
                     id="country"
                     value={country}
                     onChange={(e) => setCountry(e.target.value)}
-                    onFocus={() => setCountryOpen(true)}
+                    onClick={() => setCountryOpen(!countryOpen)}
                     onBlur={() => setCountryOpen(false)}
                     aria-describedby="country-help"
                     required
@@ -642,7 +642,7 @@ export default function App() {
                     id="sector"
                     value={sector}
                     onChange={(e) => setSector(e.target.value)}
-                    onFocus={() => setSectorOpen(true)}
+                    onClick={() => setSectorOpen(!sectorOpen)}
                     onBlur={() => setSectorOpen(false)}
                     aria-describedby="sector-help"
                     className="w-full px-4 py-3 pr-12 rounded-xl border border-gray-200 bg-white/80 focus:outline-none focus:ring-2 focus:ring-blue-400/50 focus:border-blue-300 focus:bg-white transition-all duration-200 text-gray-700 min-h-[44px] appearance-none cursor-pointer"
@@ -709,7 +709,7 @@ export default function App() {
                     id="business-stage"
                     value={businessStage}
                     onChange={(e) => setBusinessStage(e.target.value)}
-                    onFocus={() => setBusinessStageOpen(true)}
+                    onClick={() => setBusinessStageOpen(!businessStageOpen)}
                     onBlur={() => setBusinessStageOpen(false)}
                     aria-describedby="business-stage-help"
                     required
@@ -778,7 +778,7 @@ export default function App() {
                     id="motion"
                     value={motion}
                     onChange={(e) => setMotion(e.target.value)}
-                    onFocus={() => setMotionOpen(true)}
+                    onClick={() => setMotionOpen(!motionOpen)}
                     onBlur={() => setMotionOpen(false)}
                     aria-describedby="motion-help"
                     required
@@ -821,7 +821,7 @@ export default function App() {
                     id="budget"
                     value={budgetBand}
                     onChange={(e) => setBudgetBand(e.target.value)}
-                    onFocus={() => setBudgetOpen(true)}
+                    onClick={() => setBudgetOpen(!budgetOpen)}
                     onBlur={() => setBudgetOpen(false)}
                     aria-describedby="budget-help"
                     required
