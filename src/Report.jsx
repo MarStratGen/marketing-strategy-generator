@@ -1,199 +1,49 @@
-// Recursive content parser with proper nested structure support
-function parseContent(content) {
-  if (!content) return [];
-  
-  // Handle arrays
-  if (Array.isArray(content)) {
-    return renderArray(content);
-  }
-  
-  // Handle objects  
-  if (typeof content === 'object' && content !== null) {
-    return renderObject(content);
-  }
-  
-  // Handle strings with full parsing
-  return parseString(String(content));
-}
-
-function renderArray(arr) {
-  const bulletItems = [];
-  
-  for (const item of arr) {
-    if (typeof item === 'string') {
-      bulletItems.push({ text: item });
-    } else if (Array.isArray(item)) {
-      // Nested array - create recursive structure
-      const childElements = renderArray(item);
-      bulletItems.push({ 
-        text: `Array (${item.length} items)`,
-        children: childElements 
-      });
-    } else if (typeof item === 'object' && item !== null) {
-      // Object in array - create recursive structure
-      const childElements = renderObject(item);
-      const title = item.name || item.title || Object.keys(item)[0] || 'Object';
-      bulletItems.push({ 
-        text: title,
-        children: childElements 
-      });
-    } else {
-      bulletItems.push({ text: String(item) });
-    }
-  }
-  
-  return [{ type: 'bulletList', items: bulletItems }];
-}
-
-function renderObject(obj) {
-  const elements = [];
-  
-  Object.entries(obj).forEach(([key, value]) => {
-    const heading = key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
-    elements.push({ type: 'subheading', content: heading });
-    
-    // Recursively handle the value
-    if (typeof value === 'string') {
-      elements.push(...parseString(value));
-    } else if (Array.isArray(value)) {
-      elements.push(...renderArray(value));
-    } else if (typeof value === 'object' && value !== null) {
-      // Nested object - create recursive definition structure
-      const bulletItems = Object.entries(value).map(([k, v]) => {
-        const label = k.replace(/_/g, ' ');
-        
-        if (typeof v === 'string') {
-          return { text: `${label}: ${v}` };
-        } else if (Array.isArray(v)) {
-          const childElements = renderArray(v);
-          return { 
-            text: label,
-            children: childElements 
-          };
-        } else if (typeof v === 'object' && v !== null) {
-          const childElements = renderObject(v);
-          return { 
-            text: label,
-            children: childElements 
-          };
-        } else {
-          return { text: `${label}: ${String(v)}` };
-        }
-      });
-      elements.push({ type: 'bulletList', items: bulletItems });
-    } else {
-      elements.push({ type: 'paragraph', content: String(value) });
-    }
-  });
-  
-  return elements;
-}
-
-function parseString(text) {
-  if (!text) return [];
-  
-  // Split by lines but preserve paragraph breaks
-  const lines = text.split('\n');
-  const elements = [];
-  let currentBullets = [];
-  let currentParagraph = [];
-  
-  for (const line of lines) {
-    const trimmed = line.trim();
-    
-    // Empty line - flush current content and add paragraph break
-    if (!trimmed) {
-      flushContent();
-      continue;
-    }
-    
-    // Check for subheadings first
-    if (trimmed.endsWith(':') || /^#{2,4}\s+/.test(trimmed) || trimmed.startsWith('—')) {
-      flushContent();
-      const content = trimmed.replace(/^#{2,4}\s+/, '').replace(/:$/, '').replace(/^—\s*/, '');
-      elements.push({ type: 'subheading', content });
-    }
-    // Check for bullets
-    else if (/^(?:•|\-|\*|\d+[.)])\s+/.test(trimmed)) {
-      // Flush any current paragraph
-      if (currentParagraph.length > 0) {
-        elements.push({ type: 'paragraph', content: currentParagraph.join(' ') });
-        currentParagraph = [];
-      }
-      const content = trimmed.replace(/^(?:•|\-|\*|\d+[.)])\s+/, '');
-      currentBullets.push(content);
-    }
-    // Regular text
-    else {
-      // Flush any current bullets
-      if (currentBullets.length > 0) {
-        const bulletItems = currentBullets.map(bullet => ({ text: bullet }));
-        elements.push({ type: 'bulletList', items: bulletItems });
-        currentBullets = [];
-      }
-      currentParagraph.push(trimmed);
-    }
-  }
-  
-  // Flush any remaining content
-  flushContent();
-  
-  function flushContent() {
-    if (currentBullets.length > 0) {
-      const bulletItems = currentBullets.map(bullet => ({ text: bullet }));
-      elements.push({ type: 'bulletList', items: bulletItems });
-      currentBullets = [];
-    }
-    if (currentParagraph.length > 0) {
-      elements.push({ type: 'paragraph', content: currentParagraph.join(' ') });
-      currentParagraph = [];
-    }
-  }
-  
-  return elements;
-}
-
-function ContentRenderer({ content }) {
-  const elements = parseContent(content);
-  
-  const renderElement = (element, index) => {
-    if (element.type === 'subheading') {
-      return (
-        <h4 key={index} className="text-lg font-semibold text-gray-900 mt-6 mb-3 border-b border-gray-100 pb-1">
-          {element.content}
-        </h4>
-      );
-    }
-    
-    if (element.type === 'bulletList') {
-      return (
-        <ul key={index} className="list-disc list-inside space-y-2 ml-4 text-gray-700">
-          {element.items.map((item, itemIndex) => (
-            <li key={itemIndex} className="leading-relaxed">
-              {item.text}
-              {item.children && item.children.length > 0 && (
-                <div className="ml-4 mt-2">
-                  {item.children.map((child, childIndex) => 
-                    renderElement(child, `${itemIndex}-${childIndex}`)
-                  )}
-                </div>
-              )}
-            </li>
-          ))}
-        </ul>
-      );
-    }
-    
+// Dead Simple Text Block Renderer - No Complex Parsing
+function SimpleTextBlock({ content }) {
+  // Handle non-string content
+  if (!content || typeof content !== 'string') {
     return (
-      <p key={index} className="text-gray-700 leading-relaxed">
-        {element.content}
-      </p>
+      <pre className="bg-gray-50 p-4 rounded text-sm text-gray-600 whitespace-pre-wrap">
+        {JSON.stringify(content, null, 2)}
+      </pre>
     );
-  };
+  }
+
+  // Split content into blocks separated by double newlines
+  const blocks = content.split(/\n\s*\n/).filter(block => block.trim());
   
   return (
     <div className="space-y-4">
-      {elements.map((element, index) => renderElement(element, index))}
+      {blocks.map((block, index) => {
+        const lines = block.trim().split('\n');
+        
+        // Check if all lines are bullets
+        const allBullets = lines.every(line => 
+          line.trim().match(/^(?:•|\-|\*)\s+/) || line.trim() === ''
+        );
+        
+        if (allBullets && lines.some(line => line.trim())) {
+          // Render as bullet list
+          const bulletItems = lines
+            .filter(line => line.trim())
+            .map(line => line.replace(/^(?:•|\-|\*)\s+/, '').trim());
+            
+          return (
+            <ul key={index} className="list-disc list-inside space-y-1 text-gray-700 ml-4">
+              {bulletItems.map((item, itemIndex) => (
+                <li key={itemIndex} className="leading-relaxed">{item}</li>
+              ))}
+            </ul>
+          );
+        } else {
+          // Render as paragraph
+          return (
+            <p key={index} className="text-gray-700 leading-relaxed">
+              {block.trim()}
+            </p>
+          );
+        }
+      })}
     </div>
   );
 }
@@ -244,7 +94,7 @@ export default function Report({ plan, loading }) {
             <h2 className="text-2xl font-bold text-gray-900 mb-6 border-b border-gray-200 pb-3">
               Market Foundation
             </h2>
-            <ContentRenderer content={plan.market_foundation} />
+            <SimpleTextBlock content={plan.market_foundation} />
           </section>
         )}
 
@@ -254,7 +104,7 @@ export default function Report({ plan, loading }) {
             <h2 className="text-2xl font-bold text-gray-900 mb-6 border-b border-gray-200 pb-3">
               Customer Personas
             </h2>
-            <ContentRenderer content={plan.personas} />
+            <SimpleTextBlock content={plan.personas} />
           </section>
         )}
 
@@ -264,7 +114,7 @@ export default function Report({ plan, loading }) {
             <h2 className="text-2xl font-bold text-gray-900 mb-6 border-b border-gray-200 pb-3">
               Strategy Pillars
             </h2>
-            <ContentRenderer content={plan.strategy_pillars} />
+            <SimpleTextBlock content={plan.strategy_pillars} />
           </section>
         )}
 
@@ -274,7 +124,7 @@ export default function Report({ plan, loading }) {
             <h2 className="text-2xl font-bold text-gray-900 mb-6 border-b border-gray-200 pb-3">
               Marketing Mix (7 Ps)
             </h2>
-            <ContentRenderer content={plan.seven_ps} />
+            <SimpleTextBlock content={plan.seven_ps} />
           </section>
         )}
 
@@ -284,7 +134,7 @@ export default function Report({ plan, loading }) {
             <h2 className="text-2xl font-bold text-gray-900 mb-6 border-b border-gray-200 pb-3">
               Channel Playbook
             </h2>
-            <ContentRenderer content={plan.channel_playbook} />
+            <SimpleTextBlock content={plan.channel_playbook} />
           </section>
         )}
 
@@ -294,7 +144,7 @@ export default function Report({ plan, loading }) {
             <h2 className="text-2xl font-bold text-gray-900 mb-6 border-b border-gray-200 pb-3">
               Budget Allocation
             </h2>
-            <ContentRenderer content={plan.budget} />
+            <SimpleTextBlock content={plan.budget} />
           </section>
         )}
 
@@ -304,7 +154,7 @@ export default function Report({ plan, loading }) {
             <h2 className="text-2xl font-bold text-gray-900 mb-6 border-b border-gray-200 pb-3">
               90-Day Action Plan
             </h2>
-            <ContentRenderer content={plan.calendar_next_90_days} />
+            <SimpleTextBlock content={plan.calendar_next_90_days} />
           </section>
         )}
 
@@ -314,7 +164,7 @@ export default function Report({ plan, loading }) {
             <h2 className="text-2xl font-bold text-gray-900 mb-6 border-b border-gray-200 pb-3">
               Key Performance Indicators
             </h2>
-            <ContentRenderer content={plan.kpis} />
+            <SimpleTextBlock content={plan.kpis} />
           </section>
         )}
 
@@ -324,7 +174,7 @@ export default function Report({ plan, loading }) {
             <h2 className="text-2xl font-bold text-gray-900 mb-6 border-b border-gray-200 pb-3">
               Differentiation Strategy
             </h2>
-            <ContentRenderer content={plan.differentiators} />
+            <SimpleTextBlock content={plan.differentiators} />
           </section>
         )}
 
@@ -334,7 +184,7 @@ export default function Report({ plan, loading }) {
             <h2 className="text-2xl font-bold text-gray-900 mb-6 border-b border-gray-200 pb-3">
               Risks and Safety Nets
             </h2>
-            <ContentRenderer content={plan.risks_and_safety_nets} />
+            <SimpleTextBlock content={plan.risks_and_safety_nets} />
           </section>
         )}
         
