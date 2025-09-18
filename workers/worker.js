@@ -86,6 +86,7 @@ export default {
     try {
       const competitorText = form.competitor?.trim() ? form.competitor.trim() : null;
       const audienceText = form.audiences?.join(", ") || "target customers";
+      const isLaunch = form.business_stage === "launch";
       
       // Create abort controller for 28-second deadline
       const abortController = new AbortController();
@@ -109,18 +110,18 @@ export default {
             },
             { 
               role: "user", 
-              content: `Generate marketing strategy for ${form.product_type} in ${form.country} ${form.sector ? `(${form.sector} sector)` : ''}. Target: ${audienceText}.${competitorText ? ` Main competitor to analyze: ${competitorText}` : ' No specific competitor provided - focus on general market positioning.'}
+              content: `Generate marketing strategy for ${isLaunch ? 'launching' : 'growing an established'} ${form.product_type} business in ${form.country} ${form.sector ? `(${form.sector} sector)` : ''}. Target: ${audienceText}.${competitorText ? ` Main competitor to analyze: ${competitorText}` : ' No specific competitor provided - focus on general market positioning.'}
 
 Respond with valid JSON only. Return EXACTLY these fields in this order with PLAIN TEXT STRINGS only (no objects, no arrays):
 
 {
   "market_foundation": "Comprehensive market analysis as flowing text with paragraph breaks. Cover market overview, customer behaviour patterns, key opportunities${competitorText ? ', and detailed analysis of ' + competitorText : ''}. Use natural paragraphs with occasional bullets for key insights.",
   "personas": "Three detailed customer personas as flowing text with clear paragraph separation. Each persona should include name, age range, background, lifestyle, pain points, motivations, and buying behaviour for ${form.product_type} customers.",
-  "strategy_pillars": "Three core strategic pillars as flowing text with natural paragraph breaks. Focus on specific strategies for ${form.product_type} business without excessive bullet points.",
+  "strategy_pillars": "Three core strategic pillars as flowing text with natural paragraph breaks. ${isLaunch ? 'Focus on launch strategies including market entry, awareness building, and initial customer acquisition' : 'Focus on growth strategies including market expansion, customer retention, and competitive positioning'} for ${form.product_type} business without excessive bullet points.",
   "seven_ps": "Complete marketing mix analysis covering Product, Price, Place, Promotion, People, Process, Physical Evidence as flowing business text with paragraph structure.",
   "channel_playbook": "Detailed channel strategy and tactics as flowing text with natural paragraph breaks. Cover digital and traditional channels relevant to ${form.product_type} in ${form.country}.",
   "budget": "Budget allocation and financial planning as flowing text with paragraph structure. Include investment priorities and cost considerations for ${form.product_type} marketing.",
-  "calendar_next_90_days": "Realistic 90-day implementation timeline as flowing text with clear paragraph breaks and occasional bullets for key milestones only.",
+  "calendar_next_90_days": "${isLaunch ? 'Launch-focused 90-day timeline covering pre-launch, launch week, and post-launch optimization phases' : 'Growth-focused 90-day plan with optimization, scaling, and expansion initiatives'} as flowing text with clear paragraph breaks and occasional bullets for key milestones only.",
   "kpis": "Comprehensive KPI framework as flowing business text covering measurement methods, specific performance indicators with realistic targets, and analytics setup. Use natural paragraphs.",
   "differentiators": "Core differentiation strategy, value proposition, and positioning statement as flowing business text with natural paragraph structure.",
   "risks_and_safety_nets": "Risk analysis covering primary risks, mitigation strategies, and contingency plans as flowing business document with natural paragraph structure."
@@ -182,7 +183,7 @@ No markdown formatting.`
         console.log('🔧 PERSONAS REPAIR: Personas missing or too short, triggering fallback generation');
         
         try {
-          const personasPrompt = `Generate exactly 3 detailed customer personas for ${form.product_type} targeting ${audienceText}. 
+          const personasPrompt = `Generate exactly 3 detailed customer personas for ${isLaunch ? 'a new' : 'an established'} ${form.product_type} business targeting ${audienceText}. 
 
 Format as bullet points with these details for each persona:
 • Name (realistic first name)

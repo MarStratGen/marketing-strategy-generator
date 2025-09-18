@@ -133,6 +133,11 @@ const BUDGET_BANDS = [
   { label: "High", value: "high" },
 ];
 
+const BUSINESS_STAGES = [
+  { label: "New business or product launch", value: "launch" },
+  { label: "Established business seeking growth", value: "growth" },
+];
+
 /* ──────────────────────────────────────────────────────────
    Main component
    ────────────────────────────────────────────────────────── */
@@ -149,6 +154,7 @@ export default function App() {
   const [motion, setMotion] = useState("ecom_checkout");
   const [customMotion, setCustomMotion] = useState("");
   const [budgetBand, setBudgetBand] = useState("low");
+  const [businessStage, setBusinessStage] = useState("growth");
 
   const [result, setResult] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -343,6 +349,7 @@ export default function App() {
         action_custom: motion === "__custom_motion" ? customMotion : undefined,
 
         budget_band: budgetBand,
+        business_stage: businessStage,
       };
 
       console.log("🚀 === FORM SUBMISSION STARTED ===");
@@ -526,6 +533,7 @@ export default function App() {
       motion,
       customMotion,
       budgetBand,
+      businessStage,
     ],
   );
 
@@ -664,6 +672,29 @@ export default function App() {
                   placeholder="e.g. Organic seed kits"
                   required
                 />
+              </Field>
+
+              {/* business stage */}
+              <Field
+                label="Business stage"
+                required
+                tooltip="This affects whether the strategy focuses on launch tactics or growth optimization."
+                id="business-stage"
+              >
+                <select
+                  id="business-stage"
+                  value={businessStage}
+                  onChange={(e) => setBusinessStage(e.target.value)}
+                  aria-describedby="business-stage-help"
+                  required
+                  className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-white/80 focus:outline-none focus:ring-2 focus:ring-blue-400/50 focus:border-blue-300 focus:bg-white transition-all duration-200 text-gray-700 min-h-[44px]"
+                >
+                  {BUSINESS_STAGES.map((stage) => (
+                    <option key={stage.value} value={stage.value}>
+                      {stage.label}
+                    </option>
+                  ))}
+                </select>
               </Field>
 
               {/* segments */}
