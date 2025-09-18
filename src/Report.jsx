@@ -1,72 +1,137 @@
-// Simple Document-Style Report Display
+// Recursive content parser that handles all data types
 function parseContent(content) {
   if (!content) return [];
   
-  // Handle different content types
+  // Handle arrays
   if (Array.isArray(content)) {
-    const items = content.map(item => typeof item === 'string' ? item : String(item));
-    return [{ type: 'bulletList', items }];
+    return renderArray(content);
   }
   
+  // Handle objects  
   if (typeof content === 'object' && content !== null) {
-    const elements = [];
-    Object.entries(content).forEach(([key, value]) => {
-      const heading = key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
-      elements.push({ type: 'subheading', content: heading });
-      
-      // Handle value by type
-      if (Array.isArray(value)) {
-        const items = value.map(item => typeof item === 'string' ? item : String(item));
-        elements.push({ type: 'bulletList', items });
-      } else if (typeof value === 'object' && value !== null) {
-        // Nested object - render as definition list
-        const nested = Object.entries(value).map(([k, v]) => 
-          `${k.replace(/_/g, ' ')}: ${typeof v === 'string' ? v : String(v)}`
-        );
-        elements.push({ type: 'bulletList', items: nested });
-      } else {
-        // Parse string content normally
-        elements.push(...parseContent(String(value)));
-      }
-    });
-    return elements;
+    return renderObject(content);
   }
   
-  const text = String(content);
-  const lines = text.split('\n').map(line => line.trim()).filter(Boolean);
+  // Handle strings with full parsing
+  return parseString(String(content));
+}
+
+function renderArray(arr) {
+  const items = [];
+  
+  for (const item of arr) {
+    if (typeof item === 'string') {
+      items.push(item);
+    } else if (Array.isArray(item)) {
+      // Nested array - flatten as sub-bullets
+      const subItems = item.map(subItem => 
+        typeof subItem === 'string' ? `  ${subItem}` : `  ${JSON.stringify(subItem)}`
+      );
+      items.push(...subItems);
+    } else if (typeof item === 'object' && item !== null) {
+      // Object in array - convert to readable format
+      const objStr = Object.entries(item)
+        .map(([k, v]) => `${k}: ${typeof v === 'string' ? v : JSON.stringify(v)}`)
+        .join(', ');
+      items.push(objStr);
+    } else {
+      items.push(String(item));
+    }
+  }
+  
+  return [{ type: 'bulletList', items }];
+}
+
+function renderObject(obj) {
+  const elements = [];
+  
+  Object.entries(obj).forEach(([key, value]) => {
+    const heading = key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+    elements.push({ type: 'subheading', content: heading });
+    
+    // Recursively handle the value
+    if (typeof value === 'string') {
+      elements.push(...parseString(value));
+    } else if (Array.isArray(value)) {
+      elements.push(...renderArray(value));
+    } else if (typeof value === 'object' && value !== null) {
+      // Nested object - convert to definition pairs
+      const pairs = Object.entries(value).map(([k, v]) => {
+        const label = k.replace(/_/g, ' ');
+        if (typeof v === 'string') {
+          return `${label}: ${v}`;
+        } else if (Array.isArray(v)) {
+          return `${label}: ${v.join(', ')}`;
+        } else {
+          return `${label}: ${JSON.stringify(v)}`;
+        }
+      });
+      elements.push({ type: 'bulletList', items: pairs });
+    } else {
+      elements.push({ type: 'paragraph', content: String(value) });
+    }
+  });
+  
+  return elements;
+}
+
+function parseString(text) {
+  if (!text) return [];
+  
+  // Split by lines but preserve paragraph breaks
+  const lines = text.split('\n');
   const elements = [];
   let currentBullets = [];
+  let currentParagraph = [];
   
   for (const line of lines) {
-    // Check for subheadings first (before bullets)
-    if (line.endsWith(':') || /^#{2,4}\s+/.test(line) || line.startsWith('—') || line.startsWith('###')) {
-      // Flush any pending bullets
-      if (currentBullets.length > 0) {
-        elements.push({ type: 'bulletList', items: currentBullets });
-        currentBullets = [];
-      }
-      const content = line.replace(/^#{2,4}\s+/, '').replace(/:$/, '').replace(/^—\s*/, '');
+    const trimmed = line.trim();
+    
+    // Empty line - flush current content and add paragraph break
+    if (!trimmed) {
+      flushContent();
+      continue;
+    }
+    
+    // Check for subheadings first
+    if (trimmed.endsWith(':') || /^#{2,4}\s+/.test(trimmed) || trimmed.startsWith('—')) {
+      flushContent();
+      const content = trimmed.replace(/^#{2,4}\s+/, '').replace(/:$/, '').replace(/^—\s*/, '');
       elements.push({ type: 'subheading', content });
     }
-    // Detect bullets: •, -, *, 1., 1)
-    else if (/^(?:•|\-|\*|\d+[.)])\s+/.test(line)) {
-      const content = line.replace(/^(?:•|\-|\*|\d+[.)])\s+/, '');
+    // Check for bullets
+    else if (/^(?:•|\-|\*|\d+[.)])\s+/.test(trimmed)) {
+      // Flush any current paragraph
+      if (currentParagraph.length > 0) {
+        elements.push({ type: 'paragraph', content: currentParagraph.join(' ') });
+        currentParagraph = [];
+      }
+      const content = trimmed.replace(/^(?:•|\-|\*|\d+[.)])\s+/, '');
       currentBullets.push(content);
     }
-    // Regular paragraph
+    // Regular text
     else {
-      // Flush any pending bullets
+      // Flush any current bullets
       if (currentBullets.length > 0) {
         elements.push({ type: 'bulletList', items: currentBullets });
         currentBullets = [];
       }
-      elements.push({ type: 'paragraph', content: line });
+      currentParagraph.push(trimmed);
     }
   }
   
-  // Flush any remaining bullets
-  if (currentBullets.length > 0) {
-    elements.push({ type: 'bulletList', items: currentBullets });
+  // Flush any remaining content
+  flushContent();
+  
+  function flushContent() {
+    if (currentBullets.length > 0) {
+      elements.push({ type: 'bulletList', items: currentBullets });
+      currentBullets = [];
+    }
+    if (currentParagraph.length > 0) {
+      elements.push({ type: 'paragraph', content: currentParagraph.join(' ') });
+      currentParagraph = [];
+    }
   }
   
   return elements;
