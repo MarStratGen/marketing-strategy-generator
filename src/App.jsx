@@ -855,7 +855,6 @@ export default function App() {
               {/* competitors */}
               <Field
                 label="Top competitor"
-                tooltip="Short name for faster analysis"
                 id="competitor"
               >
                 <input
