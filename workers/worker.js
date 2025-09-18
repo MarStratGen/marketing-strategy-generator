@@ -69,9 +69,85 @@ export default {
     }
     catch { return new Response(JSON.stringify({ error: "invalid_request" }), cors(400, origin)); }
 
-    /* 5. Validate required fields */
+    /* 5. Enhanced input validation and security */
+    // Validate required fields
     if (!form.country || !form.product_type || !form.audiences) {
       return new Response(JSON.stringify({ error: "missing_required_fields" }), cors(400, origin));
+    }
+    
+    // Validate field lengths to prevent extremely long inputs
+    const maxLengths = {
+      country: 100,
+      product_type: 1000,
+      sector: 100,
+      competitor: 500,
+      action_custom: 500
+    };
+    
+    for (const [field, maxLength] of Object.entries(maxLengths)) {
+      if (form[field] && typeof form[field] === 'string' && form[field].length > maxLength) {
+        return new Response(JSON.stringify({ 
+          error: "field_too_long", 
+          field: field, 
+          max_length: maxLength 
+        }), cors(400, origin));
+      }
+    }
+    
+    // Validate business_stage enum
+    const validBusinessStages = ['launch', 'growth'];
+    if (form.business_stage && !validBusinessStages.includes(form.business_stage)) {
+      return new Response(JSON.stringify({ 
+        error: "invalid_business_stage", 
+        valid_values: validBusinessStages 
+      }), cors(400, origin));
+    }
+    
+    // Validate audiences array and enforce 3-item limit
+    if (!Array.isArray(form.audiences) || form.audiences.length === 0) {
+      return new Response(JSON.stringify({ error: "audiences_must_be_non_empty_array" }), cors(400, origin));
+    }
+    
+    if (form.audiences.length > 3) {
+      return new Response(JSON.stringify({ 
+        error: "too_many_audiences", 
+        max_allowed: 3, 
+        provided: form.audiences.length 
+      }), cors(400, origin));
+    }
+    
+    // Validate each audience length
+    for (let i = 0; i < form.audiences.length; i++) {
+      if (typeof form.audiences[i] !== 'string' || form.audiences[i].length > 200) {
+        return new Response(JSON.stringify({ 
+          error: "audience_invalid", 
+          index: i, 
+          max_length: 200 
+        }), cors(400, origin));
+      }
+    }
+    
+    // Basic input sanitization to prevent injection attempts
+    const sanitizeInput = (str) => {
+      if (typeof str !== 'string') return str;
+      return str
+        .replace(/<script[^>]*>.*?<\/script>/gi, '') // Remove script tags
+        .replace(/javascript:/gi, '') // Remove javascript: protocols
+        .replace(/on\w+\s*=/gi, '') // Remove event handlers
+        .replace(/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/g, '') // Remove control characters
+        .trim();
+    };
+    
+    // Sanitize string inputs
+    ['country', 'product_type', 'sector', 'competitor', 'action_custom'].forEach(field => {
+      if (form[field]) {
+        form[field] = sanitizeInput(form[field]);
+      }
+    });
+    
+    // Sanitize audience strings
+    if (form.audiences) {
+      form.audiences = form.audiences.map(audience => sanitizeInput(audience));
     }
 
     /* 6. Check API key */
@@ -85,10 +161,17 @@ export default {
     /* 7. SINGLE OPTIMIZED REQUEST FOR 20-SECOND GENERATION */
     try {
       const competitorText = form.competitor?.trim() ? form.competitor.trim() : null;
-      const audienceText = form.audiences?.join(", ") || "target customers";
+      
+      // Additional validation: ensure audiences aren't empty after sanitization
+      const validAudiences = form.audiences.filter(a => a && a.trim().length > 0);
+      if (validAudiences.length === 0) {
+        return new Response(JSON.stringify({ error: "no_valid_audiences_after_sanitization" }), cors(400, origin));
+      }
+      
+      const audienceText = validAudiences.join(", ") || "target customers";
       const isLaunch = form.business_stage === "launch";
       
-      // Create abort controller for 28-second deadline
+      // Create abort controller for 80-second deadline
       const abortController = new AbortController();
       const timeoutId = setTimeout(() => abortController.abort(), 80000);
       
@@ -428,7 +511,7 @@ Be specific and realistic. No generic descriptions.`;
       return new Response(
         JSON.stringify({ 
           error: "internal_server_error",
-          details: e.message 
+          message: "An unexpected error occurred. Please try again." 
         }),
         cors(500, origin)
       );
