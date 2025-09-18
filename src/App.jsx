@@ -606,7 +606,7 @@ export default function App() {
               <Field
                 label="Which country are you targeting?"
                 required
-                tooltip="This tailors regional insights and seasonality."
+                tooltip="This tailors regional insights and seasonality"
                 id="country"
               >
                 <div className="relative">
@@ -649,7 +649,7 @@ export default function App() {
               {/* sector */}
               <Field
                 label="Sector"
-                tooltip="If yours isn't listed, choose Other."
+                tooltip="If yours isn't listed, choose Other"
                 id="sector"
               >
                 <div className="relative">
@@ -697,7 +697,7 @@ export default function App() {
               <Field
                 label="Offering (product or service)"
                 required
-                tooltip="Keep it short for faster results."
+                tooltip="Keep it short for faster results"
                 id="offering"
               >
                 <input
@@ -716,7 +716,7 @@ export default function App() {
               <Field
                 label="Business stage"
                 required
-                tooltip="Shapes strategy focus."
+                tooltip="Shapes strategy focus"
                 id="business-stage"
               >
                 <div className="relative">
@@ -785,7 +785,7 @@ export default function App() {
               <Field
                 label="Primary action"
                 required
-                tooltip="Pick the main action you want customers to take."
+                tooltip="Pick the main action you want customers to take"
                 id="motion"
               >
                 <div className="relative">
@@ -828,7 +828,7 @@ export default function App() {
               <Field
                 label="Budget level"
                 required
-                tooltip="The plan uses percentages so you can scale up or down."
+                tooltip="The plan uses percentages so you can scale up or down"
                 id="budget"
               >
                 <div className="relative">
@@ -859,7 +859,7 @@ export default function App() {
               {/* competitors */}
               <Field
                 label="Top competitor"
-                tooltip="Short name for faster analysis."
+                tooltip="Short name for faster analysis"
                 id="competitor"
               >
                 <input
