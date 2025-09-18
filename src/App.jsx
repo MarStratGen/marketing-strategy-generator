@@ -707,7 +707,7 @@ export default function App() {
                   aria-describedby="offering-help"
                   aria-required="true"
                   className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-white/80 focus:outline-none focus:ring-2 focus:ring-blue-400/50 focus:border-blue-300 focus:bg-white transition-all duration-200 text-gray-700 min-h-[44px]"
-                  placeholder="e.g. Organic seed kits (be concise)"
+                  placeholder="e.g. Organic seed kits"
                   required
                 />
               </Field>
@@ -777,7 +777,7 @@ export default function App() {
                   aria-describedby="segments-help"
                   aria-required="true"
                   className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-white/80 focus:outline-none focus:ring-2 focus:ring-blue-400/50 focus:border-blue-300 focus:bg-white transition-all duration-200 text-gray-700 min-h-[44px]"
-                  placeholder="e.g. Home gardeners aged 35-55 (keep short)"
+                  placeholder="e.g. Home gardeners 35-55"
                 />
               </Field>
 
@@ -816,7 +816,7 @@ export default function App() {
                     value={customMotion}
                     onChange={(e) => setCustomMotion(e.target.value)}
                     className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-white/80 focus:outline-none focus:ring-2 focus:ring-blue-400/50 focus:border-blue-300 focus:bg-white transition-all duration-200 text-gray-700 mt-3 min-h-[44px]"
-                    placeholder="Describe the action (e.g. Call to book)"
+                    placeholder="e.g. Call to book"
                     aria-labelledby="motion-label"
                     aria-describedby="motion-help"
                     required
@@ -828,7 +828,7 @@ export default function App() {
               <Field
                 label="Budget level"
                 required
-                tooltip="Uses percentages; easy to scale"
+                tooltip="The plan uses percentages so you can scale up or down"
                 id="budget"
               >
                 <div className="relative">
