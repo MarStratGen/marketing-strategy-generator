@@ -1,4 +1,4 @@
-// Recursive content parser that handles all data types
+// Recursive content parser with proper nested structure support
 function parseContent(content) {
   if (!content) return [];
   
@@ -17,29 +17,32 @@ function parseContent(content) {
 }
 
 function renderArray(arr) {
-  const items = [];
+  const bulletItems = [];
   
   for (const item of arr) {
     if (typeof item === 'string') {
-      items.push(item);
+      bulletItems.push({ text: item });
     } else if (Array.isArray(item)) {
-      // Nested array - flatten as sub-bullets
-      const subItems = item.map(subItem => 
-        typeof subItem === 'string' ? `  ${subItem}` : `  ${JSON.stringify(subItem)}`
-      );
-      items.push(...subItems);
+      // Nested array - create recursive structure
+      const childElements = renderArray(item);
+      bulletItems.push({ 
+        text: `Array (${item.length} items)`,
+        children: childElements 
+      });
     } else if (typeof item === 'object' && item !== null) {
-      // Object in array - convert to readable format
-      const objStr = Object.entries(item)
-        .map(([k, v]) => `${k}: ${typeof v === 'string' ? v : JSON.stringify(v)}`)
-        .join(', ');
-      items.push(objStr);
+      // Object in array - create recursive structure
+      const childElements = renderObject(item);
+      const title = item.name || item.title || Object.keys(item)[0] || 'Object';
+      bulletItems.push({ 
+        text: title,
+        children: childElements 
+      });
     } else {
-      items.push(String(item));
+      bulletItems.push({ text: String(item) });
     }
   }
   
-  return [{ type: 'bulletList', items }];
+  return [{ type: 'bulletList', items: bulletItems }];
 }
 
 function renderObject(obj) {
@@ -55,18 +58,29 @@ function renderObject(obj) {
     } else if (Array.isArray(value)) {
       elements.push(...renderArray(value));
     } else if (typeof value === 'object' && value !== null) {
-      // Nested object - convert to definition pairs
-      const pairs = Object.entries(value).map(([k, v]) => {
+      // Nested object - create recursive definition structure
+      const bulletItems = Object.entries(value).map(([k, v]) => {
         const label = k.replace(/_/g, ' ');
+        
         if (typeof v === 'string') {
-          return `${label}: ${v}`;
+          return { text: `${label}: ${v}` };
         } else if (Array.isArray(v)) {
-          return `${label}: ${v.join(', ')}`;
+          const childElements = renderArray(v);
+          return { 
+            text: label,
+            children: childElements 
+          };
+        } else if (typeof v === 'object' && v !== null) {
+          const childElements = renderObject(v);
+          return { 
+            text: label,
+            children: childElements 
+          };
         } else {
-          return `${label}: ${JSON.stringify(v)}`;
+          return { text: `${label}: ${String(v)}` };
         }
       });
-      elements.push({ type: 'bulletList', items: pairs });
+      elements.push({ type: 'bulletList', items: bulletItems });
     } else {
       elements.push({ type: 'paragraph', content: String(value) });
     }
@@ -113,7 +127,8 @@ function parseString(text) {
     else {
       // Flush any current bullets
       if (currentBullets.length > 0) {
-        elements.push({ type: 'bulletList', items: currentBullets });
+        const bulletItems = currentBullets.map(bullet => ({ text: bullet }));
+        elements.push({ type: 'bulletList', items: bulletItems });
         currentBullets = [];
       }
       currentParagraph.push(trimmed);
@@ -125,7 +140,8 @@ function parseString(text) {
   
   function flushContent() {
     if (currentBullets.length > 0) {
-      elements.push({ type: 'bulletList', items: currentBullets });
+      const bulletItems = currentBullets.map(bullet => ({ text: bullet }));
+      elements.push({ type: 'bulletList', items: bulletItems });
       currentBullets = [];
     }
     if (currentParagraph.length > 0) {
@@ -140,33 +156,44 @@ function parseString(text) {
 function ContentRenderer({ content }) {
   const elements = parseContent(content);
   
+  const renderElement = (element, index) => {
+    if (element.type === 'subheading') {
+      return (
+        <h4 key={index} className="text-lg font-semibold text-gray-900 mt-6 mb-3 border-b border-gray-100 pb-1">
+          {element.content}
+        </h4>
+      );
+    }
+    
+    if (element.type === 'bulletList') {
+      return (
+        <ul key={index} className="list-disc list-inside space-y-2 ml-4 text-gray-700">
+          {element.items.map((item, itemIndex) => (
+            <li key={itemIndex} className="leading-relaxed">
+              {item.text}
+              {item.children && item.children.length > 0 && (
+                <div className="ml-4 mt-2">
+                  {item.children.map((child, childIndex) => 
+                    renderElement(child, `${itemIndex}-${childIndex}`)
+                  )}
+                </div>
+              )}
+            </li>
+          ))}
+        </ul>
+      );
+    }
+    
+    return (
+      <p key={index} className="text-gray-700 leading-relaxed">
+        {element.content}
+      </p>
+    );
+  };
+  
   return (
     <div className="space-y-4">
-      {elements.map((element, index) => {
-        if (element.type === 'subheading') {
-          return (
-            <h4 key={index} className="text-lg font-semibold text-gray-900 mt-6 mb-3 border-b border-gray-100 pb-1">
-              {element.content}
-            </h4>
-          );
-        }
-        
-        if (element.type === 'bulletList') {
-          return (
-            <ul key={index} className="list-disc list-inside space-y-2 ml-4 text-gray-700">
-              {element.items.map((item, itemIndex) => (
-                <li key={itemIndex} className="leading-relaxed">{item}</li>
-              ))}
-            </ul>
-          );
-        }
-        
-        return (
-          <p key={index} className="text-gray-700 leading-relaxed">
-            {element.content}
-          </p>
-        );
-      })}
+      {elements.map((element, index) => renderElement(element, index))}
     </div>
   );
 }
