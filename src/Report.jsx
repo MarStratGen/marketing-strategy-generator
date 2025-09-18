@@ -1018,7 +1018,7 @@ function StreamingDisplay({ content }) {
 
       <div className="mt-8 text-center">
         <p className="text-white/80 text-sm">
-          Once complete, your strategy will be formatted and ready for download
+          Once complete, your strategy will be formatted and ready to view
         </p>
       </div>
     </div>

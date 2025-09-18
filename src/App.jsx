@@ -754,8 +754,8 @@ export default function App() {
                 the OpenAI API to draft a marketing strategy and plan. The draft
                 is mapped to classic frameworks like STP and the 7 Ps, with
                 budgets shown as percentages and a 90-day calendar, KPIs, and
-                experiments. You get the result on screen with options to
-                download or print.
+                experiments. You get the result on screen and can print using
+                your browser.
               </p>
             </div>
 
