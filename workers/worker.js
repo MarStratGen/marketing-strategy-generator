@@ -261,7 +261,7 @@ export default {
           body: JSON.stringify({
             model: MODEL,
             temperature: 0.25,
-            max_tokens: 1450,
+            max_tokens: 2000,
             response_format: { type: "json_object" },
             messages: [
               {
@@ -280,7 +280,7 @@ Respond with valid JSON only. Return EXACTLY these fields in this order with PLA
   "personas": "Three detailed customer personas with MANDATORY \\n\\n separation between each persona AND between major points within each persona. Each persona: name, age range, background, lifestyle, pain points, motivations, buying behaviour for ${form.product_type} customers.",
   "strategy_pillars": "Three core strategic pillars with MANDATORY \\n\\n breaks between each pillar and within each pillar explanation. ${isLaunch ? "Focus on launch strategies including market entry, awareness building, and initial customer acquisition" : "Focus on growth strategies including market expansion, customer retention, and competitive positioning"} for ${form.product_type} business.",
   "seven_ps": "Complete marketing mix analysis with MANDATORY \\n\\n breaks between each P (Product, Price, Place, Promotion, People, Process, Physical Evidence) and within longer explanations. Each P gets its own paragraph section.",
-  "channel_playbook": "Detailed channel strategy with MANDATORY \\n\\n breaks between digital and traditional channels, and between major platform/tactic discussions. Cover channels relevant to ${form.product_type} in ${form.country}.",
+  "channel_playbook": "COMPREHENSIVE detailed channel strategy with MANDATORY \\n\\n breaks between digital and traditional channels, and between major platform/tactic discussions. This is the MOST IMPORTANT section - provide extensive detail on specific platforms, tactics, execution guidance, and channel-specific strategies for ${form.product_type} in ${form.country}. Minimum 400-500 words.",
   "budget": "Budget allocation with MANDATORY \\n\\n breaks between investment categories and financial sections. Include investment priorities and cost considerations for ${form.product_type} marketing.",
   "calendar_next_90_days": "${isLaunch ? "Launch-focused 90-day timeline with MANDATORY \\n\\n breaks between phases (pre-launch, launch week, post-launch optimisation)" : "Growth-focused 90-day plan with MANDATORY \\n\\n breaks between months and major initiative sections"} with clear paragraph separation and occasional bullets for key milestones only.",
   "kpis": "Comprehensive KPI framework with MANDATORY \\n\\n breaks between measurement categories, between indicator types, and between analytics sections. Cover measurement methods, specific performance indicators with realistic targets, and analytics setup.",
@@ -292,7 +292,7 @@ Generate comprehensive, business-specific content for ${form.product_type} in ${
 
 CRITICAL: Ensure the "personas" field contains detailed customer profiles with names, ages, backgrounds, and specific behaviours. Do not leave personas empty. Create 3 distinct personas for ${audienceText} customers in the ${form.country} market.
 
-CRITICAL: Each field must be a PLAIN TEXT STRING with MANDATORY \\n\\n paragraph breaks every 2-3 sentences. Never return objects, arrays, or undefined values. Write comprehensive flowing content with proper paragraph structure - no long text blocks without breaks. MANDATORY: Use British English exclusively (colour, analyse, realise, centre, behaviour, neighbouring, practise, recognised, specialised, optimised, utilise, programme, whilst, amongst).
+CRITICAL: Allocate the MOST detail and tokens to "channel_playbook" - this should be your longest, most comprehensive section with 400-500 words. Other sections should be concise but complete. Each field must be a PLAIN TEXT STRING with MANDATORY \\n\\n paragraph breaks every 2-3 sentences. Never return objects, arrays, or undefined values. Write comprehensive flowing content with proper paragraph structure - no long text blocks without breaks. MANDATORY: Use British English exclusively (colour, analyse, realise, centre, behaviour, neighbouring, practise, recognised, specialised, optimised, utilise, programme, whilst, amongst).
 
 No markdown formatting.`,
               },
