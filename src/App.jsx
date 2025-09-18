@@ -601,7 +601,7 @@ export default function App() {
               </div>
             )}
 
-            <form onSubmit={handleSubmit} className="space-y-3">
+            <form onSubmit={handleSubmit} className="space-y-6">
               {/* country */}
               <Field
                 label="Which country are you targeting?"
