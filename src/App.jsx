@@ -147,8 +147,8 @@ const BUDGET_BANDS = [
 ];
 
 const BUSINESS_STAGES = [
-  { label: "New business or product launch", value: "launch" },
-  { label: "Established business seeking growth", value: "growth" },
+  { label: "New/Launch", value: "launch" },
+  { label: "Established/Growth", value: "growth" },
 ];
 
 /* ──────────────────────────────────────────────────────────
