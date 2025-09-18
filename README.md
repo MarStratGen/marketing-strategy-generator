@@ -4,7 +4,7 @@ AI-powered marketing strategy generator that creates comprehensive marketing pla
 
 ## Features
 
-- **🎯 Comprehensive Strategies**: Complete marketing plans including STP analysis, 7 Ps, budgets, and KPIs
+- **🎯 Comprehensive Strategies**: Complete marketing plans including market analysis, customer personas, 7 Ps, budgets, and KPIs
 - **⚡ Fast Generation**: Professional strategies in ~20 seconds
 - **🔒 Enterprise Security**: Bot protection, rate limiting, and input validation
 - **🇬🇧 British English**: All content optimized for UK markets
