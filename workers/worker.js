@@ -80,140 +80,7 @@ export default {
       );
     }
 
-    // Rate limiting using KV storage - FAIL CLOSED
-    if (!env.RATE_LIMIT_KV) {
-      console.error("Rate limiting KV not available - BLOCKING REQUEST");
-      return new Response(
-        JSON.stringify({
-          error: "service_temporarily_unavailable",
-          message: "Service temporarily unavailable. Please try again later.",
-        }),
-        cors(503, origin),
-      );
-    }
-
-    try {
-      const now = Date.now();
-      const minuteWindow = Math.floor(now / 60000); // 1-minute windows
-      const hourWindow = Math.floor(now / 3600000); // 1-hour windows
-      const dayWindow = Math.floor(now / 86400000); // 1-day windows
-
-      // Rate limit keys
-      const minuteKey = `rate:${clientIP}:${minuteWindow}`;
-      const hourKey = `rate:${clientIP}:hour:${hourWindow}`;
-      const dayKey = `rate:${clientIP}:day:${dayWindow}`;
-
-      // Check and increment counters atomically
-      const [minuteCount, hourCount, dayCount] = await Promise.all([
-        env.RATE_LIMIT_KV.get(minuteKey),
-        env.RATE_LIMIT_KV.get(hourKey),
-        env.RATE_LIMIT_KV.get(dayKey),
-      ]);
-
-      const currentMinute = parseInt(minuteCount || "0");
-      const currentHour = parseInt(hourCount || "0");
-      const currentDay = parseInt(dayCount || "0");
-
-      // Rate limits: 10/minute, 100/hour, 500/day
-      if (currentMinute >= 10) {
-        return new Response(
-          JSON.stringify({
-            error: "rate_limit_exceeded",
-            message: "Too many requests. Please wait a moment.",
-            retry_after: 60 - (Math.floor(now / 1000) % 60),
-          }),
-          cors(429, origin),
-        );
-      }
-
-      if (currentHour >= 100) {
-        return new Response(
-          JSON.stringify({
-            error: "hourly_limit_exceeded",
-            message: "Hourly request limit exceeded. Please try again later.",
-            retry_after: 3600 - (Math.floor(now / 1000) % 3600),
-          }),
-          cors(429, origin),
-        );
-      }
-
-      if (currentDay >= 500) {
-        return new Response(
-          JSON.stringify({
-            error: "daily_limit_exceeded",
-            message: "Daily request limit exceeded. Please try again tomorrow.",
-            retry_after: 86400 - (Math.floor(now / 1000) % 86400),
-          }),
-          cors(429, origin),
-        );
-      }
-
-      // Bot detection heuristics
-      const suspiciousPatterns = [
-        !userAgent || userAgent.length < 10,
-        /bot|crawl|spider|scrape|curl|wget|python|node/i.test(userAgent),
-        !/mozilla|chrome|safari|firefox|edge/i.test(userAgent),
-        req.headers.get("Accept") === "*/*",
-        !req.headers.get("Accept-Language"),
-        !req.headers.get("Accept-Encoding"),
-      ];
-
-      const suspiciousScore = suspiciousPatterns.filter(Boolean).length;
-
-      // Stricter limits for suspicious requests (score >= 3)
-      if (suspiciousScore >= 3) {
-        const suspiciousKey = `suspicious:${clientIP}:${minuteWindow}`;
-        const suspiciousCount = parseInt(
-          (await env.RATE_LIMIT_KV.get(suspiciousKey)) || "0",
-        );
-
-        if (suspiciousCount >= 2) {
-          console.log(
-            `Blocked suspicious request from ${clientIP}: score ${suspiciousScore}, UA: ${userAgent ? userAgent.substring(0, 100) : "none"}`,
-          );
-          return new Response(
-            JSON.stringify({
-              error: "suspicious_activity_detected",
-              message:
-                "Suspicious activity detected. Please use a web browser to access this service.",
-            }),
-            cors(429, origin),
-          );
-        }
-
-        // Increment suspicious counter
-        await env.RATE_LIMIT_KV.put(
-          suspiciousKey,
-          (suspiciousCount + 1).toString(),
-          { expirationTtl: 120 },
-        );
-        console.log(
-          `Suspicious request from ${clientIP}: score ${suspiciousScore}, count: ${suspiciousCount + 1}`,
-        );
-      }
-
-      // Increment all counters
-      await Promise.all([
-        env.RATE_LIMIT_KV.put(minuteKey, (currentMinute + 1).toString(), {
-          expirationTtl: 120,
-        }),
-        env.RATE_LIMIT_KV.put(hourKey, (currentHour + 1).toString(), {
-          expirationTtl: 7200,
-        }),
-        env.RATE_LIMIT_KV.put(dayKey, (currentDay + 1).toString(), {
-          expirationTtl: 172800,
-        }),
-      ]);
-    } catch (rateLimitError) {
-      console.error("Rate limiting failed - BLOCKING REQUEST:", rateLimitError);
-      return new Response(
-        JSON.stringify({
-          error: "rate_limit_service_error",
-          message: "Rate limiting service error. Please try again later.",
-        }),
-        cors(503, origin),
-      );
-    }
+    // Rate limiting temporarily disabled - will be added back with KV namespace
 
     /* 5. Input validation */
     let form;
@@ -234,7 +101,7 @@ export default {
     }
 
     /* 6. Enhanced input validation and security */
-    // Validate required fields
+    // Validate required fields (match frontend field names)
     if (!form.country || !form.product_type || !form.audiences) {
       return new Response(
         JSON.stringify({ error: "missing_required_fields" }),
@@ -283,7 +150,7 @@ export default {
       );
     }
 
-    // Validate audiences array and enforce 3-item limit
+    // Validate audiences array and enforce limit
     if (!Array.isArray(form.audiences) || form.audiences.length === 0) {
       return new Response(
         JSON.stringify({ error: "audiences_must_be_non_empty_array" }),
