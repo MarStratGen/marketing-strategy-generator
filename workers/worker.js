@@ -175,9 +175,65 @@ No markdown formatting.`
       }
       
       // Validate required structure
-      if (!aiGenerated?.market_foundation || !aiGenerated?.kpis || !aiGenerated?.risks_and_safety_nets || !aiGenerated?.personas) {
+      if (!aiGenerated?.market_foundation || !aiGenerated?.kpis || !aiGenerated?.risks_and_safety_nets) {
         console.error('AI response missing required sections:', Object.keys(aiGenerated || {}));
         throw new Error('Incomplete AI response structure');
+      }
+
+      // Validate and repair personas if missing or too short
+      if (!aiGenerated?.personas || (typeof aiGenerated.personas === 'string' && aiGenerated.personas.length < 150)) {
+        console.log('🔧 PERSONAS REPAIR: Personas missing or too short, triggering fallback generation');
+        
+        try {
+          const personasPrompt = `Generate exactly 3 detailed customer personas for ${form.product_type} targeting ${audienceText} in ${form.country}. 
+
+Format as bullet points with these details for each persona:
+• Name (realistic first name)
+• Age range and demographics  
+• Background and lifestyle
+• Pain points and challenges
+• Buying behaviour and motivations
+• How they would discover ${form.product_type}
+
+Be specific and realistic. No generic descriptions.`;
+
+          const personasResponse = await fetch('https://api.openai.com/v1/chat/completions', {
+            method: 'POST',
+            headers: {
+              'Authorization': `Bearer ${env.OPENAI_API_KEY}`,
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+              model: 'gpt-4o',
+              messages: [
+                {
+                  role: 'user',
+                  content: personasPrompt
+                }
+              ],
+              temperature: 0.7,
+              max_tokens: 800
+            })
+          });
+
+          if (personasResponse.ok) {
+            const personasData = await personasResponse.json();
+            const generatedPersonas = personasData.choices[0]?.message?.content?.trim();
+            if (generatedPersonas && generatedPersonas.length > 100) {
+              aiGenerated.personas = generatedPersonas;
+              console.log('✅ PERSONAS REPAIR: Successfully generated fallback personas');
+            } else {
+              console.error('❌ PERSONAS REPAIR: Fallback generation returned insufficient content');
+              throw new Error('Failed to generate adequate personas content');
+            }
+          } else {
+            console.error('❌ PERSONAS REPAIR: Fallback API call failed');
+            throw new Error('Personas generation fallback failed');
+          }
+        } catch (error) {
+          console.error('❌ PERSONAS REPAIR: Exception during fallback:', error.message);
+          throw new Error('Critical personas generation failure');
+        }
       }
       
       // Validate competitor coverage for single competitor
