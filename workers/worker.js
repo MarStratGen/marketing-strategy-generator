@@ -4,23 +4,33 @@
 const MODEL = "gpt-4o";
 
 // Sanitization function to remove markdown and normalize formatting
-function sanitizeContent(obj) {
+function sanitizeContent(obj, fieldName = "") {
   if (typeof obj === "string") {
-    return obj
+    let result = obj
       .replace(/\*\*(.*?)\*\*/g, "$1") // Remove **bold**
       .replace(/\*(.*?)\*/g, "$1") // Remove *italic*
       .replace(/__(.*?)__/g, "$1") // Remove __underline__
       .replace(/#{1,6}\s/g, "") // Remove # headings
-      .replace(/[-*]\s/g, "• ") // Normalize bullets to •
       .replace(/\\n\\n/g, "\n\n") // Convert literal \n\n to actual paragraph breaks
-      .replace(/\n{4,}/g, "\n\n\n") // Preserve spacing but limit excessive breaks
-      .trim();
+      .replace(/\n{4,}/g, "\n\n\n"); // Preserve spacing but limit excessive breaks
+    
+    // For calendar section, strip ALL bullet/list markers completely (no conversion to •)
+    if (fieldName === "calendar_next_90_days") {
+      result = result
+        .replace(/^[\s]*[•\-\*\u2022\u2023\u25E6\u2043\u2219\u2013\u2014]\s+/gm, "") // Remove bullet markers
+        .replace(/^[\s]*\d+[\.)\:]\s+/gm, "") // Remove numbered lists (1. 1) 1:)
+        .replace(/^[\s]*[a-zA-Z][\.)\:]\s+/gm, ""); // Remove lettered lists (a. b) c:)
+    } else {
+      result = result.replace(/[-*]\s/g, "• "); // Normalize bullets to • for other sections
+    }
+    
+    return result.trim();
   } else if (Array.isArray(obj)) {
-    return obj.map((item) => sanitizeContent(item));
+    return obj.map((item) => sanitizeContent(item, fieldName));
   } else if (obj && typeof obj === "object") {
     const sanitized = {};
     for (const [key, value] of Object.entries(obj)) {
-      sanitized[key] = sanitizeContent(value);
+      sanitized[key] = sanitizeContent(value, key);
     }
     return sanitized;
   }
@@ -268,7 +278,7 @@ export default {
               {
                 role: "system",
                 content:
-                  "Marketing strategist. British English only (colour, favour, centre, analyse, realise, organise, utilise, behaviour). Plain text only, no markdown. Use \\n\\n between paragraphs for readability. Write concise, specific, relevant content.",
+                  "Marketing strategist. British English only (colour, favour, centre, analyse, realise, organise, utilise, behaviour). Plain text only, no markdown. Follow field-specific formatting rules in the prompt. Write concise, specific, relevant content.",
               },
               {
                 role: "user",
@@ -293,7 +303,7 @@ Generate comprehensive, business-specific content for ${form.product_type} in ${
 
 CRITICAL: Ensure the "personas" field contains detailed customer profiles with names, ages, backgrounds, and specific behaviours. Do not leave personas empty. Create 3 distinct personas for ${audienceText} customers in the ${form.country} market.
 
-CRITICAL: Allocate the MOST detail and tokens to "channel_playbook" - this should be your longest, most comprehensive section with 400-500 words. Other sections should be concise but complete. Each field must be a PLAIN TEXT STRING with MANDATORY \\n\\n paragraph breaks every 2-3 sentences. Never return objects, arrays, or undefined values. Write comprehensive flowing content with proper paragraph structure - no long text blocks without breaks. MANDATORY: Use British English exclusively (colour, analyse, realise, centre, behaviour, neighbouring, practise, recognised, specialised, optimised, utilise, programme, whilst, amongst).
+CRITICAL: Allocate the MOST detail and tokens to "channel_playbook" - this should be your longest, most comprehensive section with 400-500 words. Other sections should be concise but complete. Each field must be a PLAIN TEXT STRING. Use \\n\\n paragraph breaks every 2-3 sentences for MOST fields, BUT follow field-specific rules: personas must be cohesive blocks with no internal breaks, calendar must be paragraph format with no bullets/spacing within month blocks. Never return objects, arrays, or undefined values. MANDATORY: Use British English exclusively (colour, analyse, realise, centre, behaviour, neighbouring, practise, recognised, specialised, optimised, utilise, programme, whilst, amongst).
 
 No markdown formatting.`,
               },
@@ -396,6 +406,15 @@ No markdown formatting.`,
 
       // Sanitize content to remove markdown and normalize formatting
       aiGenerated = sanitizeContent(aiGenerated);
+      
+      // Post-process personas to enforce proper block structure
+      if (aiGenerated.personas && typeof aiGenerated.personas === 'string') {
+        const personaBlocks = aiGenerated.personas.split('\n\n').filter(block => block.trim());
+        const cleanedBlocks = personaBlocks.map(block => 
+          block.replace(/\n/g, ' ').trim() // Replace internal newlines with spaces
+        ).slice(0, 3); // Ensure max 3 personas
+        aiGenerated.personas = cleanedBlocks.join('\n\n'); // Rejoin with exactly one \n\n
+      }
 
       // Generate channel playbook with QUALITY content (not templated)
       const channelByMotion = {
