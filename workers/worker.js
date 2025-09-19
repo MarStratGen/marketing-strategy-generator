@@ -288,7 +288,7 @@ Return valid JSON with these fields as PLAIN TEXT STRINGS:
 
 {
   "market_foundation": "Market overview, customer behaviour, opportunities${competitorText ? ", competitor analysis" : ""}.",
-  "personas": "Three detailed customer personas (name, age, background, lifestyle, pain points, motivations, buying behaviour). Separate personas with \\n\\n only.",
+  "personas": "Three detailed customer personas (name, age, background, lifestyle, pain points, motivations, buying behaviour). No location details - focus on characteristics. Separate personas with \\n\\n only.",
   "strategy_pillars": "Three ${isLaunch ? "launch" : "growth"} strategic pillars with \\n\\n between each.",
   "seven_ps": "Marketing mix: Product, Price, Place, Promotion, People, Process, Physical Evidence. Use \\n\\n between each P.",
   "channel_playbook": "Channel strategy with category headers on separate lines (e.g., 'Digital Channels:', 'Traditional Channels:'). Most detailed section - 400+ words.",
