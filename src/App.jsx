@@ -319,11 +319,6 @@ export default function App() {
       // Small delay to ensure any pending blur events complete first
       await new Promise((resolve) => setTimeout(resolve, 10));
 
-      // Flush any pending input to pills before validation (synchronously)
-      flushSync(() => {
-        flushPendingInput(segInp, setSeg, setSegInp, 3);
-      });
-
       // Basic validation
       const finalCountry =
         country === "__custom_country" ? customCountry : country;
@@ -345,11 +340,12 @@ export default function App() {
         return;
       }
 
-      // Get the most current segments, including any flushed input
+      // Get segments for form submission
       const currentSegments = [...segments];
+      
+      // Add any text from the input field
       if (segInp.trim()) {
-        const result = processTokenizedInput(segInp.trim(), segments, 3);
-        currentSegments.push(...result.tokensAdded);
+        currentSegments.push(segInp.trim());
       }
 
       if (!currentSegments || currentSegments.length === 0) {
