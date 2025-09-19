@@ -375,6 +375,40 @@ export default function App() {
       console.log("📋 Full form data:", body);
       console.log("🌐 Making request to URL:", WORKER_URL);
 
+      // Development mode - use mock data when API is not working
+      if (import.meta.env.DEV) {
+        console.log("🔧 DEV MODE: Using mock response (API unavailable)");
+        
+        // Simulate API delay
+        await new Promise(resolve => setTimeout(resolve, 1500));
+        
+        const mockResult = {
+          meta: {
+            title: "Marketing Strategy Report",
+            country: body.country,
+            sector: body.sector,
+            goal: "Growth"
+          },
+          market_foundation: `Market analysis for ${body.product_type} in ${body.country}. The market shows strong growth potential with increasing digital adoption and changing consumer preferences.`,
+          personas: "Primary: Small business owners aged 30-50 seeking growth solutions. Goals: Increase efficiency and revenue. Pain points: Limited resources and time constraints.",
+          strategy_pillars: "1. Digital Marketing Excellence\\n2. Customer Experience Optimization\\n3. Data-Driven Growth",
+          seven_ps: "Product: Premium positioning\\nPrice: Competitive value-based pricing\\nPlace: Omnichannel distribution",
+          channel_playbook: "Google Ads: High-intent keywords targeting ready-to-buy customers\\nFacebook Ads: Lookalike audiences with social proof",
+          budget: "Advertising: 40%\\nContent: 30%\\nTools: 20%\\nStaff: 10%",
+          calendar_next_90_days: "Month 1: Setup campaigns\\nMonth 2: Optimize performance\\nMonth 3: Scale successful channels",
+          kpis: "Website traffic: +25%\\nLead generation: +40%\\nConversion rate: +15%",
+          differentiators: "1. Industry expertise\\n2. Personal service\\n3. Proven results",
+          risks_and_safety_nets: "Risk: Market saturation. Mitigation: Niche targeting and unique positioning."
+        };
+        
+        flushSync(() => {
+          setResult(mockResult);
+          setLoading(false);
+        });
+        
+        return;
+      }
+
       // Create fetch with timeout helper
       const fetchWithTimeout = async (url, options, timeout = 90000) => {
         const controller = new AbortController();
