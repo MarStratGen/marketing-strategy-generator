@@ -282,30 +282,24 @@ export default {
               },
               {
                 role: "user",
-                content: `Generate marketing strategy for ${isLaunch ? "launching" : "growing an established"} ${form.product_type} business in ${form.country} ${form.sector ? `(${form.sector} sector)` : ""}. Target: ${audienceText}.${competitorText ? ` Main competitor to analyze: ${competitorText}` : " No specific competitor provided - focus on general market positioning."}
+                content: `Generate marketing strategy for ${isLaunch ? "launching" : "growing an established"} ${form.product_type} business in ${form.country} ${form.sector ? `(${form.sector} sector)` : ""}. Target: ${audienceText}.${competitorText ? ` Main competitor: ${competitorText}` : ""}
 
-Respond with valid JSON only. Return EXACTLY these fields in this order with PLAIN TEXT STRINGS only (no objects, no arrays):
+Return valid JSON with these fields as PLAIN TEXT STRINGS:
 
 {
-  "market_foundation": "Market overview, customer behaviour, opportunities${competitorText ? ", analysis of " + competitorText : ""}. Use \\n\\n for paragraphs.",
-  "personas": "Three detailed customer personas with MANDATORY \\n\\n separation between each complete persona. Each persona should be a cohesive block with no internal line breaks: name, age range, background, lifestyle, pain points, motivations, buying behaviour for ${form.product_type} customers.",
-  "strategy_pillars": "Three core strategic pillars with MANDATORY \\n\\n breaks between each pillar and within each pillar explanation. ${isLaunch ? "Focus on launch strategies including market entry, awareness building, and initial customer acquisition" : "Focus on growth strategies including market expansion, customer retention, and competitive positioning"} for ${form.product_type} business.",
-  "seven_ps": "Complete marketing mix analysis with MANDATORY \\n\\n breaks between each P (Product, Price, Place, Promotion, People, Process, Physical Evidence) and within longer explanations. Each P gets its own paragraph section.",
-  "channel_playbook": "COMPREHENSIVE detailed channel strategy with major channel categories on separate lines followed by \\n\\n (e.g., 'Digital Channels:', 'Traditional Channels:', etc.), then detailed content with MANDATORY \\n\\n breaks between major platform/tactic discussions. This is the MOST IMPORTANT section - provide extensive detail on specific platforms, tactics, execution guidance, and channel-specific strategies for ${form.product_type} in ${form.country}. Minimum 400-500 words.",
-  "budget": "Budget allocation with MANDATORY \\n\\n breaks between investment categories and financial sections. Include investment priorities and cost considerations for ${form.product_type} marketing.",
-  "calendar_next_90_days": "${isLaunch ? "Launch-focused 90-day timeline with MANDATORY \\n\\n breaks between phases (pre-launch, launch week, post-launch optimisation)" : "Growth-focused 90-day plan with MANDATORY \\n\\n breaks between months"} in paragraph format. NO bullet points - write as flowing paragraphs with key milestones on the next line within the same month block (no internal spacing).",
-  "kpis": "Comprehensive KPI framework with MANDATORY \\n\\n breaks between measurement categories, between indicator types, and between analytics sections. Cover measurement methods, specific performance indicators with realistic targets, and analytics setup.",
-  "differentiators": "Core differentiation strategy with MANDATORY \\n\\n breaks between value proposition elements, positioning points, and competitive advantages. Include differentiation strategy, value proposition, and positioning statement.",
-  "risks_and_safety_nets": "Risk analysis with MANDATORY \\n\\n breaks between primary risks, between mitigation strategies, and between contingency plan sections. Cover risks, mitigation strategies, and contingency plans."
+  "market_foundation": "Market overview, customer behaviour, opportunities${competitorText ? ", competitor analysis" : ""}.",
+  "personas": "Three detailed customer personas (name, age, background, lifestyle, pain points, motivations, buying behaviour). Separate personas with \\n\\n only.",
+  "strategy_pillars": "Three ${isLaunch ? "launch" : "growth"} strategic pillars with \\n\\n between each.",
+  "seven_ps": "Marketing mix: Product, Price, Place, Promotion, People, Process, Physical Evidence. Use \\n\\n between each P.",
+  "channel_playbook": "Channel strategy with category headers on separate lines (e.g., 'Digital Channels:', 'Traditional Channels:'). Most detailed section - 400+ words.",
+  "budget": "Budget allocation and investment priorities.",
+  "calendar_next_90_days": "${isLaunch ? "Launch timeline by phases" : "Growth plan by months"}. Paragraph format only, no bullets.",
+  "kpis": "KPI framework with measurement methods and targets.",
+  "differentiators": "Differentiation strategy and value proposition.",
+  "risks_and_safety_nets": "Risk analysis with mitigation strategies."
 }
 
-Generate comprehensive, business-specific content for ${form.product_type} in ${form.country}. 
-
-CRITICAL: Ensure the "personas" field contains detailed customer profiles with names, ages, backgrounds, and specific behaviours. Do not leave personas empty. Create 3 distinct personas for ${audienceText} customers in the ${form.country} market.
-
-CRITICAL: Allocate the MOST detail and tokens to "channel_playbook" - this should be your longest, most comprehensive section with 400-500 words. Other sections should be concise but complete. Each field must be a PLAIN TEXT STRING. Use \\n\\n paragraph breaks every 2-3 sentences for MOST fields, BUT follow field-specific rules: personas must be cohesive blocks with no internal breaks, calendar must be paragraph format with no bullets/spacing within month blocks. Never return objects, arrays, or undefined values. MANDATORY: Use British English exclusively (colour, analyse, realise, centre, behaviour, neighbouring, practise, recognised, specialised, optimised, utilise, programme, whilst, amongst).
-
-No markdown formatting.`,
+Use \\n\\n for paragraph breaks. British English only (colour, analyse, behaviour, etc.). No markdown.`,
               },
             ],
           }),
