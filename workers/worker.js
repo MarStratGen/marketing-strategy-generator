@@ -12,7 +12,8 @@ function sanitizeContent(obj) {
       .replace(/__(.*?)__/g, "$1") // Remove __underline__
       .replace(/#{1,6}\s/g, "") // Remove # headings
       .replace(/[-*]\s/g, "• ") // Normalize bullets to •
-      .replace(/\n{3,}/g, "\n\n") // Collapse multiple newlines
+      .replace(/\\n\\n/g, "\n\n") // Convert literal \n\n to actual paragraph breaks
+      .replace(/\n{4,}/g, "\n\n\n") // Preserve spacing but limit excessive breaks
       .trim();
   } else if (Array.isArray(obj)) {
     return obj.map((item) => sanitizeContent(item));
@@ -261,7 +262,7 @@ export default {
           body: JSON.stringify({
             model: MODEL,
             temperature: 0.25,
-            max_tokens: 2000,
+            max_tokens: 3500,
             response_format: { type: "json_object" },
             messages: [
               {
