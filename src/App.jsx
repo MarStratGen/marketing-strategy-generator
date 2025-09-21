@@ -932,6 +932,15 @@ export default function App() {
 
             <div>
               <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                Why use this instead of just asking ChatGPT?
+              </h3>
+              <p className="text-gray-700 leading-relaxed">
+                You can definitely ask ChatGPT to create a marketing plan, but it often takes multiple prompts, at least a bit of marketing knowledge, and some editing to get something useful. The Marketing Strategy Generator simplifies that process by guiding you through a short form and delivering a clear, structured strategy. It includes all the essential parts like STP, 7Ps, budget allocation, and KPIs, without needing you to figure out how to ask for them. It's a faster, more reliable way to get a complete plan without starting from scratch.
+              </p>
+            </div>
+
+            <div>
+              <h3 className="text-lg font-semibold text-gray-900 mb-2">
                 Is my business information kept private?
               </h3>
               <p className="text-gray-700 leading-relaxed">
@@ -941,15 +950,6 @@ export default function App() {
                 that provider for security or operations. This site uses Google Analytics
                 to track usage patterns and improve the service. Please do not submit
                 sensitive or personal information.
-              </p>
-            </div>
-
-            <div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                Why use this instead of just asking ChatGPT?
-              </h3>
-              <p className="text-gray-700 leading-relaxed">
-                You can definitely ask ChatGPT to create a marketing plan, but it often takes multiple prompts, at least a bit of marketing knowledge, and some editing to get something useful. The Marketing Strategy Generator simplifies that process by guiding you through a short form and delivering a clear, structured strategy. It includes all the essential parts like STP, 7Ps, budget allocation, and KPIs, without needing you to figure out how to ask for them. It's a faster, more reliable way to get a complete plan without starting from scratch.
               </p>
             </div>
           </div>
