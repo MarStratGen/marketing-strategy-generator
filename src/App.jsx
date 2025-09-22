@@ -584,7 +584,7 @@ export default function App() {
               Marketing Strategy Generator
             </h1>
             <p className="text-xl text-white/90 max-w-3xl mx-auto leading-relaxed">
-              Create a marketing strategy with AI-powered insights*
+              Create a draft marketing strategy in minutes by entering a few key details and get a structured plan with STP, 7Ps, budget ideas, and KPIs.
             </p>
           </div>
 
