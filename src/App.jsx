@@ -952,15 +952,6 @@ export default function App() {
                 sensitive or personal information.
               </p>
             </div>
-
-            <div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                What this tool assumes
-              </h3>
-              <p className="text-gray-700 leading-relaxed">
-                This generator creates a structured draft using general marketing principles. It assumes your offer is already validated, your audience is clearly defined, and your budget level reflects real available spend. If you're early-stage or unsure about your positioning, treat the output as a prompt for deeper thinking and not a final strategy.
-              </p>
-            </div>
           </div>
         </div>
       </div>
