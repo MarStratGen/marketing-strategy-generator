@@ -977,8 +977,8 @@ export default function App() {
           </div>
 
           {/* Disclaimer */}
-          <div className="text-center border-t border-gray-700/50 pt-8">
-            <p className="text-xs text-gray-500 leading-relaxed max-w-3xl mx-auto">
+          <div className="border-t border-gray-700/50 pt-8">
+            <p className="text-xs text-gray-500 leading-relaxed max-w-3xl mx-auto text-justify">
               This generator creates a structured marketing strategy draft using general marketing principles. It assumes your offer is already validated, your audience is clearly defined, and your budget reflects actual available spend. If you're early-stage or unsure about your positioning, treat the output as a prompt for deeper thinking rather than a final strategy. The strategies generated are for guidance and educational use only. They are based on standard marketing frameworks, not specific market research or live performance data. While they follow proven methodologies, you should always validate assumptions, run your own tests, and adapt recommendations to suit your specific goals, audience, and operating environment. Consider seeking professional input for large budget decisions or complex business cases. This tool cannot account for tracking gaps, regulatory factors, seasonal dynamics, or unique channel constraints.
             </p>
           </div>
