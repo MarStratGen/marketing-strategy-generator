@@ -98,8 +98,8 @@ export default function Report({ plan, loading }) {
     <div className="w-full max-w-4xl mx-auto px-4">
       {/* Header */}
       <header className="text-center mb-12">
-        <h1 className="text-4xl font-bold text-white mb-4">Your Marketing Strategy</h1>
-        <p className="text-white/80 text-lg">Comprehensive plan tailored for your business</p>
+        <h1 className="text-4xl font-bold text-white mb-4">Your Draft Marketing Strategy</h1>
+        <p className="text-white/80 text-lg">A structured outline based on your inputs and general marketing principles</p>
       </header>
 
       {/* Main Report Document */}
