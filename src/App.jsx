@@ -897,7 +897,7 @@ export default function App() {
               </h3>
               <p className="text-gray-700 leading-relaxed">
                 This page turns your inputs into a clear brief and sends it to
-                the OpenAI API to draft a comprehensive marketing strategy. The strategy
+                the OpenAI API to draft a structured, high-level marketing strategy. The strategy
                 includes classic frameworks like the 7 Ps of marketing, detailed customer
                 personas, channel recommendations, budget allocation guidance, a 90-day
                 action plan, and KPI frameworks. You get the complete strategy on screen.
